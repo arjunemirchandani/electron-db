@@ -26,6 +26,8 @@ export class MigrationError extends Error {
 }
 
 function migrationsFolder(): string {
+  // Test hook: lets automated runs stage extra migrations in a temp folder.
+  if (process.env.ELECTRONDB_MIGRATIONS_DIR) return process.env.ELECTRONDB_MIGRATIONS_DIR
   // Packaged builds ship the drizzle folder via extraResources (electron-builder.yml);
   // in dev it lives at the project root.
   return app.isPackaged ? join(process.resourcesPath, 'drizzle') : join(app.getAppPath(), 'drizzle')

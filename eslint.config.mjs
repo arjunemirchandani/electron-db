@@ -28,5 +28,14 @@ export default defineConfig(
       ...eslintPluginReactRefresh.configs.vite.rules
     }
   },
+  {
+    // Playwright fixtures use empty destructuring and a `use` callback that
+    // the React hooks rules misread as a hook.
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'no-empty-pattern': 'off'
+    }
+  },
   eslintConfigPrettier
 )
