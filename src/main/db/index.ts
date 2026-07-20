@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { existsSync, readdirSync, readFileSync, unlinkSync } from 'fs'
+import { copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import Database from 'better-sqlite3'
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
@@ -14,6 +14,16 @@ const BACKUPS_TO_KEEP = 3
 
 let sqlite: Database.Database | null = null
 let db: DB | null = null
+
+export class MigrationError extends Error {
+  readonly backupPath: string | null
+
+  constructor(cause: unknown, backupPath: string | null) {
+    super(cause instanceof Error ? cause.message : String(cause))
+    this.name = 'MigrationError'
+    this.backupPath = backupPath
+  }
+}
 
 function migrationsFolder(): string {
   // Packaged builds ship the drizzle folder via extraResources (electron-builder.yml);
@@ -70,15 +80,22 @@ export async function initDatabase(): Promise<DB> {
   db = drizzle(sqlite, { schema })
 
   const folder = migrationsFolder()
+  let backupPath: string | null = null
   if (existedBefore) {
     const pending = countPendingMigrations(sqlite, folder)
     if (pending > 0) {
-      const backupPath = await backupDatabase(sqlite, userDataDir)
+      backupPath = await backupDatabase(sqlite, userDataDir)
       console.log(`[db] ${pending} pending migration(s), backed up to ${backupPath}`)
       pruneOldBackups(userDataDir)
     }
   }
-  migrate(db, { migrationsFolder: folder })
+  try {
+    migrate(db, { migrationsFolder: folder })
+  } catch (error) {
+    console.error('[db] migration failed:', error)
+    closeDatabase()
+    throw new MigrationError(error, backupPath)
+  }
 
   console.log(`[db] initialized at ${dbPath}`)
   return db
@@ -87,6 +104,18 @@ export async function initDatabase(): Promise<DB> {
 export function getDb(): DB {
   if (!db) throw new Error('Database not initialized — call initDatabase() first')
   return db
+}
+
+export function restoreFromBackup(backupPath: string): void {
+  if (sqlite) throw new Error('Close the database before restoring a backup')
+  const dbPath = join(app.getPath('userData'), DB_FILENAME)
+  copyFileSync(backupPath, dbPath)
+  // Stale WAL/SHM files from the failed database would corrupt the
+  // restored copy on next open.
+  for (const suffix of ['-wal', '-shm']) {
+    if (existsSync(dbPath + suffix)) unlinkSync(dbPath + suffix)
+  }
+  console.log(`[db] restored database from ${backupPath}`)
 }
 
 export function closeDatabase(): void {

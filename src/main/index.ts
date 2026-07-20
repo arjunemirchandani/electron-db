@@ -1,8 +1,8 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initDatabase, closeDatabase } from './db'
+import { initDatabase, closeDatabase, restoreFromBackup, MigrationError } from './db'
 import { registerIpcHandlers } from './ipc'
 
 // Test hook: lets automated runs point the app at a throwaway data
@@ -43,6 +43,34 @@ function createWindow(): void {
   }
 }
 
+function handleMigrationFailure(error: MigrationError): void {
+  const canRestore = error.backupPath !== null
+  const buttons = canRestore ? ['Restore Backup & Quit', 'Quit'] : ['Quit']
+
+  // Test hook: automated runs pick a button via env instead of the dialog.
+  const forced = process.env.ELECTRONDB_MIGRATION_CHOICE
+  const choice = forced
+    ? forced === 'restore' && canRestore
+      ? 0
+      : buttons.length - 1
+    : dialog.showMessageBoxSync({
+        type: 'error',
+        title: 'Database upgrade failed',
+        message: 'ElectronDB could not upgrade its database to this version.',
+        detail: canRestore
+          ? `${error.message}\n\nYour data was backed up before the upgrade attempt. Restoring will return it to its previous state:\n${error.backupPath}`
+          : error.message,
+        buttons,
+        defaultId: 0,
+        cancelId: buttons.length - 1
+      })
+
+  if (canRestore && choice === 0) {
+    restoreFromBackup(error.backupPath!)
+  }
+  app.quit()
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -57,7 +85,15 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  await initDatabase()
+  try {
+    await initDatabase()
+  } catch (error) {
+    if (error instanceof MigrationError) {
+      handleMigrationFailure(error)
+      return
+    }
+    throw error
+  }
   registerIpcHandlers()
 
   createWindow()
