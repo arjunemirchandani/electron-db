@@ -5,6 +5,12 @@ import icon from '../../resources/icon.png?asset'
 import { initDatabase, closeDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
 
+// Test hook: lets automated runs point the app at a throwaway data
+// directory instead of the real user profile.
+if (process.env.ELECTRONDB_USER_DATA) {
+  app.setPath('userData', process.env.ELECTRONDB_USER_DATA)
+}
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -40,7 +46,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -51,7 +57,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  initDatabase()
+  await initDatabase()
   registerIpcHandlers()
 
   createWindow()
