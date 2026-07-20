@@ -108,6 +108,15 @@ export function getDb(): DB {
   return db
 }
 
+export async function createBackup(): Promise<string> {
+  if (!sqlite) throw new Error('Database not initialized — call initDatabase() first')
+  const userDataDir = app.getPath('userData')
+  const backupPath = await backupDatabase(sqlite, userDataDir)
+  pruneOldBackups(userDataDir)
+  console.log(`[db] manual backup created at ${backupPath}`)
+  return backupPath
+}
+
 export function restoreFromBackup(backupPath: string): void {
   if (sqlite) throw new Error('Close the database before restoring a backup')
   const dbPath = join(app.getPath('userData'), DB_FILENAME)

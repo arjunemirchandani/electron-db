@@ -6,6 +6,8 @@ function Notes(): React.JSX.Element {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [backupStatus, setBackupStatus] = useState<string | null>(null)
+  const [backingUp, setBackingUp] = useState(false)
 
   const refresh = async (): Promise<void> => {
     setNotes(await window.api.listNotes())
@@ -44,6 +46,20 @@ function Notes(): React.JSX.Element {
     await refresh()
   }
 
+  const backupNow = async (): Promise<void> => {
+    setBackingUp(true)
+    setBackupStatus(null)
+    try {
+      const path = await window.api.backupNow()
+      const filename = path.split(/[\\/]/).pop()
+      setBackupStatus(`Backed up to ${filename}`)
+    } catch (err) {
+      setBackupStatus(`Backup failed: ${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setBackingUp(false)
+    }
+  }
+
   return (
     <div className="notes">
       <h2>Notes</h2>
@@ -76,6 +92,12 @@ function Notes(): React.JSX.Element {
           </li>
         ))}
       </ul>
+      <div className="notes-backup">
+        <button onClick={backupNow} disabled={backingUp}>
+          {backingUp ? 'Backing up…' : 'Back Up Database'}
+        </button>
+        {backupStatus && <span className="backup-status">{backupStatus}</span>}
+      </div>
     </div>
   )
 }

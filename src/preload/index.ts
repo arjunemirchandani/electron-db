@@ -6,7 +6,8 @@ import type { DbApi, NewNoteInput } from '../shared/types'
 const api: DbApi = {
   listNotes: () => ipcRenderer.invoke('notes:list'),
   createNote: (input: NewNoteInput) => ipcRenderer.invoke('notes:create', input),
-  deleteNote: (id: number) => ipcRenderer.invoke('notes:delete', id)
+  deleteNote: (id: number) => ipcRenderer.invoke('notes:delete', id),
+  backupNow: () => ipcRenderer.invoke('db:backup')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

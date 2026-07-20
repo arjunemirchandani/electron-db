@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import { desc, eq } from 'drizzle-orm'
-import { getDb } from './db'
+import { createBackup, getDb } from './db'
 import { notes } from './db/schema'
 import type { NewNoteInput, Note } from '../shared/types'
 
@@ -23,5 +23,9 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('notes:delete', (_event, id: number): void => {
     if (!Number.isInteger(id)) throw new Error('Invalid note id')
     getDb().delete(notes).where(eq(notes.id, id)).run()
+  })
+
+  ipcMain.handle('db:backup', (): Promise<string> => {
+    return createBackup()
   })
 }

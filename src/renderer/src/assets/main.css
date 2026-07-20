@@ -238,6 +238,28 @@ code {
   color: var(--ev-c-text-2);
 }
 
+.notes-backup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ev-button-alt-border);
+}
+
+.notes-backup button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.backup-status {
+  font-size: 12px;
+  color: var(--ev-c-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 720px) {
   .text {
     font-size: 20px;

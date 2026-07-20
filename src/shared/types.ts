@@ -18,4 +18,6 @@ export interface DbApi {
   listNotes: () => Promise<Note[]>
   createNote: (input: NewNoteInput) => Promise<Note>
   deleteNote: (id: number) => Promise<void>
+  /** Snapshot the database now; resolves to the backup file's path. */
+  backupNow: () => Promise<string>
 }
