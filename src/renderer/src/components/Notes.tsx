@@ -12,7 +12,18 @@ function Notes(): React.JSX.Element {
   }
 
   useEffect(() => {
-    refresh().catch((e) => setError(String(e)))
+    let cancelled = false
+    window.api
+      .listNotes()
+      .then((rows) => {
+        if (!cancelled) setNotes(rows)
+      })
+      .catch((e) => {
+        if (!cancelled) setError(String(e))
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const addNote = async (e: React.FormEvent): Promise<void> => {
