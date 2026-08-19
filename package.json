@@ -4,7 +4,7 @@
   "description": "Cross-platform Electron desktop app with an embedded SQLite database (better-sqlite3 + Drizzle ORM)",
   "main": "./out/main/index.js",
   "author": "Arjune Mirchandani",
-  "homepage": "https://github.com/arjunemirchandani/ElectronDB",
+  "homepage": "https://github.com/arjunemirchandani/electron-db",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
