@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initDatabase, closeDatabase, restoreFromBackup, MigrationError } from './db'
 import { registerIpcHandlers } from './ipc'
+import { initUpdater } from './updater'
 
 // Test hook: lets automated runs point the app at a throwaway data
 // directory instead of the real user profile.
@@ -97,6 +98,8 @@ app.whenReady().then(async () => {
   registerIpcHandlers()
 
   createWindow()
+
+  initUpdater()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
