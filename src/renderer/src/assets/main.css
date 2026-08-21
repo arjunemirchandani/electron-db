@@ -2,11 +2,12 @@
 
 body {
   display: flex;
-  align-items: center;
   justify-content: center;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
   background-image: url('./wavy-lines.svg');
   background-size: cover;
+  background-attachment: fixed;
   user-select: none;
 }
 
@@ -29,9 +30,11 @@ code {
 #root {
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
-  margin-bottom: 80px;
+  /* margin auto centers vertically when content is shorter than the
+     window, and collapses to 0 (instead of clipping) when it's taller */
+  margin: auto;
+  padding: 32px 0 24px;
 }
 
 .logo {
@@ -125,9 +128,7 @@ code {
 }
 
 .versions {
-  position: absolute;
-  bottom: 30px;
-  margin: 0 auto;
+  margin-top: 28px;
   padding: 15px 0;
   font-family: 'Menlo', 'Lucida Console', monospace;
   display: inline-flex;
