@@ -8,7 +8,9 @@
 
 Most Electron + SQLite examples stop at "open a database and run a query." The hard part of shipping a desktop app with local data is everything that happens *after* v1.0: schema changes arriving via app updates, migrations failing on a user's machine you can't see, and data you must never lose. This repo is a working foundation for that whole lifecycle — schema migrations that run themselves, automatic backups before every upgrade, a restore path when things go wrong, and an end-to-end test suite that proves all of it by driving the real app on macOS, Windows, and Linux in CI.
 
-<!-- screenshot placeholder: docs/screenshot.png -->
+<p align="center">
+  <img src="docs/screenshot.png" alt="ElectronDB — notes stored in SQLite, with one-click database backup" width="720">
+</p>
 
 ## What's inside
 
