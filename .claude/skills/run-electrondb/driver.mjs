@@ -60,6 +60,17 @@ const COMMANDS = {
     console.log('screenshot:', file)
   },
 
+  // resize <width> <height> — resize the app window (launch default is 900x670)
+  async resize(rest) {
+    if (!app) return console.log('ERROR: launch first')
+    const [w, h] = rest.split(/\s+/).map(Number)
+    if (!w || !h) return console.log('usage: resize <width> <height>')
+    await app.evaluate(({ BrowserWindow }, size) => {
+      BrowserWindow.getAllWindows()[0].setContentSize(size.w, size.h)
+    }, { w, h })
+    console.log(`resized to ${w}x${h}`)
+  },
+
   // App-specific helpers -------------------------------------------------
 
   // add-note <title> [:: <content>]

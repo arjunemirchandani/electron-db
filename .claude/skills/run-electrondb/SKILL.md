@@ -50,6 +50,7 @@ Screenshots land in `$TMPDIR/electrondb-shots/` (override: `SCREENSHOT_DIR`). Al
 | `add-note <title> [:: <content>]` | create a note through the real form |
 | `notes` | print the rendered notes list |
 | `delete-note <text>` | delete first note whose row contains text |
+| `resize <w> <h>` | resize the app window (launch default 900x670) |
 | `ss [name]` | screenshot → shots dir |
 | `click <css-sel>` / `click-text <text>` | click via DOM |
 | `type <text>` / `press <key>` | keyboard input |
