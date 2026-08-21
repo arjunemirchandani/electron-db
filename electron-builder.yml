@@ -23,13 +23,15 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
+  # Unsigned by design: this is a foundation template, not a published app.
+  # Downstream apps add their own signing identity + notarization here.
+  identity: null
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
   target:
     - AppImage
-    - snap
     - deb
   maintainer: 54421444+arjunemirchandani@users.noreply.github.com
   category: Utility
@@ -37,5 +39,7 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: arjunemirchandani
+  repo: electron-db
+  releaseType: release
