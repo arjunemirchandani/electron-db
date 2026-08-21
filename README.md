@@ -18,7 +18,7 @@ Most Electron + SQLite examples stop at "open a database and run a query." The h
 - 🗄️ **SQLite via [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)** — fast, synchronous, in-process; native module rebuild handled automatically
 - 🧭 **[Drizzle ORM](https://orm.drizzle.team/)** — typed schema, typed queries, and generated SQL migrations
 - 🔁 **Self-upgrading database** — pending migrations are detected and applied on launch; new installs and version upgrades need zero user action
-- 🛟 **Backups you didn't have to remember** — a WAL-safe snapshot is taken automatically before any migration runs (plus a manual *Back Up Database* button), pruned to the 3 most recent
+- 🛟 **Backups you didn't have to remember** — a WAL-safe snapshot is taken automatically before any migration runs (plus a manual *Back Up Database* button), pruned to the 3 most recent; an in-app **Backups** panel lists them and restores any one with a click (taking a safety snapshot first, so a restore is itself reversible)
 - 🚨 **Graceful failure** — if a migration fails, users get a native *Restore Backup & Quit* dialog instead of a broken white screen
 - 🔒 **Typed IPC contract** — the renderer never touches the database; it calls a `window.api` bridge whose types are shared between main and renderer, so drift is a compile error
 - ✅ **Playwright e2e suite** — tests launch the built app, click the actual UI, and assert on real files and real SQLite databases; green on a three-OS CI matrix
