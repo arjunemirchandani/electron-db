@@ -7,6 +7,9 @@ const api: DbApi = {
   listNotes: () => ipcRenderer.invoke('notes:list'),
   createNote: (input: NewNoteInput) => ipcRenderer.invoke('notes:create', input),
   deleteNote: (id: number) => ipcRenderer.invoke('notes:delete', id),
+  listTags: () => ipcRenderer.invoke('tags:list'),
+  addTag: (noteId: number, name: string) => ipcRenderer.invoke('tags:add', noteId, name),
+  removeTag: (noteId: number, tagId: number) => ipcRenderer.invoke('tags:remove', noteId, tagId),
   backupNow: () => ipcRenderer.invoke('db:backup')
 }
 
