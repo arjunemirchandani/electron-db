@@ -133,6 +133,14 @@ Pushing a version tag (`git tag v1.1.0 && git push origin v1.1.0`) builds instal
 - **Windows & Linux (AppImage)** — full auto-update via electron-updater: downloaded in the background, applied on a "Restart Now" prompt. After an update, any new schema migrations run on next launch — with the automatic backup taken first.
 - **macOS** — this template ships **unsigned by design** (a foundation repo shouldn't carry a publisher's signing identity), and macOS refuses to auto-update unsigned apps. Instead the app checks GitHub for a newer release and offers the download page. A downstream app that adds its own certificate can delete that branch in [`src/main/updater.ts`](src/main/updater.ts) and use electron-updater everywhere.
 
+> **Downloading the macOS build?** Because the app is unsigned and un-notarized, Gatekeeper quarantines internet downloads and shows a misleading *"electrondb.app is damaged and can't be opened"* dialog. The app is fine — clear the quarantine attribute and it launches normally:
+>
+> ```bash
+> xattr -cr /Applications/electrondb.app
+> ```
+>
+> Or skip the issue entirely by building from source (`npm run build:mac`) — locally built apps are never quarantined. Signed downstream apps don't have this friction.
+
 ## License
 
 [MIT](LICENSE) © Arjune Mirchandani
