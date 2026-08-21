@@ -121,7 +121,7 @@ e2e/                # Playwright suite + fixtures
 ```bash
 npm run build:mac     # .dmg
 npm run build:win     # NSIS installer
-npm run build:linux   # AppImage, snap, deb
+npm run build:linux   # AppImage, deb
 ```
 
 electron-builder handles code paths for the packaged app (the `drizzle/` folder ships via `extraResources`; the native module is unpacked automatically).
