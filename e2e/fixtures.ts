@@ -89,7 +89,7 @@ export const test = base.extend<Fixtures>({
       journal.entries.push({
         idx: journal.entries.length,
         version: '6',
-        when: journal.entries[0].when + 1,
+        when: journal.entries[journal.entries.length - 1].when + 1,
         tag,
         breakpoints: true
       })

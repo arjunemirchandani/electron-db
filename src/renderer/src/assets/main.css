@@ -238,6 +238,68 @@ code {
   color: var(--ev-c-text-2);
 }
 
+.tag-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tag-filter-label {
+  font-size: 12px;
+  color: var(--ev-c-text-2);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--ev-button-alt-border);
+  color: var(--ev-c-text-1);
+  background-color: var(--ev-button-alt-bg);
+  cursor: pointer;
+}
+
+.tag-chip:hover {
+  border-color: var(--ev-button-alt-hover-border);
+}
+
+.tag-chip-active {
+  background-color: #6988e6;
+  border-color: #6988e6;
+  color: #fff;
+}
+
+.tag-chip-static {
+  cursor: default;
+  margin-left: 6px;
+}
+
+.note-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-remove {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  line-height: 1;
+  color: var(--ev-c-text-2);
+  cursor: pointer;
+}
+
+.tag-remove:hover {
+  color: #e66;
+}
+
 .notes-backup {
   display: flex;
   align-items: center;
