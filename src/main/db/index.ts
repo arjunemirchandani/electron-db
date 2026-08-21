@@ -1,16 +1,19 @@
 import { app } from 'electron'
-import { copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from 'fs'
+import { copyFileSync, existsSync, readdirSync, readFileSync, statSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import Database from 'better-sqlite3'
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import * as schema from './schema'
+import type { BackupInfo } from '../../shared/types'
 
 export type DB = BetterSQLite3Database<typeof schema>
 
 const DB_FILENAME = 'electrondb.sqlite3'
 const BACKUP_PREFIX = 'electrondb.backup-'
 const BACKUPS_TO_KEEP = 3
+// electrondb.backup-<ISO stamp with : and . replaced by ->-v<version>.sqlite3
+const BACKUP_RE = /^electrondb\.backup-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)-v([^/\\]+)\.sqlite3$/
 
 let sqlite: Database.Database | null = null
 let db: DB | null = null
@@ -115,6 +118,55 @@ export async function createBackup(): Promise<string> {
   pruneOldBackups(userDataDir)
   console.log(`[db] manual backup created at ${backupPath}`)
   return backupPath
+}
+
+export function listBackups(): BackupInfo[] {
+  const userDataDir = app.getPath('userData')
+  return readdirSync(userDataDir)
+    .filter((f) => BACKUP_RE.test(f))
+    .sort()
+    .reverse()
+    .map((filename) => {
+      const [, stamp, appVersion] = BACKUP_RE.exec(filename)!
+      const createdAt = stamp.replace(
+        /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z$/,
+        '$1T$2:$3:$4.$5Z'
+      )
+      return {
+        filename,
+        createdAt,
+        appVersion,
+        sizeBytes: statSync(join(userDataDir, filename)).size
+      }
+    })
+}
+
+// Only bare filenames matching our own naming scheme are accepted — this is
+// called with renderer-supplied input, so no paths, no traversal.
+function resolveBackup(filename: string): string {
+  if (!BACKUP_RE.test(filename)) throw new Error('Invalid backup filename')
+  const path = join(app.getPath('userData'), filename)
+  if (!existsSync(path)) throw new Error('Backup not found')
+  return path
+}
+
+export async function restoreBackup(filename: string): Promise<void> {
+  const source = resolveBackup(filename)
+  const userDataDir = app.getPath('userData')
+  // Safety net: snapshot the live database first so the restore itself is
+  // reversible from the same backups list.
+  if (sqlite) await backupDatabase(sqlite, userDataDir)
+  closeDatabase()
+  restoreFromBackup(source)
+  pruneOldBackups(userDataDir)
+  // Reopen through the normal path: an older-schema backup gets migrated
+  // (with its own pre-migration backup) exactly like an app upgrade.
+  await initDatabase()
+}
+
+export function deleteBackup(filename: string): void {
+  unlinkSync(resolveBackup(filename))
+  console.log(`[db] deleted backup ${filename}`)
 }
 
 export function restoreFromBackup(backupPath: string): void {

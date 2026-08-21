@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron'
 import { and, desc, eq, inArray, notInArray } from 'drizzle-orm'
-import { createBackup, getDb } from './db'
+import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
 import { notes, noteTags, tags } from './db/schema'
-import type { NewNoteInput, Note, Tag } from '../shared/types'
+import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
 
 function tagsByNote(): Map<number, Tag[]> {
   const rows = getDb()
@@ -94,5 +94,17 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('db:backup', (): Promise<string> => {
     return createBackup()
+  })
+
+  ipcMain.handle('backups:list', (): BackupInfo[] => listBackups())
+
+  ipcMain.handle('backups:restore', (_event, filename: string): Promise<void> => {
+    if (typeof filename !== 'string') throw new Error('Invalid backup filename')
+    return restoreBackup(filename)
+  })
+
+  ipcMain.handle('backups:delete', (_event, filename: string): void => {
+    if (typeof filename !== 'string') throw new Error('Invalid backup filename')
+    deleteBackup(filename)
   })
 }

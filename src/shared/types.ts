@@ -22,6 +22,15 @@ export interface NewNoteInput {
   tags?: string[]
 }
 
+export interface BackupInfo {
+  filename: string
+  /** ISO-8601 timestamp parsed from the filename. */
+  createdAt: string
+  /** App version that wrote the backup. */
+  appVersion: string
+  sizeBytes: number
+}
+
 export interface DbApi {
   listNotes: () => Promise<Note[]>
   createNote: (input: NewNoteInput) => Promise<Note>
@@ -34,4 +43,9 @@ export interface DbApi {
   removeTag: (noteId: number, tagId: number) => Promise<void>
   /** Snapshot the database now; resolves to the backup file's path. */
   backupNow: () => Promise<string>
+  /** Backups on disk, newest first. */
+  listBackups: () => Promise<BackupInfo[]>
+  /** Replace the live database with a backup (a safety snapshot is taken first). */
+  restoreBackup: (filename: string) => Promise<void>
+  deleteBackup: (filename: string) => Promise<void>
 }

@@ -10,7 +10,10 @@ const api: DbApi = {
   listTags: () => ipcRenderer.invoke('tags:list'),
   addTag: (noteId: number, name: string) => ipcRenderer.invoke('tags:add', noteId, name),
   removeTag: (noteId: number, tagId: number) => ipcRenderer.invoke('tags:remove', noteId, tagId),
-  backupNow: () => ipcRenderer.invoke('db:backup')
+  backupNow: () => ipcRenderer.invoke('db:backup'),
+  listBackups: () => ipcRenderer.invoke('backups:list'),
+  restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),
+  deleteBackup: (filename: string) => ipcRenderer.invoke('backups:delete', filename)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
