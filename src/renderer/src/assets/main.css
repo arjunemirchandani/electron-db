@@ -1,8 +1,6 @@
 @import './base.css';
 
 body {
-  display: flex;
-  justify-content: center;
   min-height: 100vh;
   overflow-x: hidden;
   background-image: url('./wavy-lines.svg');
@@ -29,22 +27,18 @@ code {
 
 #root {
   display: flex;
-  align-items: center;
   flex-direction: column;
-  /* margin auto centers vertically when content is shorter than the
-     window, and collapses to 0 (instead of clipping) when it's taller */
-  margin: auto;
-  padding: 32px 0 24px;
+  align-items: stretch;
+  gap: 16px;
+  min-height: 100vh;
+  padding: 18px 24px 22px;
 }
 
 .app-header {
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 8px 20px;
-  margin-bottom: 20px;
-  width: min(560px, 90vw);
 }
 
 .app-header-text {
@@ -159,11 +153,17 @@ code {
 }
 
 .notes {
-  width: min(560px, 90vw);
-  margin-top: 8px;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px;
   border-radius: 12px;
-  background-color: var(--color-background-soft);
+  /* Translucent over the wavy background art; the blur keeps text
+     readable while the pattern bleeds through */
+  background-color: rgba(34, 34, 40, 0.62);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
 }
 
 .notes h2 {
@@ -192,7 +192,7 @@ code {
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--ev-button-alt-border);
-  background-color: var(--color-background);
+  background-color: rgba(27, 27, 31, 0.65);
   color: var(--ev-c-text-1);
   font-size: 14px;
 }
@@ -222,7 +222,8 @@ code {
 
 .notes-list {
   list-style: none;
-  max-height: 220px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
