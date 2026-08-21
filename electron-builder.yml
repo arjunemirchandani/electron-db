@@ -42,4 +42,6 @@ publish:
   provider: github
   owner: arjunemirchandani
   repo: electron-db
-  releaseType: release
+  # Draft so parallel CI jobs upload into one pre-created release without
+  # racing to create it; the release workflow publishes the draft at the end.
+  releaseType: draft

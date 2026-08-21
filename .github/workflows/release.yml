@@ -8,7 +8,23 @@ permissions:
   contents: write
 
 jobs:
+  # Create the draft release once, so the parallel build jobs never race
+  # to create it (electron-builder reuses an existing draft, but three
+  # simultaneous creates collide with 422 already_exists).
+  create-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create draft release for tag
+        run: |
+          gh release view "$TAG" -R "$REPO" >/dev/null 2>&1 || \
+            gh release create "$TAG" -R "$REPO" --draft --title "$TAG" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+
   build-and-publish:
+    needs: create-draft
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +41,19 @@ jobs:
 
       - run: npm run build
 
-      - name: Build and publish installers
+      - name: Build installers and upload to draft release
         run: npx electron-builder --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish the draft only when every platform uploaded successfully.
+  publish:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        run: gh release edit "$TAG" -R "$REPO" --draft=false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
