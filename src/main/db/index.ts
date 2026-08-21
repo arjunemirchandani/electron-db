@@ -13,7 +13,8 @@ const DB_FILENAME = 'electrondb.sqlite3'
 const BACKUP_PREFIX = 'electrondb.backup-'
 const BACKUPS_TO_KEEP = 3
 // electrondb.backup-<ISO stamp with : and . replaced by ->-v<version>.sqlite3
-const BACKUP_RE = /^electrondb\.backup-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)-v([^/\\]+)\.sqlite3$/
+const BACKUP_RE =
+  /^electrondb\.backup-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)-v([^/\\]+)\.sqlite3$/
 
 let sqlite: Database.Database | null = null
 let db: DB | null = null

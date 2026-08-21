@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { Note, Tag } from '../../../shared/types'
+import type { BackupInfo, Note, Tag } from '../../../shared/types'
 
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
@@ -11,6 +11,10 @@ function Notes(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [backupStatus, setBackupStatus] = useState<string | null>(null)
   const [backingUp, setBackingUp] = useState(false)
+  const [backups, setBackups] = useState<BackupInfo[]>([])
+  const [showBackups, setShowBackups] = useState(false)
+  const [pendingRestore, setPendingRestore] = useState<string | null>(null)
+  const [restoring, setRestoring] = useState(false)
 
   const refresh = useCallback(async (): Promise<void> => {
     const [nextNotes, nextTags] = await Promise.all([window.api.listNotes(), window.api.listTags()])
@@ -23,11 +27,12 @@ function Notes(): React.JSX.Element {
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([window.api.listNotes(), window.api.listTags()])
-      .then(([nextNotes, nextTags]) => {
+    Promise.all([window.api.listNotes(), window.api.listTags(), window.api.listBackups()])
+      .then(([nextNotes, nextTags, nextBackups]) => {
         if (cancelled) return
         setNotes(nextNotes)
         setAllTags(nextTags)
+        setBackups(nextBackups)
       })
       .catch((e) => {
         if (!cancelled) setError(String(e))
@@ -65,6 +70,10 @@ function Notes(): React.JSX.Element {
     await refresh()
   }
 
+  const refreshBackups = useCallback(async (): Promise<void> => {
+    setBackups(await window.api.listBackups())
+  }, [])
+
   const backupNow = async (): Promise<void> => {
     setBackingUp(true)
     setBackupStatus(null)
@@ -72,12 +81,39 @@ function Notes(): React.JSX.Element {
       const path = await window.api.backupNow()
       const filename = path.split(/[\\/]/).pop()
       setBackupStatus(`Backed up to ${filename}`)
+      await refreshBackups()
     } catch (err) {
       setBackupStatus(`Backup failed: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setBackingUp(false)
     }
   }
+
+  const restoreBackup = async (filename: string): Promise<void> => {
+    setRestoring(true)
+    setBackupStatus(null)
+    try {
+      await window.api.restoreBackup(filename)
+      setPendingRestore(null)
+      setFilterTag(null)
+      setBackupStatus(`Restored ${filename}`)
+      await Promise.all([refresh(), refreshBackups()])
+    } catch (err) {
+      setBackupStatus(`Restore failed: ${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setRestoring(false)
+    }
+  }
+
+  const deleteBackup = async (filename: string): Promise<void> => {
+    await window.api.deleteBackup(filename)
+    await refreshBackups()
+  }
+
+  const formatSize = (bytes: number): string =>
+    bytes >= 1024 * 1024
+      ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+      : `${Math.round(bytes / 1024)} KB`
 
   const visibleNotes = filterTag
     ? notes.filter((note) => note.tags.some((t) => t.name === filterTag))
@@ -159,8 +195,46 @@ function Notes(): React.JSX.Element {
         <button onClick={backupNow} disabled={backingUp}>
           {backingUp ? 'Backing up…' : 'Back Up Database'}
         </button>
+        <button className="backups-toggle" onClick={() => setShowBackups((v) => !v)}>
+          {showBackups ? 'Hide Backups' : `Backups (${backups.length})`}
+        </button>
         {backupStatus && <span className="backup-status">{backupStatus}</span>}
       </div>
+      {showBackups && (
+        <ul className="backups-list">
+          {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}
+          {backups.map((backup) => (
+            <li key={backup.filename}>
+              <div className="backup-meta">
+                <strong>{new Date(backup.createdAt).toLocaleString()}</strong>
+                <span className="backup-detail">
+                  v{backup.appVersion} · {formatSize(backup.sizeBytes)}
+                </span>
+              </div>
+              {pendingRestore === backup.filename ? (
+                <div className="backup-actions">
+                  <span className="backup-confirm-text">Replace current data?</span>
+                  <button
+                    className="backup-confirm"
+                    onClick={() => restoreBackup(backup.filename)}
+                    disabled={restoring}
+                  >
+                    {restoring ? 'Restoring…' : 'Confirm'}
+                  </button>
+                  <button onClick={() => setPendingRestore(null)} disabled={restoring}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="backup-actions">
+                  <button onClick={() => setPendingRestore(backup.filename)}>Restore</button>
+                  <button onClick={() => deleteBackup(backup.filename)}>Delete</button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

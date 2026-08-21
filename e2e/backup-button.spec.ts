@@ -5,7 +5,7 @@ test('backup button creates a backup and prunes to the 3 most recent', async ({
   backups
 }) => {
   const { page } = await launch()
-  const button = page.locator('.notes-backup button')
+  const button = page.locator('.notes-backup button', { hasText: 'Back Up Database' })
 
   await button.click()
   await expect(page.locator('.backup-status')).toContainText('Backed up to')

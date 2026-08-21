@@ -327,6 +327,53 @@ code {
   flex-shrink: 0;
 }
 
+.backups-list {
+  list-style: none;
+  margin-top: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  border-top: 1px solid var(--ev-button-alt-border);
+}
+
+.backups-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--ev-c-text-1);
+}
+
+.backup-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.backup-detail {
+  font-size: 12px;
+  color: var(--ev-c-text-2);
+}
+
+.backup-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backup-confirm-text {
+  font-size: 12px;
+  color: #e6b366;
+  margin-right: 4px;
+}
+
+.backup-confirm {
+  background-color: #6988e6 !important;
+  border-color: #6988e6 !important;
+  color: #fff !important;
+}
+
 .backup-status {
   font-size: 12px;
   color: var(--ev-c-text-2);
