@@ -179,12 +179,16 @@ code {
 
 .notes-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 14px;
 }
 
 .notes-form input {
-  flex: 1;
+  /* min-width: 0 lets inputs shrink below placeholder width so the Add
+     button never overflows the panel; the row wraps when truly cramped */
+  flex: 1 1 130px;
+  min-width: 0;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--ev-button-alt-border);
@@ -195,6 +199,7 @@ code {
 
 .notes button {
   cursor: pointer;
+  flex-shrink: 0;
   border: 1px solid var(--ev-button-alt-border);
   border-radius: 8px;
   padding: 6px 14px;
