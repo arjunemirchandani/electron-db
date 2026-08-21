@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.arjunemirchandani.electron-db
 productName: electrondb
 directories:
   buildResources: build
@@ -23,11 +23,6 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
@@ -36,7 +31,7 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: 54421444+arjunemirchandani@users.noreply.github.com
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
