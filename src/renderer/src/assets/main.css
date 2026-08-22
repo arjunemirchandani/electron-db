@@ -162,6 +162,8 @@ code {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  /* Rows adapt to the panel's width (container queries), not the window's */
+  container-type: inline-size;
   padding: 20px 24px;
   border-radius: 12px;
   /* Translucent over the wavy background art; the blur keeps text
@@ -235,6 +237,10 @@ code {
   margin-left: 0;
 }
 
+.note-tags {
+  margin-left: 0;
+}
+
 .tag-suggestions {
   position: absolute;
   top: calc(100% + 4px);
@@ -285,40 +291,116 @@ code {
 
 .notes-list {
   list-style: none;
+  padding: 0;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
 
-.notes-list li {
+.note-row {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
-  padding: 8px 0;
+  gap: 12px;
+  padding: 10px 0;
   border-bottom: 1px solid var(--ev-button-alt-border);
   font-size: 14px;
   color: var(--ev-c-text-1);
 }
 
-.notes-list li:last-child {
+.note-row:last-child {
   border-bottom: none;
 }
 
-.notes-list li > div:first-child {
-  flex: 1 1 200px;
+.note-main {
+  flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-title-line {
+  overflow-wrap: anywhere;
+}
+
+.note-content {
+  color: var(--ev-c-text-2);
+}
+
+.note-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notes .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ev-c-text-2);
+  opacity: 0.7;
+  transition:
+    opacity 120ms,
+    background-color 120ms,
+    color 120ms;
+}
+
+.note-row:hover .icon-button,
+.notes .icon-button:focus-visible {
+  opacity: 1;
+}
+
+.notes .icon-button:hover {
+  color: #f08080;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--ev-button-alt-border);
+}
+
+/* Compact: stack into a card — title, tags, then a footer with date and actions */
+@container (max-width: 520px) {
+  .note-row {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .note-foot {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .notes .icon-button {
+    opacity: 1;
+  }
 }
 
 .notes-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 0;
   color: var(--ev-c-text-2);
+  font-size: 14px;
+}
+
+.notes-empty strong {
+  color: var(--ev-c-text-1);
+  font-weight: 500;
 }
 
 .notes-date {
   font-size: 12px;
   color: var(--ev-c-text-2);
   white-space: nowrap;
+  cursor: default;
 }
 
 .tag-filter {
@@ -494,6 +576,7 @@ code {
 
 .backups-list {
   list-style: none;
+  padding: 0;
   margin-top: 10px;
   max-height: 180px;
   overflow-y: auto;
@@ -551,6 +634,7 @@ code {
 
 .manage-tags-list {
   list-style: none;
+  padding: 0;
 }
 
 .manage-tags-list li {

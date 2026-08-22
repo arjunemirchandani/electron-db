@@ -3,6 +3,8 @@ import type { BackupInfo, Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
 import ManageTags from './ManageTags'
 import { tagStyle } from '../lib/tagColor'
+import { formatFull, formatRelative } from '../lib/time'
+import { TrashIcon } from './icons'
 
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
@@ -217,16 +219,37 @@ function Notes(): React.JSX.Element {
       <ul className="notes-list">
         {visibleNotes.length === 0 && (
           <li className="notes-empty">
-            {filterTags.length > 0
-              ? `No notes match ${filterMode === 'all' ? 'all of' : 'any of'} ${filterTags.join(', ')}.`
-              : 'No notes yet — add one above.'}
+            {filterTags.length > 0 ? (
+              <>
+                <strong>
+                  No notes match {filterMode === 'all' ? 'all of' : 'any of'}{' '}
+                  {filterTags.join(', ')}.
+                </strong>
+                <span>
+                  Try switching to {filterMode === 'all' ? '“any”' : '“all”'} or{' '}
+                  <button className="tag-filter-clear" onClick={() => setFilterTags([])}>
+                    clear the filter
+                  </button>
+                  .
+                </span>
+              </>
+            ) : (
+              <>
+                <strong>No notes yet — add one above.</strong>
+                <span>
+                  Tags help you find notes later; the filter bar appears once you have some.
+                </span>
+              </>
+            )}
           </li>
         )}
         {visibleNotes.map((note) => (
-          <li key={note.id}>
-            <div>
-              <strong>{note.title}</strong>
-              {note.content && <span> — {note.content}</span>}
+          <li key={note.id} className="note-row">
+            <div className="note-main">
+              <div className="note-title-line">
+                <strong>{note.title}</strong>
+                {note.content && <span className="note-content"> — {note.content}</span>}
+              </div>
               <span className="note-tags">
                 {note.tags.map((tag) => (
                   <span
@@ -267,9 +290,20 @@ function Notes(): React.JSX.Element {
                   </button>
                 )}
               </span>
-              <div className="notes-date">{note.createdAt}</div>
             </div>
-            <button onClick={() => removeNote(note.id)}>Delete</button>
+            <div className="note-foot">
+              <time className="notes-date" title={formatFull(note.createdAt)}>
+                {formatRelative(note.createdAt)}
+              </time>
+              <button
+                className="icon-button"
+                aria-label="Delete"
+                title="Delete note"
+                onClick={() => removeNote(note.id)}
+              >
+                <TrashIcon />
+              </button>
+            </div>
           </li>
         ))}
       </ul>

@@ -69,3 +69,24 @@ test('the window refuses to shrink below the 320px design floor', async ({ launc
   // innerWidth: classic scrollbars (Windows/Linux, and CI macOS) would shave clientWidth.
   expect(await page.evaluate(() => window.innerWidth)).toBeGreaterThanOrEqual(320)
 })
+
+test('note rows become stacked cards in a narrow panel, with relative dates', async ({
+  launch
+}) => {
+  const { app, page } = await launch()
+  await page.evaluate(async () => {
+    await window.api.createNote({ title: 'Fresh note', content: 'just written', tags: ['work'] })
+    location.reload()
+  })
+  const row = page.locator('.note-row').first()
+  await expect(row.locator('.notes-date')).toHaveText('just now')
+  await expect(row.locator('.notes-date')).toHaveAttribute('title', /\d{4}|\d{1,2}:\d{2}/)
+
+  await setWidth(app, 900, 700)
+  await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('row')
+  await setWidth(app, 360, 700)
+  await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('column')
+
+  await row.getByRole('button', { name: 'Delete' }).click()
+  await expect(page.locator('.notes-empty')).toContainText('No notes yet')
+})
