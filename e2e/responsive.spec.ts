@@ -50,7 +50,8 @@ test('no horizontal overflow or clipped controls from 320px up', async ({ launch
 
   for (const width of [320, 420, 600, 900]) {
     await setWidth(app, width, 700)
-    await expect.poll(() => page.evaluate(() => document.documentElement.clientWidth)).toBe(width)
+    // innerWidth includes a classic scrollbar (Windows/Linux); clientWidth doesn't.
+    await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(width)
     const report = await layoutReport(page)
     expect(report, `at ${width}px`).toEqual({ overflow: false, clipped: [] })
   }
@@ -59,8 +60,10 @@ test('no horizontal overflow or clipped controls from 320px up', async ({ launch
 test('the window refuses to shrink below the 320px design floor', async ({ launch }) => {
   const { app, page } = await launch()
   await setWidth(app, 200, 300)
-  // min{Width,Height} constrain the outer window; the title bar sits inside it.
-  const size = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getSize())
+  // With useContentSize the floor is measured on the page itself.
+  const size = await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].getContentSize()
+  )
   expect(size[0]).toBeGreaterThanOrEqual(320)
   expect(size[1]).toBeGreaterThanOrEqual(480)
   expect(await page.evaluate(() => document.documentElement.clientWidth)).toBeGreaterThanOrEqual(

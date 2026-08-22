@@ -21,6 +21,10 @@ function createWindow(): void {
     // desktop apps generally stop being usable (VS Code/Slack floor ~400).
     minWidth: 320,
     minHeight: 480,
+    // Size and floor refer to the page, not the outer frame, so the 320px
+    // floor means the same thing on every platform (Windows/Linux frames
+    // would otherwise eat ~15-30px of it).
+    useContentSize: true,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
