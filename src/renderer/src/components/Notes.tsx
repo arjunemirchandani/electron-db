@@ -1,24 +1,15 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BackupInfo, Note, Tag } from '../../../shared/types'
-
-// Deterministic hue per tag name, so "work" is the same color everywhere
-// and across sessions without storing anything.
-function tagHue(name: string): number {
-  let hash = 0
-  for (const ch of name.toLowerCase()) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0
-  return hash % 360
-}
-
-function tagStyle(name: string): React.CSSProperties {
-  return { '--tag-h': tagHue(name) } as React.CSSProperties
-}
+import TagInput, { type TagInputHandle } from './TagInput'
+import { tagStyle } from '../lib/tagColor'
 
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
   const [allTags, setAllTags] = useState<Tag[]>([])
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [tagsInput, setTagsInput] = useState('')
+  const [newTags, setNewTags] = useState<string[]>([])
+  const tagInputRef = useRef<TagInputHandle>(null)
   const [filterTag, setFilterTag] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [backupStatus, setBackupStatus] = useState<string | null>(null)
@@ -58,14 +49,11 @@ function Notes(): React.JSX.Element {
     e.preventDefault()
     setError(null)
     try {
-      const tagNames = tagsInput
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean)
+      const tagNames = tagInputRef.current?.flush() ?? newTags
       await window.api.createNote({ title, content, tags: tagNames })
       setTitle('')
       setContent('')
-      setTagsInput('')
+      setNewTags([])
       await refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
@@ -152,11 +140,13 @@ function Notes(): React.JSX.Element {
           onChange={(e) => setContent(e.target.value)}
           placeholder="Content (optional)"
         />
-        <input
-          className="notes-tags-input"
-          value={tagsInput}
-          onChange={(e) => setTagsInput(e.target.value)}
-          placeholder="Tags (comma separated)"
+        <TagInput
+          ref={tagInputRef}
+          className="notes-form-tags"
+          value={newTags}
+          onChange={setNewTags}
+          suggestions={allTags.map((t) => t.name)}
+          placeholder="Tags"
         />
         <button type="submit">Add</button>
       </form>

@@ -197,6 +197,64 @@ code {
   font-size: 14px;
 }
 
+.tag-input {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 160px;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ev-button-alt-border);
+  background-color: rgba(27, 27, 31, 0.65);
+}
+
+.tag-input:focus-within {
+  border-color: var(--ev-button-alt-hover-border);
+}
+
+.tag-input input.notes-tags-input {
+  flex: 1 1 70px;
+  min-width: 0;
+  padding: 3px 2px;
+  border: none;
+  background: none;
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+  outline: none;
+}
+
+.notes .tag-chip-editable {
+  margin-left: 0;
+}
+
+.tag-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  min-width: 160px;
+  list-style: none;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--ev-button-alt-border);
+  background-color: rgba(27, 27, 31, 0.96);
+  backdrop-filter: blur(12px);
+}
+
+.tag-suggestions li {
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tag-suggestions li:hover,
+.tag-suggestion-active {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .notes button {
   cursor: pointer;
   flex-shrink: 0;
