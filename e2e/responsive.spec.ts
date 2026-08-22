@@ -66,7 +66,6 @@ test('the window refuses to shrink below the 320px design floor', async ({ launc
   )
   expect(size[0]).toBeGreaterThanOrEqual(320)
   expect(size[1]).toBeGreaterThanOrEqual(480)
-  expect(await page.evaluate(() => document.documentElement.clientWidth)).toBeGreaterThanOrEqual(
-    320
-  )
+  // innerWidth: classic scrollbars (Windows/Linux, and CI macOS) would shave clientWidth.
+  expect(await page.evaluate(() => window.innerWidth)).toBeGreaterThanOrEqual(320)
 })
