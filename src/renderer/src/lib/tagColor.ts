@@ -8,6 +8,6 @@ export function tagHue(name: string): number {
   return hash % 360
 }
 
-export function tagStyle(name: string): CSSProperties {
-  return { '--tag-h': tagHue(name) } as CSSProperties
+export function tagStyle(name: string, hue?: number | null): CSSProperties {
+  return { '--tag-h': hue ?? tagHue(name) } as CSSProperties
 }

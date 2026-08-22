@@ -136,6 +136,9 @@ function Notes(): React.JSX.Element {
             : filterTags.some((name) => names.includes(name))
         })
 
+  const hueFor = (name: string): number | null | undefined =>
+    allTags.find((t) => t.name === name)?.hue
+
   const tagCounts = new Map<string, number>()
   for (const note of notes) {
     for (const tag of note.tags) tagCounts.set(tag.name, (tagCounts.get(tag.name) ?? 0) + 1)
@@ -163,6 +166,7 @@ function Notes(): React.JSX.Element {
           value={newTags}
           onChange={setNewTags}
           suggestions={allTags.map((t) => t.name)}
+          hueFor={hueFor}
           placeholder="Tags"
         />
         <button type="submit">Add</button>
@@ -175,7 +179,7 @@ function Notes(): React.JSX.Element {
             <button
               key={tag.id}
               className={`tag-chip ${filterTags.includes(tag.name) ? 'tag-chip-active' : ''}`}
-              style={tagStyle(tag.name)}
+              style={tagStyle(tag.name, tag.hue)}
               onClick={() => toggleFilter(tag.name)}
             >
               {tag.name}
@@ -226,7 +230,7 @@ function Notes(): React.JSX.Element {
                   <span
                     key={tag.id}
                     className="tag-chip tag-chip-static"
-                    style={tagStyle(tag.name)}
+                    style={tagStyle(tag.name, tag.hue)}
                   >
                     {tag.name}
                     <button
@@ -246,6 +250,7 @@ function Notes(): React.JSX.Element {
                     suggestions={allTags
                       .map((t) => t.name)
                       .filter((name) => !note.tags.some((t) => t.name === name))}
+                    hueFor={hueFor}
                     placeholder="Add tag"
                     autoFocus
                     onDismiss={() => setAddingTagFor(null)}

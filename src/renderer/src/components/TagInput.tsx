@@ -16,6 +16,8 @@ interface TagInputProps {
   className?: string
   /** Called on Escape, or on blur when nothing is typed. */
   onDismiss?: () => void
+  /** Stored hue for a tag name, if the user picked one. */
+  hueFor?: (name: string) => number | null | undefined
 }
 
 function parseTags(text: string): string[] {
@@ -26,7 +28,7 @@ function parseTags(text: string): string[] {
 }
 
 const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
-  { value, onChange, suggestions, placeholder, autoFocus, className, onDismiss },
+  { value, onChange, suggestions, placeholder, autoFocus, className, onDismiss, hueFor },
   ref
 ) {
   const [draft, setDraft] = useState('')
@@ -133,7 +135,7 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
                 setOpen(false)
               }}
             >
-              <span className="tag-chip tag-chip-static" style={tagStyle(name)}>
+              <span className="tag-chip tag-chip-static" style={tagStyle(name, hueFor?.(name))}>
                 {name}
               </span>
             </li>

@@ -6,7 +6,7 @@ import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
 
 function tagsByNote(): Map<number, Tag[]> {
   const rows = getDb()
-    .select({ noteId: noteTags.noteId, id: tags.id, name: tags.name })
+    .select({ noteId: noteTags.noteId, id: tags.id, name: tags.name, hue: tags.hue })
     .from(noteTags)
     .innerJoin(tags, eq(noteTags.tagId, tags.id))
     .orderBy(tags.name)
@@ -14,7 +14,7 @@ function tagsByNote(): Map<number, Tag[]> {
   const map = new Map<number, Tag[]>()
   for (const row of rows) {
     const list = map.get(row.noteId) ?? []
-    list.push({ id: row.id, name: row.name })
+    list.push({ id: row.id, name: row.name, hue: row.hue })
     map.set(row.noteId, list)
   }
   return map
@@ -90,6 +90,14 @@ export function registerIpcHandlers(): void {
       .where(and(eq(noteTags.noteId, noteId), eq(noteTags.tagId, tagId)))
       .run()
     pruneOrphanTags()
+  })
+
+  ipcMain.handle('tags:setHue', (_event, tagId: number, hue: number | null): void => {
+    if (!Number.isInteger(tagId)) throw new Error('Invalid tag id')
+    if (hue !== null && (!Number.isInteger(hue) || hue < 0 || hue > 359)) {
+      throw new Error('Hue must be an integer from 0 to 359, or null')
+    }
+    getDb().update(tags).set({ hue }).where(eq(tags.id, tagId)).run()
   })
 
   ipcMain.handle('db:backup', (): Promise<string> => {

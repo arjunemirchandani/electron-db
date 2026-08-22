@@ -12,7 +12,9 @@ export const notes = sqliteTable('notes', {
 
 export const tags = sqliteTable('tags', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull().unique()
+  name: text('name').notNull().unique(),
+  /** User-chosen hue (0-359); null means "derive from the name". */
+  hue: integer('hue')
 })
 
 export const noteTags = sqliteTable(

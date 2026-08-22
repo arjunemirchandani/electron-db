@@ -10,6 +10,7 @@ const api: DbApi = {
   listTags: () => ipcRenderer.invoke('tags:list'),
   addTag: (noteId: number, name: string) => ipcRenderer.invoke('tags:add', noteId, name),
   removeTag: (noteId: number, tagId: number) => ipcRenderer.invoke('tags:remove', noteId, tagId),
+  setTagHue: (tagId: number, hue: number | null) => ipcRenderer.invoke('tags:setHue', tagId, hue),
   backupNow: () => ipcRenderer.invoke('db:backup'),
   listBackups: () => ipcRenderer.invoke('backups:list'),
   restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),

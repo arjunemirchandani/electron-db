@@ -5,6 +5,8 @@
 export interface Tag {
   id: number
   name: string
+  /** User-chosen hue (0-359), or null to derive a color from the name. */
+  hue: number | null
 }
 
 export interface Note {
@@ -41,6 +43,8 @@ export interface DbApi {
   addTag: (noteId: number, name: string) => Promise<void>
   /** Detach a tag from a note; orphaned tags are pruned. */
   removeTag: (noteId: number, tagId: number) => Promise<void>
+  /** Set a tag's display hue (0-359), or null to go back to the derived color. */
+  setTagHue: (tagId: number, hue: number | null) => Promise<void>
   /** Snapshot the database now; resolves to the backup file's path. */
   backupNow: () => Promise<string>
   /** Backups on disk, newest first. */
