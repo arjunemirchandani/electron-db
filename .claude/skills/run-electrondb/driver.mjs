@@ -65,9 +65,12 @@ const COMMANDS = {
     if (!app) return console.log('ERROR: launch first')
     const [w, h] = rest.split(/\s+/).map(Number)
     if (!w || !h) return console.log('usage: resize <width> <height>')
-    await app.evaluate(({ BrowserWindow }, size) => {
-      BrowserWindow.getAllWindows()[0].setContentSize(size.w, size.h)
-    }, { w, h })
+    await app.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()[0].setContentSize(size.w, size.h)
+      },
+      { w, h }
+    )
     console.log(`resized to ${w}x${h}`)
   },
 
