@@ -20,6 +20,7 @@ Most Electron + SQLite examples stop at "open a database and run a query." The h
 - 🔁 **Self-upgrading database** — pending migrations are detected and applied on launch; new installs and version upgrades need zero user action
 - 🛟 **Backups you didn't have to remember** — a WAL-safe snapshot is taken automatically before any migration runs (plus a manual *Back Up Database* button), pruned to the 3 most recent; an in-app **Backups** panel lists them and restores any one with a click (taking a safety snapshot first, so a restore is itself reversible)
 - 🚨 **Graceful failure** — if a migration fails, users get a native *Restore Backup & Quit* dialog instead of a broken white screen
+- 🏷️ **Tags done properly** — a many-to-many `tags`/`note_tags` model (the repo's first shipped migration) with color-coded chips, chip-style input with autocomplete, multi-select all/any filtering, and a Manage Tags panel for colors, rename, merge, and delete
 - 🔒 **Typed IPC contract** — the renderer never touches the database; it calls a `window.api` bridge whose types are shared between main and renderer, so drift is a compile error
 - ✅ **Playwright e2e suite** — tests launch the built app, click the actual UI, and assert on real files and real SQLite databases; green on a three-OS CI matrix
 - 🤖 **AI-agent ready** — a committed [driver skill](.claude/skills/run-electrondb/SKILL.md) lets Claude Code (and similar agents) launch, drive, and screenshot the app safely in a sandboxed profile
