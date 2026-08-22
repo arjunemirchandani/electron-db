@@ -1,6 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { BackupInfo, Note, Tag } from '../../../shared/types'
 
+// Deterministic hue per tag name, so "work" is the same color everywhere
+// and across sessions without storing anything.
+function tagHue(name: string): number {
+  let hash = 0
+  for (const ch of name.toLowerCase()) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0
+  return hash % 360
+}
+
+function tagStyle(name: string): React.CSSProperties {
+  return { '--tag-h': tagHue(name) } as React.CSSProperties
+}
+
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
   const [allTags, setAllTags] = useState<Tag[]>([])
@@ -119,6 +131,11 @@ function Notes(): React.JSX.Element {
     ? notes.filter((note) => note.tags.some((t) => t.name === filterTag))
     : notes
 
+  const tagCounts = new Map<string, number>()
+  for (const note of notes) {
+    for (const tag of note.tags) tagCounts.set(tag.name, (tagCounts.get(tag.name) ?? 0) + 1)
+  }
+
   return (
     <div className="notes">
       <h2>Notes</h2>
@@ -151,11 +168,21 @@ function Notes(): React.JSX.Element {
             <button
               key={tag.id}
               className={`tag-chip ${filterTag === tag.name ? 'tag-chip-active' : ''}`}
+              style={tagStyle(tag.name)}
               onClick={() => setFilterTag(filterTag === tag.name ? null : tag.name)}
             >
               {tag.name}
+              <span className="tag-count">{tagCounts.get(tag.name) ?? 0}</span>
             </button>
           ))}
+          {filterTag && (
+            <span className="tag-filter-state">
+              {visibleNotes.length} of {notes.length}
+              <button className="tag-filter-clear" onClick={() => setFilterTag(null)}>
+                Clear
+              </button>
+            </span>
+          )}
         </div>
       )}
       <ul className="notes-list">
@@ -172,7 +199,11 @@ function Notes(): React.JSX.Element {
               {note.tags.length > 0 && (
                 <span className="note-tags">
                   {note.tags.map((tag) => (
-                    <span key={tag.id} className="tag-chip tag-chip-static">
+                    <span
+                      key={tag.id}
+                      className="tag-chip tag-chip-static"
+                      style={tagStyle(tag.name)}
+                    >
                       {tag.name}
                       <button
                         className="tag-remove"

@@ -264,28 +264,62 @@ code {
   color: var(--ev-c-text-2);
 }
 
-.tag-chip {
+.notes .tag-chip {
+  --tag-h: 220;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 12px;
   line-height: 1;
   padding: 4px 9px;
   border-radius: 999px;
-  border: 1px solid var(--ev-button-alt-border);
-  color: var(--ev-c-text-1);
-  background-color: var(--ev-button-alt-bg);
+  border: 1px solid hsl(var(--tag-h) 60% 55% / 0.45);
+  color: hsl(var(--tag-h) 70% 82%);
+  background-color: hsl(var(--tag-h) 60% 55% / 0.18);
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+.notes .tag-chip:hover {
+  background-color: hsl(var(--tag-h) 60% 55% / 0.3);
+  border-color: hsl(var(--tag-h) 60% 55% / 0.7);
+}
+
+.notes .tag-chip-active,
+.notes .tag-chip-active:hover {
+  background-color: hsl(var(--tag-h) 60% 50%);
+  border-color: hsl(var(--tag-h) 60% 50%);
+  color: #fff;
+}
+
+.tag-count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.tag-filter-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--ev-c-text-2);
+}
+
+.tag-filter-clear {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #8fa8ff !important;
   cursor: pointer;
 }
 
-.tag-chip:hover {
-  border-color: var(--ev-button-alt-hover-border);
-}
-
-.tag-chip-active {
-  background-color: #6988e6;
-  border-color: #6988e6;
-  color: #fff;
+.tag-filter-clear:hover {
+  text-decoration: underline;
 }
 
 .tag-chip-static {
@@ -305,12 +339,20 @@ code {
   padding: 0 !important;
   font-size: 13px !important;
   line-height: 1;
-  color: var(--ev-c-text-2);
+  color: inherit;
   cursor: pointer;
+  /* revealed on hover/focus so rows read as labels, not buttons */
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+.tag-chip-static:hover .tag-remove,
+.tag-chip-static:focus-within .tag-remove {
+  opacity: 0.85;
 }
 
 .tag-remove:hover {
-  color: #e66;
+  color: #fff;
 }
 
 .notes-backup {

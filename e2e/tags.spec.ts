@@ -17,7 +17,7 @@ test('notes can be tagged, filtered, and untagged with orphan pruning', async ({
   const sprintRow = page.locator('.notes-list li', { hasText: 'Plan sprint' })
   await expect(sprintRow.locator('.tag-chip')).toHaveText(['planning×', 'work×'])
   const filterBar = page.locator('.tag-filter')
-  await expect(filterBar.locator('.tag-chip')).toHaveText(['home', 'planning', 'work'])
+  await expect(filterBar.locator('.tag-chip')).toHaveText([/^home/, /^planning/, /^work/])
 
   // Filtering by tag narrows the list; clicking again clears the filter.
   await filterBar.locator('.tag-chip', { hasText: 'home' }).click()
@@ -36,7 +36,7 @@ test('notes can be tagged, filtered, and untagged with orphan pruning', async ({
   const plantsRow = relaunched.page.locator('.notes-list li', { hasText: 'Water plants' })
   await plantsRow.locator('.tag-remove').click()
   await expect(plantsRow.locator('.tag-chip')).toHaveCount(0)
-  await expect(relaunched.page.locator('.tag-filter .tag-chip')).toHaveText(['planning', 'work'])
+  await expect(relaunched.page.locator('.tag-filter .tag-chip')).toHaveText([/^planning/, /^work/])
 
   // Deleting a note prunes its now-orphaned tags too.
   await relaunched.page
