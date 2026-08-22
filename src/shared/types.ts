@@ -45,6 +45,12 @@ export interface DbApi {
   removeTag: (noteId: number, tagId: number) => Promise<void>
   /** Set a tag's display hue (0-359), or null to go back to the derived color. */
   setTagHue: (tagId: number, hue: number | null) => Promise<void>
+  /** Rename a tag everywhere it's used; fails if the name is taken. */
+  renameTag: (tagId: number, name: string) => Promise<void>
+  /** Move every note from one tag to another, then delete the source tag. */
+  mergeTags: (sourceId: number, targetId: number) => Promise<void>
+  /** Delete a tag, detaching it from every note. */
+  deleteTag: (tagId: number) => Promise<void>
   /** Snapshot the database now; resolves to the backup file's path. */
   backupNow: () => Promise<string>
   /** Backups on disk, newest first. */

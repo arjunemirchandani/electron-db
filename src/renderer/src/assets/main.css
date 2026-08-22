@@ -526,6 +526,80 @@ code {
   color: #fff !important;
 }
 
+.manage-tags {
+  margin-top: 10px;
+  border-top: 1px solid var(--ev-button-alt-border);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.manage-tags-list {
+  list-style: none;
+}
+
+.manage-tags-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.manage-tag-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.manage-tag-rename {
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ev-button-alt-hover-border);
+  background-color: rgba(27, 27, 31, 0.65);
+  color: var(--ev-c-text-1);
+  font-size: 12px;
+  width: 140px;
+}
+
+.manage-tag-palette {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.notes .swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: hsl(var(--tag-h) 60% 55%);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--ev-c-text-2);
+}
+
+.notes .swatch-auto {
+  background: none;
+  border-color: var(--ev-c-gray-1);
+}
+
+.notes .swatch-active {
+  border-color: #fff;
+}
+
+.manage-tag-select {
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--ev-button-alt-border);
+  background-color: rgba(27, 27, 31, 0.9);
+  color: var(--ev-c-text-1);
+  font-size: 12px;
+}
+
 .backup-status {
   font-size: 12px;
   color: var(--ev-c-text-2);

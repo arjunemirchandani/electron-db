@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BackupInfo, Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
+import ManageTags from './ManageTags'
 import { tagStyle } from '../lib/tagColor'
 
 function Notes(): React.JSX.Element {
@@ -18,6 +19,7 @@ function Notes(): React.JSX.Element {
   const [backingUp, setBackingUp] = useState(false)
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [showBackups, setShowBackups] = useState(false)
+  const [showManageTags, setShowManageTags] = useState(false)
   const [pendingRestore, setPendingRestore] = useState<string | null>(null)
   const [restoring, setRestoring] = useState(false)
 
@@ -278,8 +280,12 @@ function Notes(): React.JSX.Element {
         <button className="backups-toggle" onClick={() => setShowBackups((v) => !v)}>
           {showBackups ? 'Hide Backups' : `Backups (${backups.length})`}
         </button>
+        <button className="manage-tags-toggle" onClick={() => setShowManageTags((v) => !v)}>
+          {showManageTags ? 'Hide Tags' : `Manage Tags (${allTags.length})`}
+        </button>
         {backupStatus && <span className="backup-status">{backupStatus}</span>}
       </div>
+      {showManageTags && <ManageTags tags={allTags} counts={tagCounts} onChanged={refresh} />}
       {showBackups && (
         <ul className="backups-list">
           {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}

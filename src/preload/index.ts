@@ -11,6 +11,10 @@ const api: DbApi = {
   addTag: (noteId: number, name: string) => ipcRenderer.invoke('tags:add', noteId, name),
   removeTag: (noteId: number, tagId: number) => ipcRenderer.invoke('tags:remove', noteId, tagId),
   setTagHue: (tagId: number, hue: number | null) => ipcRenderer.invoke('tags:setHue', tagId, hue),
+  renameTag: (tagId: number, name: string) => ipcRenderer.invoke('tags:rename', tagId, name),
+  mergeTags: (sourceId: number, targetId: number) =>
+    ipcRenderer.invoke('tags:merge', sourceId, targetId),
+  deleteTag: (tagId: number) => ipcRenderer.invoke('tags:delete', tagId),
   backupNow: () => ipcRenderer.invoke('db:backup'),
   listBackups: () => ipcRenderer.invoke('backups:list'),
   restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),

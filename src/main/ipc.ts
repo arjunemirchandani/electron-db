@@ -100,6 +100,38 @@ export function registerIpcHandlers(): void {
     getDb().update(tags).set({ hue }).where(eq(tags.id, tagId)).run()
   })
 
+  ipcMain.handle('tags:rename', (_event, tagId: number, name: string): void => {
+    if (!Number.isInteger(tagId)) throw new Error('Invalid tag id')
+    const trimmed = typeof name === 'string' ? name.trim() : ''
+    if (!trimmed) throw new Error('Tag name is required')
+    const db = getDb()
+    const clash = db.select().from(tags).where(eq(tags.name, trimmed)).get()
+    if (clash && clash.id !== tagId) {
+      throw new Error(`A tag named "${trimmed}" already exists — merge into it instead`)
+    }
+    db.update(tags).set({ name: trimmed }).where(eq(tags.id, tagId)).run()
+  })
+
+  ipcMain.handle('tags:merge', (_event, sourceId: number, targetId: number): void => {
+    if (!Number.isInteger(sourceId) || !Number.isInteger(targetId)) throw new Error('Invalid ids')
+    if (sourceId === targetId) throw new Error('Choose a different tag to merge into')
+    const db = getDb()
+    const links = db.select().from(noteTags).where(eq(noteTags.tagId, sourceId)).all()
+    for (const link of links) {
+      db.insert(noteTags)
+        .values({ noteId: link.noteId, tagId: targetId })
+        .onConflictDoNothing()
+        .run()
+    }
+    // Cascade removes the source's remaining links.
+    db.delete(tags).where(eq(tags.id, sourceId)).run()
+  })
+
+  ipcMain.handle('tags:delete', (_event, tagId: number): void => {
+    if (!Number.isInteger(tagId)) throw new Error('Invalid tag id')
+    getDb().delete(tags).where(eq(tags.id, tagId)).run()
+  })
+
   ipcMain.handle('db:backup', (): Promise<string> => {
     return createBackup()
   })
