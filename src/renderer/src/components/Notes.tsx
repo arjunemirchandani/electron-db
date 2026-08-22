@@ -10,7 +10,8 @@ function Notes(): React.JSX.Element {
   const [content, setContent] = useState('')
   const [newTags, setNewTags] = useState<string[]>([])
   const tagInputRef = useRef<TagInputHandle>(null)
-  const [filterTag, setFilterTag] = useState<string | null>(null)
+  const [filterTags, setFilterTags] = useState<string[]>([])
+  const [filterMode, setFilterMode] = useState<'all' | 'any'>('all')
   const [addingTagFor, setAddingTagFor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [backupStatus, setBackupStatus] = useState<string | null>(null)
@@ -24,9 +25,7 @@ function Notes(): React.JSX.Element {
     const [nextNotes, nextTags] = await Promise.all([window.api.listNotes(), window.api.listTags()])
     setNotes(nextNotes)
     setAllTags(nextTags)
-    setFilterTag((current) =>
-      current && !nextTags.some((t) => t.name === current) ? null : current
-    )
+    setFilterTags((current) => current.filter((name) => nextTags.some((t) => t.name === name)))
   }, [])
 
   useEffect(() => {
@@ -102,7 +101,7 @@ function Notes(): React.JSX.Element {
     try {
       await window.api.restoreBackup(filename)
       setPendingRestore(null)
-      setFilterTag(null)
+      setFilterTags([])
       setBackupStatus(`Restored ${filename}`)
       await Promise.all([refresh(), refreshBackups()])
     } catch (err) {
@@ -122,9 +121,20 @@ function Notes(): React.JSX.Element {
       ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
       : `${Math.round(bytes / 1024)} KB`
 
-  const visibleNotes = filterTag
-    ? notes.filter((note) => note.tags.some((t) => t.name === filterTag))
-    : notes
+  const toggleFilter = (name: string): void =>
+    setFilterTags((current) =>
+      current.includes(name) ? current.filter((n) => n !== name) : [...current, name]
+    )
+
+  const visibleNotes =
+    filterTags.length === 0
+      ? notes
+      : notes.filter((note) => {
+          const names = note.tags.map((t) => t.name)
+          return filterMode === 'all'
+            ? filterTags.every((name) => names.includes(name))
+            : filterTags.some((name) => names.includes(name))
+        })
 
   const tagCounts = new Map<string, number>()
   for (const note of notes) {
@@ -164,18 +174,34 @@ function Notes(): React.JSX.Element {
           {allTags.map((tag) => (
             <button
               key={tag.id}
-              className={`tag-chip ${filterTag === tag.name ? 'tag-chip-active' : ''}`}
+              className={`tag-chip ${filterTags.includes(tag.name) ? 'tag-chip-active' : ''}`}
               style={tagStyle(tag.name)}
-              onClick={() => setFilterTag(filterTag === tag.name ? null : tag.name)}
+              onClick={() => toggleFilter(tag.name)}
             >
               {tag.name}
               <span className="tag-count">{tagCounts.get(tag.name) ?? 0}</span>
             </button>
           ))}
-          {filterTag && (
+          {filterTags.length > 0 && (
             <span className="tag-filter-state">
+              {filterTags.length > 1 && (
+                <span className="filter-mode" role="group" aria-label="Match mode">
+                  <button
+                    className={filterMode === 'all' ? 'filter-mode-active' : ''}
+                    onClick={() => setFilterMode('all')}
+                  >
+                    all
+                  </button>
+                  <button
+                    className={filterMode === 'any' ? 'filter-mode-active' : ''}
+                    onClick={() => setFilterMode('any')}
+                  >
+                    any
+                  </button>
+                </span>
+              )}
               {visibleNotes.length} of {notes.length}
-              <button className="tag-filter-clear" onClick={() => setFilterTag(null)}>
+              <button className="tag-filter-clear" onClick={() => setFilterTags([])}>
                 Clear
               </button>
             </span>
@@ -185,7 +211,9 @@ function Notes(): React.JSX.Element {
       <ul className="notes-list">
         {visibleNotes.length === 0 && (
           <li className="notes-empty">
-            {filterTag ? `No notes tagged “${filterTag}”.` : 'No notes yet — add one above.'}
+            {filterTags.length > 0
+              ? `No notes match ${filterMode === 'all' ? 'all of' : 'any of'} ${filterTags.join(', ')}.`
+              : 'No notes yet — add one above.'}
           </li>
         )}
         {visibleNotes.map((note) => (

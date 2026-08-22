@@ -366,6 +366,28 @@ code {
   color: var(--ev-c-text-2);
 }
 
+.filter-mode {
+  display: inline-flex;
+  border: 1px solid var(--ev-button-alt-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.notes .filter-mode button {
+  border: none;
+  border-radius: 0;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  background: none;
+  color: var(--ev-c-text-2);
+}
+
+.notes .filter-mode button.filter-mode-active {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--ev-c-text-1);
+}
+
 .tag-filter-clear {
   border: none !important;
   background: none !important;
