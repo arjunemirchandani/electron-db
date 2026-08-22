@@ -70,7 +70,12 @@ code {
   color: var(--ev-c-text-1);
   font-weight: 700;
   line-height: 24px;
-  white-space: nowrap;
+}
+
+@media (min-width: 400px) {
+  .text {
+    white-space: nowrap;
+  }
 }
 
 .tip {
@@ -287,6 +292,7 @@ code {
 
 .notes-list li {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -300,6 +306,11 @@ code {
   border-bottom: none;
 }
 
+.notes-list li > div:first-child {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
 .notes-empty {
   color: var(--ev-c-text-2);
 }
@@ -307,6 +318,7 @@ code {
 .notes-date {
   font-size: 12px;
   color: var(--ev-c-text-2);
+  white-space: nowrap;
 }
 
 .tag-filter {
@@ -467,6 +479,7 @@ code {
 
 .notes-backup {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   margin-top: 14px;
@@ -489,6 +502,7 @@ code {
 
 .backups-list li {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -510,8 +524,10 @@ code {
 
 .backup-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
+  margin-left: auto;
 }
 
 .backup-confirm-text {
@@ -539,9 +555,10 @@ code {
 
 .manage-tags-list li {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px 10px;
   padding: 8px 0;
   font-size: 13px;
 }
@@ -566,11 +583,13 @@ code {
 
 .manage-tag-palette {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
 }
 
 .notes .swatch {
+  flex-shrink: 0;
   width: 16px;
   height: 16px;
   padding: 0;

@@ -17,6 +17,10 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
+    // Narrowest layout we design for: a sidebar-sized column. Below this,
+    // desktop apps generally stop being usable (VS Code/Slack floor ~400).
+    minWidth: 320,
+    minHeight: 480,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
