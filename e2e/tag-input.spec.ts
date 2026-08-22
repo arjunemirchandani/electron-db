@@ -34,4 +34,23 @@ test('tag input turns typed names into chips and autocompletes existing tags', a
   await input.type('Wo')
   await page.locator('.tag-suggestions li', { hasText: 'work' }).click()
   await expect(formChips).toHaveText(['work×'])
+
+  // The + affordance on a note row adds tags in place, with autocomplete too.
+  await input.press('Backspace')
+  await expect(formChips).toHaveCount(0)
+  await page.fill('input[placeholder="Title"]', 'Untagged note')
+  await page.click('.notes-form button[type="submit"]')
+  const untagged = page.locator('.notes-list li', { hasText: 'Untagged note' })
+  await untagged.locator('.tag-add').click()
+  const inline = untagged.locator('.tag-input-inline .notes-tags-input')
+  await inline.type('urgent')
+  await inline.press('Enter')
+  await expect(untagged.locator('.tag-chip')).toHaveText(['urgent×'])
+  await expect(page.locator('.tag-filter .tag-chip')).toHaveText([/^urgent/, /^work/])
+  await expect(untagged.locator('.tag-input-inline')).toHaveCount(0)
+
+  await untagged.locator('.tag-add').click()
+  await untagged.locator('.tag-input-inline .notes-tags-input').type('wo')
+  await page.locator('.tag-suggestions li', { hasText: 'work' }).click()
+  await expect(untagged.locator('.tag-chip')).toHaveText(['urgent×', 'work×'])
 })

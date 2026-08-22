@@ -11,6 +11,7 @@ function Notes(): React.JSX.Element {
   const [newTags, setNewTags] = useState<string[]>([])
   const tagInputRef = useRef<TagInputHandle>(null)
   const [filterTag, setFilterTag] = useState<string | null>(null)
+  const [addingTagFor, setAddingTagFor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [backupStatus, setBackupStatus] = useState<string | null>(null)
   const [backingUp, setBackingUp] = useState(false)
@@ -67,6 +68,12 @@ function Notes(): React.JSX.Element {
 
   const removeTag = async (noteId: number, tagId: number): Promise<void> => {
     await window.api.removeTag(noteId, tagId)
+    await refresh()
+  }
+
+  const addTagsToNote = async (noteId: number, names: string[]): Promise<void> => {
+    for (const name of names) await window.api.addTag(noteId, name)
+    setAddingTagFor(null)
     await refresh()
   }
 
@@ -186,26 +193,45 @@ function Notes(): React.JSX.Element {
             <div>
               <strong>{note.title}</strong>
               {note.content && <span> — {note.content}</span>}
-              {note.tags.length > 0 && (
-                <span className="note-tags">
-                  {note.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="tag-chip tag-chip-static"
-                      style={tagStyle(tag.name)}
+              <span className="note-tags">
+                {note.tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="tag-chip tag-chip-static"
+                    style={tagStyle(tag.name)}
+                  >
+                    {tag.name}
+                    <button
+                      className="tag-remove"
+                      title={`Remove tag ${tag.name}`}
+                      onClick={() => removeTag(note.id, tag.id)}
                     >
-                      {tag.name}
-                      <button
-                        className="tag-remove"
-                        title={`Remove tag ${tag.name}`}
-                        onClick={() => removeTag(note.id, tag.id)}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </span>
-              )}
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {addingTagFor === note.id ? (
+                  <TagInput
+                    className="tag-input-inline"
+                    value={[]}
+                    onChange={(names) => addTagsToNote(note.id, names)}
+                    suggestions={allTags
+                      .map((t) => t.name)
+                      .filter((name) => !note.tags.some((t) => t.name === name))}
+                    placeholder="Add tag"
+                    autoFocus
+                    onDismiss={() => setAddingTagFor(null)}
+                  />
+                ) : (
+                  <button
+                    className="tag-add"
+                    title="Add tag"
+                    onClick={() => setAddingTagFor(note.id)}
+                  >
+                    +
+                  </button>
+                )}
+              </span>
               <div className="notes-date">{note.createdAt}</div>
             </div>
             <button onClick={() => removeNote(note.id)}>Delete</button>
