@@ -1,5 +1,24 @@
 @import './base.css';
 
+:root {
+  /* Layout tokens — the shared vocabulary for every component */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+  --fs-caption: 12px;
+  --fs-body: 14px;
+  --fs-title: 18px;
+  --surface-input: rgba(27, 27, 31, 0.65);
+  --surface-panel: rgba(34, 34, 40, 0.62);
+  --border-subtle: var(--ev-button-alt-border);
+}
+
 body {
   min-height: 100vh;
   overflow-x: hidden;
@@ -165,10 +184,10 @@ code {
   /* Rows adapt to the panel's width (container queries), not the window's */
   container-type: inline-size;
   padding: 20px 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   /* Translucent over the wavy background art; the blur keeps text
      readable while the pattern bleeds through */
-  background-color: rgba(34, 34, 40, 0.62);
+  background-color: var(--surface-panel);
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
 }
@@ -196,12 +215,12 @@ code {
      button never overflows the panel; the row wraps when truly cramped */
   flex: 1 1 130px;
   min-width: 0;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--ev-button-alt-border);
-  background-color: rgba(27, 27, 31, 0.65);
+  padding: var(--space-2) 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-input);
   color: var(--ev-c-text-1);
-  font-size: 14px;
+  font-size: var(--fs-body);
 }
 
 .tag-input {
@@ -212,10 +231,10 @@ code {
   gap: 5px;
   flex: 1 1 160px;
   min-width: 0;
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: 1px solid var(--ev-button-alt-border);
-  background-color: rgba(27, 27, 31, 0.65);
+  padding: 5px var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-input);
 }
 
 .tag-input:focus-within {
@@ -269,8 +288,8 @@ code {
 .notes button {
   cursor: pointer;
   flex-shrink: 0;
-  border: 1px solid var(--ev-button-alt-border);
-  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 600;
@@ -403,12 +422,16 @@ code {
   cursor: default;
 }
 
-.tag-filter {
+.toolbar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tag-filter {
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .tag-filter-label {
@@ -560,13 +583,10 @@ code {
 }
 
 .notes-backup {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: 10px;
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid var(--ev-button-alt-border);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .notes-backup button {
@@ -574,24 +594,56 @@ code {
   flex-shrink: 0;
 }
 
-.backups-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-  max-height: 180px;
-  overflow-y: auto;
-  border-top: 1px solid var(--ev-button-alt-border);
-}
-
-.backups-list li {
+.list-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 8px 0;
+  gap: var(--space-2) 10px;
+  padding: var(--space-2) 0;
   font-size: 13px;
   color: var(--ev-c-text-1);
+}
+
+.list-row-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.list-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.panel-section {
+  margin-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+}
+
+.panel-section-header h3 {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ev-c-text-1);
+}
+
+.panel-section-header p {
+  font-size: var(--fs-caption);
+  color: var(--ev-c-text-2);
+  margin: 2px 0 var(--space-2);
+}
+
+.backups-list {
+  list-style: none;
+  padding: 0;
+  max-height: 180px;
+  overflow-y: auto;
 }
 
 .backup-meta {
@@ -603,14 +655,6 @@ code {
 .backup-detail {
   font-size: 12px;
   color: var(--ev-c-text-2);
-}
-
-.backup-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
 }
 
 .backup-confirm-text {
@@ -625,9 +669,7 @@ code {
   color: #fff !important;
 }
 
-.manage-tags {
-  margin-top: 10px;
-  border-top: 1px solid var(--ev-button-alt-border);
+.manage-tags .manage-tags-list {
   max-height: 220px;
   overflow-y: auto;
 }
@@ -635,24 +677,6 @@ code {
 .manage-tags-list {
   list-style: none;
   padding: 0;
-}
-
-.manage-tags-list li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 10px;
-  padding: 8px 0;
-  font-size: 13px;
-}
-
-.manage-tag-main {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  min-width: 0;
 }
 
 .manage-tag-rename {

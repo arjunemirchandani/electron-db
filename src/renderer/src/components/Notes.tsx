@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BackupInfo, Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
 import ManageTags from './ManageTags'
+import NoteRow from './NoteRow'
+import BackupsPanel from './BackupsPanel'
+import { Toolbar } from './primitives'
 import { tagStyle } from '../lib/tagColor'
-import { formatFull, formatRelative } from '../lib/time'
-import { TrashIcon } from './icons'
 
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
@@ -22,14 +23,16 @@ function Notes(): React.JSX.Element {
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [showBackups, setShowBackups] = useState(false)
   const [showManageTags, setShowManageTags] = useState(false)
-  const [pendingRestore, setPendingRestore] = useState<string | null>(null)
-  const [restoring, setRestoring] = useState(false)
 
   const refresh = useCallback(async (): Promise<void> => {
     const [nextNotes, nextTags] = await Promise.all([window.api.listNotes(), window.api.listTags()])
     setNotes(nextNotes)
     setAllTags(nextTags)
     setFilterTags((current) => current.filter((name) => nextTags.some((t) => t.name === name)))
+  }, [])
+
+  const refreshBackups = useCallback(async (): Promise<void> => {
+    setBackups(await window.api.listBackups())
   }, [])
 
   useEffect(() => {
@@ -80,10 +83,6 @@ function Notes(): React.JSX.Element {
     await refresh()
   }
 
-  const refreshBackups = useCallback(async (): Promise<void> => {
-    setBackups(await window.api.listBackups())
-  }, [])
-
   const backupNow = async (): Promise<void> => {
     setBackingUp(true)
     setBackupStatus(null)
@@ -100,18 +99,15 @@ function Notes(): React.JSX.Element {
   }
 
   const restoreBackup = async (filename: string): Promise<void> => {
-    setRestoring(true)
     setBackupStatus(null)
     try {
       await window.api.restoreBackup(filename)
-      setPendingRestore(null)
       setFilterTags([])
       setBackupStatus(`Restored ${filename}`)
       await Promise.all([refresh(), refreshBackups()])
     } catch (err) {
       setBackupStatus(`Restore failed: ${err instanceof Error ? err.message : String(err)}`)
-    } finally {
-      setRestoring(false)
+      throw err
     }
   }
 
@@ -119,11 +115,6 @@ function Notes(): React.JSX.Element {
     await window.api.deleteBackup(filename)
     await refreshBackups()
   }
-
-  const formatSize = (bytes: number): string =>
-    bytes >= 1024 * 1024
-      ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
-      : `${Math.round(bytes / 1024)} KB`
 
   const toggleFilter = (name: string): void =>
     setFilterTags((current) =>
@@ -177,7 +168,7 @@ function Notes(): React.JSX.Element {
       </form>
       {error && <p className="notes-error">{error}</p>}
       {allTags.length > 0 && (
-        <div className="tag-filter">
+        <Toolbar className="tag-filter">
           <span className="tag-filter-label">Filter:</span>
           {allTags.map((tag) => (
             <button
@@ -214,7 +205,7 @@ function Notes(): React.JSX.Element {
               </button>
             </span>
           )}
-        </div>
+        </Toolbar>
       )}
       <ul className="notes-list">
         {visibleNotes.length === 0 && (
@@ -244,70 +235,21 @@ function Notes(): React.JSX.Element {
           </li>
         )}
         {visibleNotes.map((note) => (
-          <li key={note.id} className="note-row">
-            <div className="note-main">
-              <div className="note-title-line">
-                <strong>{note.title}</strong>
-                {note.content && <span className="note-content"> — {note.content}</span>}
-              </div>
-              <span className="note-tags">
-                {note.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="tag-chip tag-chip-static"
-                    style={tagStyle(tag.name, tag.hue)}
-                  >
-                    {tag.name}
-                    <button
-                      className="tag-remove"
-                      title={`Remove tag ${tag.name}`}
-                      onClick={() => removeTag(note.id, tag.id)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                {addingTagFor === note.id ? (
-                  <TagInput
-                    className="tag-input-inline"
-                    value={[]}
-                    onChange={(names) => addTagsToNote(note.id, names)}
-                    suggestions={allTags
-                      .map((t) => t.name)
-                      .filter((name) => !note.tags.some((t) => t.name === name))}
-                    hueFor={hueFor}
-                    placeholder="Add tag"
-                    autoFocus
-                    onDismiss={() => setAddingTagFor(null)}
-                  />
-                ) : (
-                  <button
-                    className="tag-add"
-                    title="Add tag"
-                    onClick={() => setAddingTagFor(note.id)}
-                  >
-                    +
-                  </button>
-                )}
-              </span>
-            </div>
-            <div className="note-foot">
-              <time className="notes-date" title={formatFull(note.createdAt)}>
-                {formatRelative(note.createdAt)}
-              </time>
-              <button
-                className="icon-button"
-                aria-label="Delete"
-                title="Delete note"
-                onClick={() => removeNote(note.id)}
-              >
-                <TrashIcon />
-              </button>
-            </div>
-          </li>
+          <NoteRow
+            key={note.id}
+            note={note}
+            tagSuggestions={allTags.map((t) => t.name)}
+            hueFor={hueFor}
+            addingTag={addingTagFor === note.id}
+            onStartAddTag={() => setAddingTagFor(note.id)}
+            onCancelAddTag={() => setAddingTagFor(null)}
+            onAddTags={(names) => addTagsToNote(note.id, names)}
+            onRemoveTag={(tagId) => removeTag(note.id, tagId)}
+            onDelete={() => removeNote(note.id)}
+          />
         ))}
       </ul>
-      <div className="notes-backup">
+      <Toolbar className="notes-backup">
         <button onClick={backupNow} disabled={backingUp}>
           {backingUp ? 'Backing up…' : 'Back Up Database'}
         </button>
@@ -318,42 +260,10 @@ function Notes(): React.JSX.Element {
           {showManageTags ? 'Hide Tags' : `Manage Tags (${allTags.length})`}
         </button>
         {backupStatus && <span className="backup-status">{backupStatus}</span>}
-      </div>
+      </Toolbar>
       {showManageTags && <ManageTags tags={allTags} counts={tagCounts} onChanged={refresh} />}
       {showBackups && (
-        <ul className="backups-list">
-          {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}
-          {backups.map((backup) => (
-            <li key={backup.filename}>
-              <div className="backup-meta">
-                <strong>{new Date(backup.createdAt).toLocaleString()}</strong>
-                <span className="backup-detail">
-                  v{backup.appVersion} · {formatSize(backup.sizeBytes)}
-                </span>
-              </div>
-              {pendingRestore === backup.filename ? (
-                <div className="backup-actions">
-                  <span className="backup-confirm-text">Replace current data?</span>
-                  <button
-                    className="backup-confirm"
-                    onClick={() => restoreBackup(backup.filename)}
-                    disabled={restoring}
-                  >
-                    {restoring ? 'Restoring…' : 'Confirm'}
-                  </button>
-                  <button onClick={() => setPendingRestore(null)} disabled={restoring}>
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="backup-actions">
-                  <button onClick={() => setPendingRestore(backup.filename)}>Restore</button>
-                  <button onClick={() => deleteBackup(backup.filename)}>Delete</button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+        <BackupsPanel backups={backups} onRestore={restoreBackup} onDelete={deleteBackup} />
       )}
     </div>
   )
