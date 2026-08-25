@@ -67,6 +67,17 @@ code {
   padding-top: 36px;
 }
 
+/* The whole strip beside the traffic lights drags, not just the header */
+.platform-darwin body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  -webkit-app-region: drag;
+}
+
 .platform-darwin .app-header {
   -webkit-app-region: drag;
 }
