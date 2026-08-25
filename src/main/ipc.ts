@@ -91,11 +91,12 @@ export function registerIpcHandlers(): void {
     const trimmed = query.trim().toLowerCase()
     const byNote = tagsByNote()
     const base = getDb().select().from(notes).orderBy(desc(notes.id))
+    // Escape LIKE wildcards so the user searches literal text.
+    const pattern = '%' + trimmed.replace(/[\\%_]/g, '\\$&') + '%'
     const rows = trimmed
       ? base
           .where(
-            // Escape LIKE wildcards so the user searches literal text.
-            sql`(lower(title) LIKE ${'%' + trimmed.replace(/[\%_]/g, '\$&') + '%'} ESCAPE '\' OR lower(content) LIKE ${'%' + trimmed.replace(/[\%_]/g, '\$&') + '%'} ESCAPE '\')`
+            sql`(lower(title) LIKE ${pattern} ESCAPE '\\' OR lower(content) LIKE ${pattern} ESCAPE '\\')`
           )
           .all()
       : base.all()

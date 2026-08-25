@@ -247,6 +247,10 @@ function Notes(): React.JSX.Element {
             onCancelAddTag={() => setAddingTagFor(null)}
             onAddTags={(names) => addTagsToNote(note.id, names)}
             onRemoveTag={(tagId) => removeTag(note.id, tagId)}
+            onUpdate={async (input) => {
+              await window.api.updateNote(note.id, input)
+              await refresh()
+            }}
             onDelete={() => removeNote(note.id)}
           />
         ))}

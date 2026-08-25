@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
 import { tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { IconButton } from './primitives'
-import { TrashIcon } from './icons'
+import { PencilIcon, TrashIcon } from './icons'
 
 interface NoteRowProps {
   note: Note
@@ -14,6 +15,7 @@ interface NoteRowProps {
   onCancelAddTag: () => void
   onAddTags: (names: string[]) => void
   onRemoveTag: (tagId: number) => void
+  onUpdate: (input: { title: string; content: string }) => Promise<void>
   onDelete: () => void
 }
 
@@ -26,8 +28,65 @@ function NoteRow({
   onCancelAddTag,
   onAddTags,
   onRemoveTag,
+  onUpdate,
   onDelete
 }: NoteRowProps): React.JSX.Element {
+  const [editing, setEditing] = useState(false)
+  const [draftTitle, setDraftTitle] = useState('')
+  const [draftContent, setDraftContent] = useState('')
+  const [editError, setEditError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  const startEdit = (): void => {
+    setDraftTitle(note.title)
+    setDraftContent(note.content)
+    setEditError(null)
+    setEditing(true)
+  }
+
+  const save = async (e?: React.FormEvent): Promise<void> => {
+    e?.preventDefault()
+    setSaving(true)
+    setEditError(null)
+    try {
+      await onUpdate({ title: draftTitle, content: draftContent })
+      setEditing(false)
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <li className="note-row note-row-editing">
+        <form className="note-edit" onSubmit={save}>
+          <input
+            value={draftTitle}
+            autoFocus
+            placeholder="Title"
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
+          />
+          <input
+            value={draftContent}
+            placeholder="Content (optional)"
+            onChange={(e) => setDraftContent(e.target.value)}
+            onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
+          />
+          <button type="submit" className="button-primary" disabled={saving}>
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+          <button type="button" onClick={() => setEditing(false)} disabled={saving}>
+            Cancel
+          </button>
+          {editError && <p className="notes-error note-edit-error">{editError}</p>}
+        </form>
+      </li>
+    )
+  }
+
   return (
     <li className="note-row">
       <div className="note-main">
@@ -71,9 +130,14 @@ function NoteRow({
         </span>
       </div>
       <div className="note-foot">
-        <time className="notes-date" title={formatFull(note.createdAt)}>
-          {formatRelative(note.createdAt)}
+        <time className="notes-date" title={formatFull(note.updatedAt ?? note.createdAt)}>
+          {note.updatedAt
+            ? `edited ${formatRelative(note.updatedAt)}`
+            : formatRelative(note.createdAt)}
         </time>
+        <IconButton label="Edit" onClick={startEdit}>
+          <PencilIcon />
+        </IconButton>
         <IconButton label="Delete" onClick={onDelete}>
           <TrashIcon />
         </IconButton>
