@@ -67,14 +67,21 @@ code {
   padding-top: 36px;
 }
 
-/* The whole strip beside the traffic lights drags, not just the header */
-.platform-darwin body::before {
-  content: '';
+/* The whole strip beside the traffic lights drags, not just the header.
+   Must be a real element: Electron's drag-region hit-testing ignores
+   pseudo-elements. */
+.titlebar-drag {
+  display: none;
+}
+
+.platform-darwin .titlebar-drag {
+  display: block;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 36px;
+  z-index: 5;
   -webkit-app-region: drag;
 }
 

@@ -90,3 +90,18 @@ test('note rows become stacked cards in a narrow panel, with relative dates', as
   await row.getByRole('button', { name: 'Delete' }).click()
   await expect(page.locator('.notes-empty')).toContainText('No notes yet')
 })
+
+test('macOS: a real drag element covers the strip beside the traffic lights', async ({
+  launch
+}) => {
+  test.skip(process.platform !== 'darwin', 'hiddenInset title bar is macOS-only')
+  const { page } = await launch()
+  const probe = await page.evaluate(() => {
+    const el = document.elementFromPoint(window.innerWidth / 2, 18)
+    if (!el) return null
+    const style = getComputedStyle(el) as CSSStyleDeclaration & { webkitAppRegion?: string }
+    return { className: el.className, appRegion: style.webkitAppRegion ?? '' }
+  })
+  expect(probe?.className).toContain('titlebar-drag')
+  expect(probe?.appRegion).toBe('drag')
+})

@@ -10,6 +10,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
+      <div className="titlebar-drag" aria-hidden="true" />
       <header className="app-header">
         <img alt="logo" className="logo" src={electronLogo} />
         <div className="app-header-text">
