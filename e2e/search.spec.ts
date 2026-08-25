@@ -31,13 +31,15 @@ test('search matches titles and content, composes with tag filters', async ({ la
   await expect(rows).toHaveCount(1)
   await expect(rows).toContainText('Groceries')
 
-  // LIKE wildcards are treated as literal text.
-  await search.fill('100%')
+  // FTS5 semantics: whole words and prefixes, punctuation is not a token.
+  await search.fill('100')
   await expect(rows).toHaveCount(1)
-  await search.fill('0% oat')
+  // Only the trailing token is a prefix (it's the word being typed).
+  await search.fill('set road')
   await expect(rows).toHaveCount(1)
+  await expect(rows).toContainText('Quarterly planning')
   await search.fill('%')
-  await expect(rows).toHaveCount(1)
+  await expect(rows).toHaveCount(3)
 
   // No matches shows a search-specific empty state; Clear restores.
   await search.fill('zzz nothing')
@@ -51,4 +53,14 @@ test('search matches titles and content, composes with tag filters', async ({ la
   await page.locator('.tag-filter .tag-chip', { hasText: 'home' }).click()
   await expect(rows).toHaveCount(1)
   await expect(rows).toContainText('Water plants')
+
+  // Ranking: a title hit outranks a content hit for the same term.
+  await page.locator('.tag-filter .tag-chip', { hasText: 'home' }).click()
+  await search.fill('')
+  await page.evaluate(async () => {
+    await window.api.createNote({ title: 'basil care', content: 'water twice a week' })
+  })
+  await search.fill('basil')
+  await expect(rows).toHaveCount(2)
+  await expect(rows.first()).toContainText('basil care')
 })

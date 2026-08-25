@@ -88,19 +88,32 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('notes:search', (_event, query: string): Note[] => {
     if (typeof query !== 'string') throw new Error('Invalid search query')
-    const trimmed = query.trim().toLowerCase()
+    // Sanitize into FTS5 phrase tokens: word/number runs only, each quoted
+    // (so user text is never query syntax), the last as a prefix for
+    // search-as-you-type. Punctuation-only input behaves like an empty box.
+    const tokens = query.match(/[\p{L}\p{N}]+/gu) ?? []
     const byNote = tagsByNote()
-    const base = getDb().select().from(notes).orderBy(desc(notes.id))
-    // Escape LIKE wildcards so the user searches literal text.
-    const pattern = '%' + trimmed.replace(/[\\%_]/g, '\\$&') + '%'
-    const rows = trimmed
-      ? base
-          .where(
-            sql`(lower(title) LIKE ${pattern} ESCAPE '\\' OR lower(content) LIKE ${pattern} ESCAPE '\\')`
-          )
-          .all()
-      : base.all()
-    return rows.map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
+    if (tokens.length === 0) {
+      return getDb()
+        .select()
+        .from(notes)
+        .orderBy(desc(notes.id))
+        .all()
+        .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
+    }
+    const expression = tokens.map((t, i) => `"${t}"${i === tokens.length - 1 ? '*' : ''}`).join(' ')
+    // Best matches first: a title hit outweighs a content hit 10:1.
+    const ranked = getDb().all<{ id: number }>(
+      sql`SELECT rowid AS id FROM notes_fts WHERE notes_fts MATCH ${expression} ORDER BY bm25(notes_fts, 10.0, 1.0)`
+    )
+    if (ranked.length === 0) return []
+    const ids = ranked.map((r) => r.id)
+    const rows = getDb().select().from(notes).where(inArray(notes.id, ids)).all()
+    const byId = new Map(rows.map((note) => [note.id, note]))
+    return ids
+      .map((id) => byId.get(id))
+      .filter((note): note is NonNullable<typeof note> => note !== undefined)
+      .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
   })
 
   ipcMain.handle('notes:delete', (_event, id: number): void => {
