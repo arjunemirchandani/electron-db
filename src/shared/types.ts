@@ -17,6 +17,10 @@ export interface Note {
   /** Set on every edit; null means never edited. */
   updatedAt: string | null
   tags: Tag[]
+  /** Search results only: title with matches wrapped in \u0001…\u0002. */
+  highlightedTitle?: string
+  /** Search results only: content excerpt with matches wrapped in \u0001…\u0002. */
+  contentSnippet?: string
 }
 
 export interface NewNoteInput {

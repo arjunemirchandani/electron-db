@@ -102,18 +102,40 @@ export function registerIpcHandlers(): void {
         .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
     }
     const expression = tokens.map((t, i) => `"${t}"${i === tokens.length - 1 ? '*' : ''}`).join(' ')
-    // Best matches first: a title hit outweighs a content hit 10:1.
-    const ranked = getDb().all<{ id: number }>(
-      sql`SELECT rowid AS id FROM notes_fts WHERE notes_fts MATCH ${expression} ORDER BY bm25(notes_fts, 10.0, 1.0)`
+    // Best matches first: a title hit outweighs a content hit 10:1. The
+    // \u0001/\u0002 markers are split into <mark> elements by the renderer,
+    // so note text is never interpreted as HTML.
+    const ranked = getDb().all<{ id: number; ht: string; cs: string }>(
+      sql`SELECT rowid AS id,
+            highlight(notes_fts, 0, char(1), char(2)) AS ht,
+            snippet(notes_fts, 1, char(1), char(2), '…', 12) AS cs
+          FROM notes_fts WHERE notes_fts MATCH ${expression}
+          ORDER BY bm25(notes_fts, 10.0, 1.0)`
     )
     if (ranked.length === 0) return []
-    const ids = ranked.map((r) => r.id)
-    const rows = getDb().select().from(notes).where(inArray(notes.id, ids)).all()
+    const rows = getDb()
+      .select()
+      .from(notes)
+      .where(
+        inArray(
+          notes.id,
+          ranked.map((r) => r.id)
+        )
+      )
+      .all()
     const byId = new Map(rows.map((note) => [note.id, note]))
-    return ids
-      .map((id) => byId.get(id))
-      .filter((note): note is NonNullable<typeof note> => note !== undefined)
-      .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
+    return ranked.flatMap((r) => {
+      const note = byId.get(r.id)
+      if (!note) return []
+      return [
+        {
+          ...note,
+          tags: byNote.get(note.id) ?? [],
+          highlightedTitle: r.ht,
+          contentSnippet: r.cs
+        }
+      ]
+    })
   })
 
   ipcMain.handle('notes:delete', (_event, id: number): void => {

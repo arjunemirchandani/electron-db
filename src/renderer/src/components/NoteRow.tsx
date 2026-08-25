@@ -6,6 +6,14 @@ import { formatFull, formatRelative } from '../lib/time'
 import { IconButton } from './primitives'
 import { PencilIcon, TrashIcon } from './icons'
 
+// Search matches arrive wrapped in \u0001…\u0002; render them as <mark>
+// elements so note text itself is never treated as markup.
+function renderMarked(text: string): React.ReactNode {
+  // eslint-disable-next-line no-control-regex -- the markers are deliberately control chars so they can't occur in note text
+  const parts = text.split(/\u0001(.*?)\u0002/g)
+  return parts.map((part, i) => (i % 2 === 1 ? <mark key={i}>{part}</mark> : part))
+}
+
 interface NoteRowProps {
   note: Note
   tagSuggestions: string[]
@@ -91,8 +99,14 @@ function NoteRow({
     <li className="note-row">
       <div className="note-main">
         <div className="note-title-line">
-          <strong>{note.title}</strong>
-          {note.content && <span className="note-content"> — {note.content}</span>}
+          <strong>
+            {note.highlightedTitle ? renderMarked(note.highlightedTitle) : note.title}
+          </strong>
+          {note.contentSnippet
+            ? note.contentSnippet.length > 0 && (
+                <span className="note-content"> — {renderMarked(note.contentSnippet)}</span>
+              )
+            : note.content && <span className="note-content"> — {note.content}</span>}
         </div>
         <span className="note-tags">
           {note.tags.map((tag) => (

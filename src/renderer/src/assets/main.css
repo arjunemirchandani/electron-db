@@ -436,6 +436,13 @@ code {
   color: var(--ev-c-text-2);
 }
 
+.note-title-line mark {
+  background-color: hsl(228 65% 60% / 0.35);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
 .note-row-editing {
   display: block;
 }

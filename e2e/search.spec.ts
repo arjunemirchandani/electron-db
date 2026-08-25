@@ -63,4 +63,9 @@ test('search matches titles and content, composes with tag filters', async ({ la
   await search.fill('basil')
   await expect(rows).toHaveCount(2)
   await expect(rows.first()).toContainText('basil care')
+
+  // Matches are highlighted in title and content snippet.
+  await expect(rows.first().locator('.note-title-line strong mark')).toHaveText('basil')
+  await search.fill('milk')
+  await expect(rows.first().locator('.note-content mark')).toHaveText('milk')
 })
