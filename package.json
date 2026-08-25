@@ -1,6 +1,6 @@
 {
   "name": "electrondb",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Cross-platform Electron desktop app with an embedded SQLite database (better-sqlite3 + Drizzle ORM)",
   "main": "./out/main/index.js",
   "author": "Arjune Mirchandani",
