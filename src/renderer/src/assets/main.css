@@ -243,6 +243,30 @@ code {
   margin-bottom: 14px;
 }
 
+.notes-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  color: var(--ev-c-text-2);
+}
+
+.notes-search input {
+  flex: 1 1 120px;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-input);
+  color: var(--ev-c-text-1);
+  font-size: var(--fs-caption);
+}
+
+.search-count {
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
 .notes-form input {
   /* min-width: 0 lets inputs shrink below placeholder width so the Add
      button never overflows the panel; the row wraps when truly cramped */

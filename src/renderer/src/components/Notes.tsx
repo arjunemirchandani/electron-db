@@ -6,6 +6,7 @@ import NoteRow from './NoteRow'
 import BackupsPanel from './BackupsPanel'
 import { Toolbar } from './primitives'
 import { tagStyle } from '../lib/tagColor'
+import { SearchIcon } from './icons'
 
 function Notes(): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
@@ -15,6 +16,8 @@ function Notes(): React.JSX.Element {
   const [newTags, setNewTags] = useState<string[]>([])
   const tagInputRef = useRef<TagInputHandle>(null)
   const [filterTags, setFilterTags] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Note[] | null>(null)
   const [filterMode, setFilterMode] = useState<'all' | 'any'>('all')
   const [addingTagFor, setAddingTagFor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -51,6 +54,23 @@ function Notes(): React.JSX.Element {
       cancelled = true
     }
   }, [])
+
+  const searchActive = searchQuery.trim().length > 0
+
+  // Re-runs on note changes too, so results stay fresh after edits/deletes.
+  // Whether search applies is derived from the query; stale results are
+  // simply ignored once the box is cleared.
+  useEffect(() => {
+    const query = searchQuery.trim()
+    if (!query) return
+    const timer = setTimeout(() => {
+      window.api
+        .searchNotes(query)
+        .then(setSearchResults)
+        .catch((e) => setError(String(e)))
+    }, 180)
+    return () => clearTimeout(timer)
+  }, [searchQuery, notes])
 
   const addNote = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
@@ -121,10 +141,11 @@ function Notes(): React.JSX.Element {
       current.includes(name) ? current.filter((n) => n !== name) : [...current, name]
     )
 
+  const baseNotes = searchActive && searchResults ? searchResults : notes
   const visibleNotes =
     filterTags.length === 0
-      ? notes
-      : notes.filter((note) => {
+      ? baseNotes
+      : baseNotes.filter((note) => {
           const names = note.tags.map((t) => t.name)
           return filterMode === 'all'
             ? filterTags.every((name) => names.includes(name))
@@ -169,6 +190,25 @@ function Notes(): React.JSX.Element {
         </button>
       </form>
       {error && <p className="notes-error">{error}</p>}
+      <div className="notes-search">
+        <SearchIcon />
+        <input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search notes…"
+          aria-label="Search notes"
+        />
+        {searchActive && searchResults !== null && (
+          <span className="search-count">
+            {visibleNotes.length} of {notes.length}
+          </span>
+        )}
+        {searchQuery && (
+          <button className="tag-filter-clear" onClick={() => setSearchQuery('')}>
+            Clear
+          </button>
+        )}
+      </div>
       {allTags.length > 0 && (
         <Toolbar className="tag-filter">
           <span className="tag-filter-label">Filter:</span>
@@ -212,7 +252,18 @@ function Notes(): React.JSX.Element {
       <ul className="notes-list">
         {visibleNotes.length === 0 && (
           <li className="notes-empty">
-            {filterTags.length > 0 ? (
+            {searchActive && searchResults !== null ? (
+              <>
+                <strong>No notes match “{searchQuery.trim()}”.</strong>
+                <span>
+                  Search covers titles and content.{' '}
+                  <button className="tag-filter-clear" onClick={() => setSearchQuery('')}>
+                    Clear the search
+                  </button>
+                  .
+                </span>
+              </>
+            ) : filterTags.length > 0 ? (
               <>
                 <strong>
                   No notes match {filterMode === 'all' ? 'all of' : 'any of'}{' '}
