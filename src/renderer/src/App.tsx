@@ -1,8 +1,13 @@
+import { useEffect } from 'react'
 import Versions from './components/Versions'
 import Notes from './components/Notes'
 import electronLogo from './assets/electron.svg'
 
 function App(): React.JSX.Element {
+  useEffect(() => {
+    document.body.classList.add(`platform-${window.electron.process.platform}`)
+  }, [])
+
   return (
     <>
       <header className="app-header">

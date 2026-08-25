@@ -27,6 +27,9 @@ function createWindow(): void {
     useContentSize: true,
     show: false,
     autoHideMenuBar: true,
+    // Frameless-feeling chrome on macOS: traffic lights overlay our own
+    // header, which becomes the drag region (see .app-header CSS).
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' as const } : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
