@@ -164,7 +164,9 @@ function Notes(): React.JSX.Element {
           hueFor={hueFor}
           placeholder="Tags"
         />
-        <button type="submit">Add</button>
+        <button type="submit" className="button-primary">
+          Add
+        </button>
       </form>
       {error && <p className="notes-error">{error}</p>}
       {allTags.length > 0 && (

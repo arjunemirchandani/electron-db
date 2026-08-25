@@ -17,6 +17,8 @@
   --surface-input: rgba(27, 27, 31, 0.65);
   --surface-panel: rgba(34, 34, 40, 0.62);
   --border-subtle: var(--ev-button-alt-border);
+  --accent: #6988e6;
+  --accent-hover: #7b97ea;
 }
 
 body {
@@ -238,7 +240,7 @@ code {
 }
 
 .tag-input:focus-within {
-  border-color: var(--ev-button-alt-hover-border);
+  border-color: rgba(105, 136, 230, 0.75);
 }
 
 .tag-input input.notes-tags-input {
@@ -295,11 +297,36 @@ code {
   font-weight: 600;
   color: var(--ev-button-alt-text);
   background-color: var(--ev-button-alt-bg);
+  transition:
+    background-color 120ms,
+    border-color 120ms,
+    color 120ms;
+}
+
+.notes button.button-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.notes button.button-primary:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .notes button:hover {
   border-color: var(--ev-button-alt-hover-border);
   background-color: var(--ev-button-alt-hover-bg);
+}
+
+.notes :is(button, select):focus-visible {
+  outline: 2px solid rgba(105, 136, 230, 0.85);
+  outline-offset: 1px;
+}
+
+.notes input:focus-visible {
+  outline: none;
+  border-color: rgba(105, 136, 230, 0.75);
 }
 
 .notes-error {
@@ -321,7 +348,10 @@ code {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 0;
+  padding: 10px var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  border-radius: var(--radius-md);
+  transition: background-color 120ms;
   border-bottom: 1px solid var(--ev-button-alt-border);
   font-size: 14px;
   color: var(--ev-c-text-1);
@@ -329,6 +359,10 @@ code {
 
 .note-row:last-child {
   border-bottom: none;
+}
+
+.note-row:hover {
+  background-color: rgba(255, 255, 255, 0.035);
 }
 
 .note-main {
@@ -600,9 +634,16 @@ code {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2) 10px;
-  padding: var(--space-2) 0;
+  padding: var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  border-radius: var(--radius-md);
+  transition: background-color 120ms;
   font-size: 13px;
   color: var(--ev-c-text-1);
+}
+
+.list-row:hover {
+  background-color: rgba(255, 255, 255, 0.035);
 }
 
 .list-row-main {
@@ -730,6 +771,10 @@ code {
 .backup-status {
   font-size: 12px;
   color: var(--ev-c-text-2);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
