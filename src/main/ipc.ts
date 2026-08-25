@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { and, desc, eq, inArray, notInArray } from 'drizzle-orm'
+import { and, desc, eq, inArray, notInArray, sql } from 'drizzle-orm'
 import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
 import { notes, noteTags, tags } from './db/schema'
 import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
@@ -62,6 +62,44 @@ export function registerIpcHandlers(): void {
       .get()
     for (const name of input.tags ?? []) attachTag(note.id, name)
     return { ...note, tags: tagsByNote().get(note.id) ?? [] }
+  })
+
+  ipcMain.handle(
+    'notes:update',
+    (_event, id: number, input: { title: string; content?: string }): Note => {
+      if (!Number.isInteger(id)) throw new Error('Invalid note id')
+      if (typeof input?.title !== 'string' || input.title.trim() === '') {
+        throw new Error('Note title is required')
+      }
+      const note = getDb()
+        .update(notes)
+        .set({
+          title: input.title.trim(),
+          content: input.content ?? '',
+          updatedAt: sql`(datetime('now'))`
+        })
+        .where(eq(notes.id, id))
+        .returning()
+        .get()
+      if (!note) throw new Error('Note not found')
+      return { ...note, tags: tagsByNote().get(note.id) ?? [] }
+    }
+  )
+
+  ipcMain.handle('notes:search', (_event, query: string): Note[] => {
+    if (typeof query !== 'string') throw new Error('Invalid search query')
+    const trimmed = query.trim().toLowerCase()
+    const byNote = tagsByNote()
+    const base = getDb().select().from(notes).orderBy(desc(notes.id))
+    const rows = trimmed
+      ? base
+          .where(
+            // Escape LIKE wildcards so the user searches literal text.
+            sql`(lower(title) LIKE ${'%' + trimmed.replace(/[\%_]/g, '\$&') + '%'} ESCAPE '\' OR lower(content) LIKE ${'%' + trimmed.replace(/[\%_]/g, '\$&') + '%'} ESCAPE '\')`
+          )
+          .all()
+      : base.all()
+    return rows.map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
   })
 
   ipcMain.handle('notes:delete', (_event, id: number): void => {

@@ -7,7 +7,9 @@ export const notes = sqliteTable('notes', {
   content: text('content').notNull().default(''),
   createdAt: text('created_at')
     .notNull()
-    .default(sql`(datetime('now'))`)
+    .default(sql`(datetime('now'))`),
+  /** Set on every edit; null means never edited. */
+  updatedAt: text('updated_at')
 })
 
 export const tags = sqliteTable('tags', {

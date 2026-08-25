@@ -1,0 +1,1 @@
+ALTER TABLE `notes` ADD `updated_at` text;

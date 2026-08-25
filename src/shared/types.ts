@@ -14,6 +14,8 @@ export interface Note {
   title: string
   content: string
   createdAt: string
+  /** Set on every edit; null means never edited. */
+  updatedAt: string | null
   tags: Tag[]
 }
 
@@ -36,6 +38,10 @@ export interface BackupInfo {
 export interface DbApi {
   listNotes: () => Promise<Note[]>
   createNote: (input: NewNoteInput) => Promise<Note>
+  /** Update a note's title and content; stamps updatedAt. */
+  updateNote: (id: number, input: { title: string; content?: string }) => Promise<Note>
+  /** Case-insensitive title/content search; empty query returns everything. */
+  searchNotes: (query: string) => Promise<Note[]>
   deleteNote: (id: number) => Promise<void>
   /** All tags currently attached to at least one note. */
   listTags: () => Promise<Tag[]>

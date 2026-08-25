@@ -6,6 +6,9 @@ import type { DbApi, NewNoteInput } from '../shared/types'
 const api: DbApi = {
   listNotes: () => ipcRenderer.invoke('notes:list'),
   createNote: (input: NewNoteInput) => ipcRenderer.invoke('notes:create', input),
+  updateNote: (id: number, input: { title: string; content?: string }) =>
+    ipcRenderer.invoke('notes:update', id, input),
+  searchNotes: (query: string) => ipcRenderer.invoke('notes:search', query),
   deleteNote: (id: number) => ipcRenderer.invoke('notes:delete', id),
   listTags: () => ipcRenderer.invoke('tags:list'),
   addTag: (noteId: number, name: string) => ipcRenderer.invoke('tags:add', noteId, name),
