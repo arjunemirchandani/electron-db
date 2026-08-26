@@ -16,6 +16,8 @@ export interface Note {
   createdAt: string
   /** Set on every edit; null means never edited. */
   updatedAt: string | null
+  /** Flexible key/value properties (e.g. priority, url, due). */
+  metadata: Record<string, string>
   tags: Tag[]
   /** Search results only: title with matches wrapped in \u0001…\u0002. */
   highlightedTitle?: string
@@ -42,8 +44,11 @@ export interface BackupInfo {
 export interface DbApi {
   listNotes: () => Promise<Note[]>
   createNote: (input: NewNoteInput) => Promise<Note>
-  /** Update a note's title and content; stamps updatedAt. */
-  updateNote: (id: number, input: { title: string; content?: string }) => Promise<Note>
+  /** Update a note's title, content, and properties; stamps updatedAt. */
+  updateNote: (
+    id: number,
+    input: { title: string; content?: string; metadata?: Record<string, string> }
+  ) => Promise<Note>
   /** Case-insensitive title/content search; empty query returns everything. */
   searchNotes: (query: string) => Promise<Note[]>
   deleteNote: (id: number) => Promise<void>

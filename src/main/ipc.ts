@@ -4,6 +4,38 @@ import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from '.
 import { notes, noteTags, tags } from './db/schema'
 import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
 
+const META_MAX_ENTRIES = 20
+const META_MAX_KEY = 40
+const META_MAX_VALUE = 400
+
+// Normalize and validate renderer-supplied properties: string keys and
+// values only, trimmed keys, size caps — anything else is rejected loudly.
+function cleanMetadata(raw: unknown): Record<string, string> {
+  if (raw === undefined || raw === null) return {}
+  if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Invalid properties')
+  const clean: Record<string, string> = {}
+  for (const [rawKey, value] of Object.entries(raw)) {
+    const key = rawKey.trim()
+    if (!key) continue
+    if (typeof value !== 'string') throw new Error('Property values must be text')
+    if (key.length > META_MAX_KEY)
+      throw new Error(`Property names are limited to ${META_MAX_KEY} characters`)
+    if (value.length > META_MAX_VALUE)
+      throw new Error(`Property values are limited to ${META_MAX_VALUE} characters`)
+    clean[key] = value
+  }
+  if (Object.keys(clean).length > META_MAX_ENTRIES) {
+    throw new Error(`A note can have at most ${META_MAX_ENTRIES} properties`)
+  }
+  return clean
+}
+
+function withDefaults<T extends { metadata: Record<string, string> | null }>(
+  note: T
+): T & { metadata: Record<string, string> } {
+  return { ...note, metadata: note.metadata ?? {} }
+}
+
 function tagsByNote(): Map<number, Tag[]> {
   const rows = getDb()
     .select({ noteId: noteTags.noteId, id: tags.id, name: tags.name, hue: tags.hue })
@@ -48,7 +80,7 @@ export function registerIpcHandlers(): void {
       .from(notes)
       .orderBy(desc(notes.id))
       .all()
-      .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
+      .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
   })
 
   ipcMain.handle('notes:create', (_event, input: NewNoteInput): Note => {
@@ -61,12 +93,16 @@ export function registerIpcHandlers(): void {
       .returning()
       .get()
     for (const name of input.tags ?? []) attachTag(note.id, name)
-    return { ...note, tags: tagsByNote().get(note.id) ?? [] }
+    return { ...withDefaults(note), tags: tagsByNote().get(note.id) ?? [] }
   })
 
   ipcMain.handle(
     'notes:update',
-    (_event, id: number, input: { title: string; content?: string }): Note => {
+    (
+      _event,
+      id: number,
+      input: { title: string; content?: string; metadata?: Record<string, string> }
+    ): Note => {
       if (!Number.isInteger(id)) throw new Error('Invalid note id')
       if (typeof input?.title !== 'string' || input.title.trim() === '') {
         throw new Error('Note title is required')
@@ -76,13 +112,14 @@ export function registerIpcHandlers(): void {
         .set({
           title: input.title.trim(),
           content: input.content ?? '',
+          ...(input.metadata !== undefined ? { metadata: cleanMetadata(input.metadata) } : {}),
           updatedAt: sql`(datetime('now'))`
         })
         .where(eq(notes.id, id))
         .returning()
         .get()
       if (!note) throw new Error('Note not found')
-      return { ...note, tags: tagsByNote().get(note.id) ?? [] }
+      return { ...withDefaults(note), tags: tagsByNote().get(note.id) ?? [] }
     }
   )
 
@@ -99,7 +136,7 @@ export function registerIpcHandlers(): void {
         .from(notes)
         .orderBy(desc(notes.id))
         .all()
-        .map((note) => ({ ...note, tags: byNote.get(note.id) ?? [] }))
+        .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
     }
     const expression = tokens.map((t, i) => `"${t}"${i === tokens.length - 1 ? '*' : ''}`).join(' ')
     // Best matches first: a title hit outweighs a content hit 10:1. The
@@ -129,7 +166,7 @@ export function registerIpcHandlers(): void {
       if (!note) return []
       return [
         {
-          ...note,
+          ...withDefaults(note),
           tags: byNote.get(note.id) ?? [],
           highlightedTitle: r.ht,
           contentSnippet: r.cs

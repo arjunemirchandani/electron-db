@@ -9,7 +9,9 @@ export const notes = sqliteTable('notes', {
     .notNull()
     .default(sql`(datetime('now'))`),
   /** Set on every edit; null means never edited. */
-  updatedAt: text('updated_at')
+  updatedAt: text('updated_at'),
+  /** Flexible per-note properties; stored as a JSON object of strings. */
+  metadata: text('metadata', { mode: 'json' }).$type<Record<string, string>>()
 })
 
 export const tags = sqliteTable('tags', {
