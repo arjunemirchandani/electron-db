@@ -23,6 +23,8 @@ interface NoteRowProps {
   onCancelAddTag: () => void
   onAddTags: (names: string[]) => void
   onRemoveTag: (tagId: number) => void
+  /** Toggle a metadata key/value filter in the parent list. */
+  onFilterMeta: (key: string, value: string) => void
   onUpdate: (input: {
     title: string
     content: string
@@ -40,6 +42,7 @@ function NoteRow({
   onCancelAddTag,
   onAddTags,
   onRemoveTag,
+  onFilterMeta,
   onUpdate,
   onDelete
 }: NoteRowProps): React.JSX.Element {
@@ -203,10 +206,15 @@ function NoteRow({
         {Object.keys(note.metadata).length > 0 && (
           <span className="note-meta">
             {Object.entries(note.metadata).map(([key, value]) => (
-              <span key={key} className="meta-pill" title={`${key}: ${value}`}>
+              <button
+                key={key}
+                className="meta-pill"
+                title={`Filter by ${key}: ${value}`}
+                onClick={() => onFilterMeta(key, value)}
+              >
                 <span className="meta-key">{key}</span>
                 {value}
-              </span>
+              </button>
             ))}
           </span>
         )}

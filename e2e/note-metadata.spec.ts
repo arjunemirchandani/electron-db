@@ -49,4 +49,18 @@ test('note properties can be added, edited, removed, and are validated', async (
     }
   })
   expect(tooMany).toContain('at most 20 properties')
+
+  // Clicking a property pill filters to notes sharing that key/value.
+  await relaunched.page.evaluate(async () => {
+    const a = await window.api.createNote({ title: 'Also low' })
+    await window.api.updateNote(a.id, { title: 'Also low', metadata: { priority: 'low' } })
+    const b = await window.api.createNote({ title: 'Unrelated' })
+    void b
+    location.reload()
+  })
+  await expect(relaunched.page.locator('.note-row')).toHaveCount(3)
+  await relaunched.page.locator('.note-row .meta-pill').first().click()
+  await expect(relaunched.page.locator('.note-row')).toHaveCount(2)
+  await relaunched.page.locator('.notes-search .meta-pill-active').click()
+  await expect(relaunched.page.locator('.note-row')).toHaveCount(3)
 })

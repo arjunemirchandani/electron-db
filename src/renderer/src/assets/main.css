@@ -475,6 +475,7 @@ code {
   gap: 4px;
 }
 
+.notes button.meta-pill,
 .meta-pill {
   display: inline-flex;
   align-items: center;
@@ -490,6 +491,16 @@ code {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.notes button.meta-pill:hover {
+  border-color: var(--ev-button-alt-hover-border);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.notes button.meta-pill-active {
+  border-color: rgba(105, 136, 230, 0.75);
+  background-color: rgba(105, 136, 230, 0.16);
 }
 
 .meta-key {

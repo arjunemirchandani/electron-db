@@ -16,6 +16,7 @@ function Notes(): React.JSX.Element {
   const [newTags, setNewTags] = useState<string[]>([])
   const tagInputRef = useRef<TagInputHandle>(null)
   const [filterTags, setFilterTags] = useState<string[]>([])
+  const [metaFilter, setMetaFilter] = useState<{ key: string; value: string } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Note[] | null>(null)
   const [filterMode, setFilterMode] = useState<'all' | 'any'>('all')
@@ -142,7 +143,7 @@ function Notes(): React.JSX.Element {
     )
 
   const baseNotes = searchActive && searchResults ? searchResults : notes
-  const visibleNotes =
+  const tagFiltered =
     filterTags.length === 0
       ? baseNotes
       : baseNotes.filter((note) => {
@@ -151,6 +152,9 @@ function Notes(): React.JSX.Element {
             ? filterTags.every((name) => names.includes(name))
             : filterTags.some((name) => names.includes(name))
         })
+  const visibleNotes = metaFilter
+    ? tagFiltered.filter((note) => note.metadata[metaFilter.key] === metaFilter.value)
+    : tagFiltered
 
   const hueFor = (name: string): number | null | undefined =>
     allTags.find((t) => t.name === name)?.hue
@@ -206,6 +210,16 @@ function Notes(): React.JSX.Element {
         {searchQuery && (
           <button className="tag-filter-clear" onClick={() => setSearchQuery('')}>
             Clear
+          </button>
+        )}
+        {metaFilter && (
+          <button
+            className="meta-pill meta-pill-active"
+            title="Clear property filter"
+            onClick={() => setMetaFilter(null)}
+          >
+            <span className="meta-key">{metaFilter.key}</span>
+            {metaFilter.value} ×
           </button>
         )}
       </div>
@@ -298,6 +312,11 @@ function Notes(): React.JSX.Element {
             onCancelAddTag={() => setAddingTagFor(null)}
             onAddTags={(names) => addTagsToNote(note.id, names)}
             onRemoveTag={(tagId) => removeTag(note.id, tagId)}
+            onFilterMeta={(key, value) =>
+              setMetaFilter((current) =>
+                current && current.key === key && current.value === value ? null : { key, value }
+              )
+            }
             onUpdate={async (input) => {
               await window.api.updateNote(note.id, input)
               await refresh()
