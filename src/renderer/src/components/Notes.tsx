@@ -144,6 +144,23 @@ function Notes(): React.JSX.Element {
     }
   }
 
+  const importNotes = async (): Promise<void> => {
+    setBackupStatus(null)
+    try {
+      const result = await window.api.importNotes()
+      if (result) {
+        setBackupStatus(
+          `Imported ${result.notes} notes` +
+            (result.tagsCreated > 0 ? ` and ${result.tagsCreated} new tags` : '') +
+            ' (snapshot taken first)'
+        )
+        await Promise.all([refresh(), refreshBackups()])
+      }
+    } catch (err) {
+      setBackupStatus(`Import failed: ${err instanceof Error ? err.message : String(err)}`)
+    }
+  }
+
   const deleteBackup = async (filename: string): Promise<void> => {
     await window.api.deleteBackup(filename)
     await refreshBackups()
@@ -349,6 +366,9 @@ function Notes(): React.JSX.Element {
         </button>
         <button className="export-button" onClick={exportNotes}>
           Export…
+        </button>
+        <button className="import-button" onClick={importNotes}>
+          Import…
         </button>
         {backupStatus && <span className="backup-status">{backupStatus}</span>}
       </Toolbar>

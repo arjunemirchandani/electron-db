@@ -68,6 +68,8 @@ export interface DbApi {
   deleteTag: (tagId: number) => Promise<void>
   /** Export all notes and tags to a JSON file; null when the dialog is canceled. */
   exportNotes: () => Promise<{ path: string; notes: number } | null>
+  /** Import an export file (a safety snapshot is taken first); null when canceled. */
+  importNotes: () => Promise<{ path: string; notes: number; tagsCreated: number } | null>
   /** Snapshot the database now; resolves to the backup file's path. */
   backupNow: () => Promise<string>
   /** Backups on disk, newest first. */

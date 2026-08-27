@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { and, desc, eq, inArray, notInArray, sql } from 'drizzle-orm'
 import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
-import { cleanMetadata, exportToFile } from './transfer'
+import { cleanMetadata, exportToFile, importFromFile } from './transfer'
 import { notes, noteTags, tags } from './db/schema'
 import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
 
@@ -221,6 +221,13 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('transfer:export', (): Promise<{ path: string; notes: number } | null> => {
     return exportToFile()
   })
+
+  ipcMain.handle(
+    'transfer:import',
+    (): Promise<{ path: string; notes: number; tagsCreated: number } | null> => {
+      return importFromFile()
+    }
+  )
 
   ipcMain.handle('db:backup', (): Promise<string> => {
     return createBackup()
