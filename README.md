@@ -127,6 +127,24 @@ npm run build:linux   # AppImage, deb
 
 electron-builder handles code paths for the packaged app (the `drizzle/` folder ships via `extraResources`; the native module is unpacked automatically).
 
+## Export & import
+
+*Export…* writes every note and tag to a single JSON file; *Import…* merges one back in (a safety snapshot is taken first, so an import is reversible from the Backups panel). The file is a versioned envelope designed to outlive the current schema:
+
+```json
+{
+  "format": "electrondb-export",
+  "formatVersion": 1,
+  "exportedAt": "…", "appVersion": "…",
+  "tags":  [{ "name": "work", "hue": 210 }],
+  "notes": [{ "title": "…", "content": "…", "createdAt": "…",
+              "updatedAt": null, "metadata": { "priority": "high" },
+              "tags": ["work"] }]
+}
+```
+
+Compatibility policy: the writer always emits the full current shape; the reader ignores unknown fields, upgrades older `formatVersion`s on import (file-format migrations, like the database's), and refuses files from newer app versions with an honest error. Notes reference tags by name — never by database id. When note content someday grows richer (blocks, arrays, images), `formatVersion` bumps and older files keep importing; binary assets would move the container to a zip with this JSON as its manifest, keeping the same versioning story.
+
 ## Releases & auto-update
 
 Pushing a version tag (`git tag v1.1.0 && git push origin v1.1.0`) builds installers on all three platforms and publishes them to a [GitHub Release](https://github.com/arjunemirchandani/electron-db/releases). Installed apps then pick updates up automatically:
