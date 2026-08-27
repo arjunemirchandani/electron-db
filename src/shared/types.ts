@@ -66,6 +66,8 @@ export interface DbApi {
   mergeTags: (sourceId: number, targetId: number) => Promise<void>
   /** Delete a tag, detaching it from every note. */
   deleteTag: (tagId: number) => Promise<void>
+  /** Export all notes and tags to a JSON file; null when the dialog is canceled. */
+  exportNotes: () => Promise<{ path: string; notes: number } | null>
   /** Snapshot the database now; resolves to the backup file's path. */
   backupNow: () => Promise<string>
   /** Backups on disk, newest first. */

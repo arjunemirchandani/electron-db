@@ -132,6 +132,18 @@ function Notes(): React.JSX.Element {
     }
   }
 
+  const exportNotes = async (): Promise<void> => {
+    setBackupStatus(null)
+    try {
+      const result = await window.api.exportNotes()
+      if (result) {
+        setBackupStatus(`Exported ${result.notes} notes to ${result.path.split(/[\\/]/).pop()}`)
+      }
+    } catch (err) {
+      setBackupStatus(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
+    }
+  }
+
   const deleteBackup = async (filename: string): Promise<void> => {
     await window.api.deleteBackup(filename)
     await refreshBackups()
@@ -334,6 +346,9 @@ function Notes(): React.JSX.Element {
         </button>
         <button className="manage-tags-toggle" onClick={() => setShowManageTags((v) => !v)}>
           {showManageTags ? 'Hide Tags' : `Manage Tags (${allTags.length})`}
+        </button>
+        <button className="export-button" onClick={exportNotes}>
+          Export…
         </button>
         {backupStatus && <span className="backup-status">{backupStatus}</span>}
       </Toolbar>

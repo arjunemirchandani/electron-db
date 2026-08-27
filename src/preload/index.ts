@@ -20,6 +20,7 @@ const api: DbApi = {
   mergeTags: (sourceId: number, targetId: number) =>
     ipcRenderer.invoke('tags:merge', sourceId, targetId),
   deleteTag: (tagId: number) => ipcRenderer.invoke('tags:delete', tagId),
+  exportNotes: () => ipcRenderer.invoke('transfer:export'),
   backupNow: () => ipcRenderer.invoke('db:backup'),
   listBackups: () => ipcRenderer.invoke('backups:list'),
   restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),

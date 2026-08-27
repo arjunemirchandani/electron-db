@@ -1,34 +1,9 @@
 import { ipcMain } from 'electron'
 import { and, desc, eq, inArray, notInArray, sql } from 'drizzle-orm'
 import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
+import { cleanMetadata, exportToFile } from './transfer'
 import { notes, noteTags, tags } from './db/schema'
 import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
-
-const META_MAX_ENTRIES = 20
-const META_MAX_KEY = 40
-const META_MAX_VALUE = 400
-
-// Normalize and validate renderer-supplied properties: string keys and
-// values only, trimmed keys, size caps — anything else is rejected loudly.
-function cleanMetadata(raw: unknown): Record<string, string> {
-  if (raw === undefined || raw === null) return {}
-  if (typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Invalid properties')
-  const clean: Record<string, string> = {}
-  for (const [rawKey, value] of Object.entries(raw)) {
-    const key = rawKey.trim()
-    if (!key) continue
-    if (typeof value !== 'string') throw new Error('Property values must be text')
-    if (key.length > META_MAX_KEY)
-      throw new Error(`Property names are limited to ${META_MAX_KEY} characters`)
-    if (value.length > META_MAX_VALUE)
-      throw new Error(`Property values are limited to ${META_MAX_VALUE} characters`)
-    clean[key] = value
-  }
-  if (Object.keys(clean).length > META_MAX_ENTRIES) {
-    throw new Error(`A note can have at most ${META_MAX_ENTRIES} properties`)
-  }
-  return clean
-}
 
 function withDefaults<T extends { metadata: Record<string, string> | null }>(
   note: T
@@ -241,6 +216,10 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('tags:delete', (_event, tagId: number): void => {
     if (!Number.isInteger(tagId)) throw new Error('Invalid tag id')
     getDb().delete(tags).where(eq(tags.id, tagId)).run()
+  })
+
+  ipcMain.handle('transfer:export', (): Promise<{ path: string; notes: number } | null> => {
+    return exportToFile()
   })
 
   ipcMain.handle('db:backup', (): Promise<string> => {
