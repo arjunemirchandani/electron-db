@@ -9,7 +9,23 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # Types track the runtime major (Node 22 in CI and in Electron);
+      # lift this when the runtime itself moves.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # electron-vite's peer range is vite ^5||^6||^7 — it doesn't support
+      # Vite 8 yet. Remove both entries when it does.
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitejs/plugin-react'
+        update-types: ['version-update:semver-major']
     groups:
+      # vite and its plugins are peer-locked; their updates travel together.
+      vite:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
       minor-and-patch:
         applies-to: version-updates
         update-types:
