@@ -10,7 +10,7 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     ignore:
-      # Types track the runtime major (Node 22 in CI and in Electron);
+      # Types track the runtime major (Node 24 — Electron 44's runtime and CI);
       # lift this when the runtime itself moves.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
