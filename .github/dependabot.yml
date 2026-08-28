@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # npm dependencies: weekly, with minor/patch changes grouped into a
+  # single PR so the queue stays readable. Majors arrive individually —
+  # they deserve individual attention (Electron especially).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+
+  # The CI/release workflows' actions age too.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
