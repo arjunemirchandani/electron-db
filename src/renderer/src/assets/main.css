@@ -522,7 +522,6 @@ code {
   justify-content: space-between;
   gap: 12px;
   padding: 10px var(--space-2);
-  margin-inline: calc(-1 * var(--space-2));
   border-radius: var(--radius-md);
   transition: background-color 120ms;
   border-bottom: 1px solid var(--ev-button-alt-border);
@@ -703,7 +702,7 @@ code {
   .note-row {
     flex-direction: column;
     gap: 8px;
-    padding: 12px 0;
+    padding: 12px var(--space-2);
   }
 
   .note-row-editing {
@@ -1004,7 +1003,6 @@ code {
   justify-content: space-between;
   gap: var(--space-2) 10px;
   padding: var(--space-2);
-  margin-inline: calc(-1 * var(--space-2));
   border-radius: var(--radius-md);
   transition: background-color 120ms;
   font-size: 13px;
