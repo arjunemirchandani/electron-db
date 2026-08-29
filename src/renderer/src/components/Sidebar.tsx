@@ -2,10 +2,12 @@ import { ArchiveIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
 
 export type View = 'notes' | 'backups' | 'tags'
 
+// Ordered by expected frequency of use: tags get touched far more
+// often than the data-lifecycle chores.
 const ITEMS: { view: View; label: string; icon: React.JSX.Element }[] = [
   { view: 'notes', label: 'Notes', icon: <NotesIcon size={16} /> },
-  { view: 'backups', label: 'Backups', icon: <ArchiveIcon size={16} /> },
-  { view: 'tags', label: 'Tags', icon: <TagIcon size={16} /> }
+  { view: 'tags', label: 'Tags', icon: <TagIcon size={16} /> },
+  { view: 'backups', label: 'Backups', icon: <ArchiveIcon size={16} /> }
 ]
 
 interface SidebarProps {
