@@ -17,6 +17,9 @@
   --surface-input: rgba(27, 27, 31, 0.65);
   --surface-panel: rgba(34, 34, 40, 0.62);
   --border-subtle: var(--ev-button-alt-border);
+  /* Resting border for text inputs: lighter than the panel surface so
+     fields read as fields before they're focused */
+  --border-input: rgba(255, 255, 255, 0.14);
   --accent: #6988e6;
   --accent-hover: #7b97ea;
 }
@@ -371,7 +374,7 @@ code {
   min-width: 0;
   padding: 6px 10px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-input);
   background-color: var(--surface-input);
   color: var(--ev-c-text-1);
   font-size: var(--fs-caption);
@@ -389,7 +392,7 @@ code {
   min-width: 0;
   padding: var(--space-2) 10px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-input);
   background-color: var(--surface-input);
   color: var(--ev-c-text-1);
   font-size: var(--fs-body);
@@ -405,7 +408,7 @@ code {
   min-width: 0;
   padding: 5px var(--space-2);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-input);
   background-color: var(--surface-input);
 }
 
@@ -573,7 +576,7 @@ code {
   min-width: 0;
   padding: var(--space-2) 10px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-input);
   background-color: var(--surface-input);
   color: var(--ev-c-text-1);
   font-size: var(--fs-body);
@@ -641,7 +644,7 @@ code {
   min-width: 0;
   padding: 5px 8px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-input);
   background-color: var(--surface-input);
   color: var(--ev-c-text-1);
   font-size: var(--fs-caption);
@@ -718,7 +721,7 @@ code {
     min-width: 0;
     padding: var(--space-2) 10px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--border-input);
     background-color: var(--surface-input);
     color: var(--ev-c-text-1);
     font-size: var(--fs-body);
@@ -775,7 +778,7 @@ code {
     min-width: 0;
     padding: 5px 8px;
     border-radius: var(--radius-sm);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--border-input);
     background-color: var(--surface-input);
     color: var(--ev-c-text-1);
     font-size: var(--fs-caption);
@@ -1100,7 +1103,7 @@ code {
 .manage-tag-rename {
   padding: 3px 8px;
   border-radius: 999px;
-  border: 1px solid var(--ev-button-alt-hover-border);
+  border: 1px solid var(--border-input);
   background-color: rgba(27, 27, 31, 0.65);
   color: var(--ev-c-text-1);
   font-size: 12px;
