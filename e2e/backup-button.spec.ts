@@ -5,6 +5,7 @@ test('backup button creates a backup and prunes to the 3 most recent', async ({
   backups
 }) => {
   const { page } = await launch()
+  await page.click('.sidebar-item[data-view="backups"]')
   const button = page.locator('.notes-backup button', { hasText: 'Back Up Database' })
 
   await button.click()

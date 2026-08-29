@@ -20,6 +20,7 @@ test('export writes a versioned envelope with tags by name', async ({ launch }) 
   })
   await expect(page.locator('.note-row')).toHaveCount(2)
 
+  await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Export…' }).click()
   await expect(page.locator('.backup-status')).toContainText('Exported 2 notes')
 
@@ -78,10 +79,12 @@ test('import merges a v1 file, preserves existing tag colors, snapshots first', 
   })
   await expect(page.locator('.note-row')).toHaveCount(1)
 
+  await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Import…' }).click()
   await expect(page.locator('.backup-status')).toContainText(
     'Imported 2 notes and 1 new tags (snapshot taken first)'
   )
+  await page.click('.sidebar-item[data-view="notes"]')
   await expect(page.locator('.note-row')).toHaveCount(3)
   const imported = page.locator('.note-row', { hasText: 'Imported plans' })
   await expect(imported.locator('.tag-chip')).toHaveText(['travel×', 'work×'])
@@ -104,16 +107,19 @@ test('import rejects newer or foreign files with honest errors', async ({ launch
     JSON.stringify({ format: 'electrondb-export', formatVersion: 99, notes: [] })
   )
   const { app, page } = await launch({ ELECTRONDB_IMPORT_PATH: newer })
+  await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Import…' }).click()
   await expect(page.locator('.backup-status')).toContainText(
     'created by a newer version of ElectronDB'
   )
+  await page.click('.sidebar-item[data-view="notes"]')
   await expect(page.locator('.note-row')).toHaveCount(0)
   await app.close()
 
   const foreign = path.join(dir, 'foreign.json')
   fs.writeFileSync(foreign, JSON.stringify({ hello: 'world' }))
   const second = await launch({ ELECTRONDB_IMPORT_PATH: foreign })
+  await second.page.click('.sidebar-item[data-view="backups"]')
   await second.page.getByRole('button', { name: 'Import…' }).click()
   await expect(second.page.locator('.backup-status')).toContainText("isn't an ElectronDB export")
 })

@@ -17,7 +17,9 @@ async function setWidth(
 async function layoutReport(page: Page): Promise<{ overflow: boolean; clipped: string[] }> {
   return page.evaluate(() => {
     const viewport = document.documentElement.clientWidth
-    const clipped = [...document.querySelectorAll<HTMLElement>('.notes button, .notes input')]
+    const clipped = [
+      ...document.querySelectorAll<HTMLElement>('.notes button, .notes input, .sidebar button')
+    ]
       .filter((el) => el.offsetParent !== null)
       .filter((el) => {
         const r = el.getBoundingClientRect()
@@ -44,16 +46,18 @@ test('no horizontal overflow or clipped controls from 320px up', async ({ launch
     location.reload()
   })
   await expect(page.locator('.tag-filter')).toBeVisible()
-  await page.click('.backups-toggle')
-  await page.click('.manage-tags-toggle')
+  await page.click('.sidebar-item[data-view="tags"]')
   await expect(page.locator('.manage-tags-list li')).toHaveCount(4)
 
   for (const width of [320, 420, 600, 900]) {
     await setWidth(app, width, 700)
     // innerWidth includes a classic scrollbar (Windows/Linux); clientWidth doesn't.
     await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(width)
-    const report = await layoutReport(page)
-    expect(report, `at ${width}px`).toEqual({ overflow: false, clipped: [] })
+    for (const view of ['notes', 'backups', 'tags'] as const) {
+      await page.click(`.sidebar-item[data-view="${view}"]`)
+      const report = await layoutReport(page)
+      expect(report, `at ${width}px in ${view}`).toEqual({ overflow: false, clipped: [] })
+    }
   }
 })
 

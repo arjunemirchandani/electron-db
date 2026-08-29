@@ -93,6 +93,121 @@ code {
   -webkit-app-region: no-drag;
 }
 
+/* Shell: sidebar on the left, header + active view stacked on the right */
+.app-shell {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  gap: 16px;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 16px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 180px;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-panel);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  overflow: hidden;
+  transition: width 160ms ease;
+}
+
+.sidebar-collapsed {
+  width: 52px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sidebar-collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar button {
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--ev-c-text-2);
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.sidebar button:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--ev-c-text-1);
+}
+
+.sidebar button:focus-visible {
+  outline: 2px solid rgba(105, 136, 230, 0.85);
+  outline-offset: 1px;
+}
+
+.sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sidebar-item svg {
+  flex-shrink: 0;
+}
+
+/* button.… so this outranks the `.sidebar button` background: none */
+.sidebar button.sidebar-item-active {
+  background-color: rgba(105, 136, 230, 0.16);
+  color: var(--ev-c-text-1);
+}
+
+.sidebar button.sidebar-item-active:hover {
+  background-color: rgba(105, 136, 230, 0.22);
+}
+
+.sidebar-collapsed .sidebar-item {
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.sidebar-collapsed .sidebar-label {
+  display: none;
+}
+
 .app-header-text {
   flex: 1;
 }
@@ -871,9 +986,7 @@ code {
 
 .notes-backup {
   gap: 10px;
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-3);
 }
 
 .notes-backup button {
@@ -933,10 +1046,20 @@ code {
   margin: 2px 0 var(--space-2);
 }
 
+/* Panels own a whole view now; their lists take the remaining height */
+.backups-panel,
+.manage-tags {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .backups-list {
   list-style: none;
   padding: 0;
-  max-height: 180px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -964,7 +1087,8 @@ code {
 }
 
 .manage-tags .manage-tags-list {
-  max-height: 220px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -1048,6 +1172,35 @@ code {
 @media (max-width: 350px) {
   .tip,
   .actions {
+    display: none;
+  }
+}
+
+/* Thin-column mode: the sidebar always shows as an icon rail so the
+   320px content floor keeps room for the actual view */
+@media (max-width: 520px) {
+  #root {
+    padding-inline: 12px;
+  }
+
+  .app-shell {
+    gap: 10px;
+  }
+
+  .sidebar {
+    width: 52px;
+  }
+
+  .sidebar-header {
+    justify-content: center;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .sidebar-label {
     display: none;
   }
 }

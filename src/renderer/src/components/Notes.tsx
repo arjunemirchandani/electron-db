@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { BackupInfo, Note, Tag } from '../../../shared/types'
+import type { Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
-import ManageTags from './ManageTags'
 import NoteRow from './NoteRow'
-import BackupsPanel from './BackupsPanel'
 import { Toolbar } from './primitives'
 import { tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
@@ -22,11 +20,6 @@ function Notes(): React.JSX.Element {
   const [filterMode, setFilterMode] = useState<'all' | 'any'>('all')
   const [addingTagFor, setAddingTagFor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [backupStatus, setBackupStatus] = useState<string | null>(null)
-  const [backingUp, setBackingUp] = useState(false)
-  const [backups, setBackups] = useState<BackupInfo[]>([])
-  const [showBackups, setShowBackups] = useState(false)
-  const [showManageTags, setShowManageTags] = useState(false)
 
   const refresh = useCallback(async (): Promise<void> => {
     const [nextNotes, nextTags] = await Promise.all([window.api.listNotes(), window.api.listTags()])
@@ -35,18 +28,13 @@ function Notes(): React.JSX.Element {
     setFilterTags((current) => current.filter((name) => nextTags.some((t) => t.name === name)))
   }, [])
 
-  const refreshBackups = useCallback(async (): Promise<void> => {
-    setBackups(await window.api.listBackups())
-  }, [])
-
   useEffect(() => {
     let cancelled = false
-    Promise.all([window.api.listNotes(), window.api.listTags(), window.api.listBackups()])
-      .then(([nextNotes, nextTags, nextBackups]) => {
+    Promise.all([window.api.listNotes(), window.api.listTags()])
+      .then(([nextNotes, nextTags]) => {
         if (cancelled) return
         setNotes(nextNotes)
         setAllTags(nextTags)
-        setBackups(nextBackups)
       })
       .catch((e) => {
         if (!cancelled) setError(String(e))
@@ -102,68 +90,6 @@ function Notes(): React.JSX.Element {
     for (const name of names) await window.api.addTag(noteId, name)
     setAddingTagFor(null)
     await refresh()
-  }
-
-  const backupNow = async (): Promise<void> => {
-    setBackingUp(true)
-    setBackupStatus(null)
-    try {
-      const path = await window.api.backupNow()
-      const filename = path.split(/[\\/]/).pop()
-      setBackupStatus(`Backed up to ${filename}`)
-      await refreshBackups()
-    } catch (err) {
-      setBackupStatus(`Backup failed: ${err instanceof Error ? err.message : String(err)}`)
-    } finally {
-      setBackingUp(false)
-    }
-  }
-
-  const restoreBackup = async (filename: string): Promise<void> => {
-    setBackupStatus(null)
-    try {
-      await window.api.restoreBackup(filename)
-      setFilterTags([])
-      setBackupStatus(`Restored ${filename}`)
-      await Promise.all([refresh(), refreshBackups()])
-    } catch (err) {
-      setBackupStatus(`Restore failed: ${err instanceof Error ? err.message : String(err)}`)
-      throw err
-    }
-  }
-
-  const exportNotes = async (): Promise<void> => {
-    setBackupStatus(null)
-    try {
-      const result = await window.api.exportNotes()
-      if (result) {
-        setBackupStatus(`Exported ${result.notes} notes to ${result.path.split(/[\\/]/).pop()}`)
-      }
-    } catch (err) {
-      setBackupStatus(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
-    }
-  }
-
-  const importNotes = async (): Promise<void> => {
-    setBackupStatus(null)
-    try {
-      const result = await window.api.importNotes()
-      if (result) {
-        setBackupStatus(
-          `Imported ${result.notes} notes` +
-            (result.tagsCreated > 0 ? ` and ${result.tagsCreated} new tags` : '') +
-            ' (snapshot taken first)'
-        )
-        await Promise.all([refresh(), refreshBackups()])
-      }
-    } catch (err) {
-      setBackupStatus(`Import failed: ${err instanceof Error ? err.message : String(err)}`)
-    }
-  }
-
-  const deleteBackup = async (filename: string): Promise<void> => {
-    await window.api.deleteBackup(filename)
-    await refreshBackups()
   }
 
   const toggleFilter = (name: string): void =>
@@ -354,28 +280,6 @@ function Notes(): React.JSX.Element {
           />
         ))}
       </ul>
-      <Toolbar className="notes-backup">
-        <button onClick={backupNow} disabled={backingUp}>
-          {backingUp ? 'Backing up…' : 'Back Up Database'}
-        </button>
-        <button className="backups-toggle" onClick={() => setShowBackups((v) => !v)}>
-          {showBackups ? 'Hide Backups' : `Backups (${backups.length})`}
-        </button>
-        <button className="manage-tags-toggle" onClick={() => setShowManageTags((v) => !v)}>
-          {showManageTags ? 'Hide Tags' : `Manage Tags (${allTags.length})`}
-        </button>
-        <button className="export-button" onClick={exportNotes}>
-          Export…
-        </button>
-        <button className="import-button" onClick={importNotes}>
-          Import…
-        </button>
-        {backupStatus && <span className="backup-status">{backupStatus}</span>}
-      </Toolbar>
-      {showManageTags && <ManageTags tags={allTags} counts={tagCounts} onChanged={refresh} />}
-      {showBackups && (
-        <BackupsPanel backups={backups} onRestore={restoreBackup} onDelete={deleteBackup} />
-      )}
     </div>
   )
 }

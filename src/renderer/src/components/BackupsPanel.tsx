@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { BackupInfo } from '../../../shared/types'
-import { ListRow, Section } from './primitives'
+import { ListRow } from './primitives'
 
 function formatSize(bytes: number): string {
   return bytes >= 1024 * 1024
@@ -29,11 +29,7 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
   }
 
   return (
-    <Section
-      title="Backups"
-      description="Snapshots of your database. Restoring takes a safety snapshot first."
-      className="backups-panel"
-    >
+    <div className="backups-panel">
       <ul className="backups-list">
         {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}
         {backups.map((backup) => (
@@ -72,7 +68,7 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
           />
         ))}
       </ul>
-    </Section>
+    </div>
   )
 }
 

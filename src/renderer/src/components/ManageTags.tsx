@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Tag } from '../../../shared/types'
 import { tagStyle } from '../lib/tagColor'
-import { ListRow, Section } from './primitives'
+import { ListRow } from './primitives'
 
 const PALETTE = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 
@@ -166,11 +166,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
   }
 
   return (
-    <Section
-      title="Tags"
-      description="Pick colors, rename, merge, or delete — changes apply to every note."
-      className="manage-tags"
-    >
+    <div className="manage-tags">
       {error && <p className="notes-error">{error}</p>}
       {tags.length === 0 && <p className="notes-empty">No tags yet.</p>}
       <ul className="manage-tags-list">
@@ -178,7 +174,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           <ListRow key={tag.id} main={renderMain(tag)} actions={renderActions(tag)} />
         ))}
       </ul>
-    </Section>
+    </div>
   )
 }
 
