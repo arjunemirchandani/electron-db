@@ -144,7 +144,13 @@ code {
 .sidebar nav {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 2px;
+}
+
+/* Settings sinks to the bottom of the rail, desktop-app convention */
+.sidebar-item[data-view='settings'] {
+  margin-top: auto;
 }
 
 .sidebar button {
@@ -1156,6 +1162,54 @@ code {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settings-row-main {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.settings-row-main strong {
+  font-size: var(--fs-body);
+  color: var(--ev-c-text-1);
+}
+
+.settings-row-main p {
+  font-size: var(--fs-caption);
+  color: var(--ev-c-text-2);
+  margin-top: 2px;
+}
+
+.settings-retention {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-retention input {
+  width: 56px;
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-input);
+  background-color: var(--surface-input);
+  color: var(--ev-c-text-1);
+  font-size: var(--fs-body);
+}
+
+.notes .settings-retention button {
+  width: 30px;
+  padding: 6px 0;
+  text-align: center;
 }
 
 @media (max-width: 720px) {

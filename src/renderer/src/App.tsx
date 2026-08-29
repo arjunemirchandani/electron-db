@@ -3,6 +3,7 @@ import Versions from './components/Versions'
 import Notes from './components/Notes'
 import BackupsView from './components/BackupsView'
 import TagsView from './components/TagsView'
+import SettingsView from './components/SettingsView'
 import Sidebar, { type View } from './components/Sidebar'
 import electronLogo from './assets/electron.svg'
 
@@ -56,6 +57,7 @@ function App(): React.JSX.Element {
           {view === 'notes' && <Notes />}
           {view === 'backups' && <BackupsView />}
           {view === 'tags' && <TagsView />}
+          {view === 'settings' && <SettingsView />}
         </main>
       </div>
     </>

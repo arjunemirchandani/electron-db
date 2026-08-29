@@ -1,13 +1,15 @@
-import { ArchiveIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
+import { ArchiveIcon, GearIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
 
-export type View = 'notes' | 'backups' | 'tags'
+export type View = 'notes' | 'backups' | 'tags' | 'settings'
 
 // Ordered by expected frequency of use: tags get touched far more
-// often than the data-lifecycle chores.
+// often than the data-lifecycle chores. Settings sinks to the bottom
+// of the rail (see the CSS margin-top: auto).
 const ITEMS: { view: View; label: string; icon: React.JSX.Element }[] = [
   { view: 'notes', label: 'Notes', icon: <NotesIcon size={16} /> },
   { view: 'tags', label: 'Tags', icon: <TagIcon size={16} /> },
-  { view: 'backups', label: 'Backups', icon: <ArchiveIcon size={16} /> }
+  { view: 'backups', label: 'Backups', icon: <ArchiveIcon size={16} /> },
+  { view: 'settings', label: 'Settings', icon: <GearIcon size={16} /> }
 ]
 
 interface SidebarProps {
