@@ -1212,6 +1212,57 @@ code {
   text-align: center;
 }
 
+/* Success toasts: bottom-right overlay, out of layout flow so feedback
+   never displaces controls. Lifetime must match TOAST_LIFETIME_MS. */
+.toast-region {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.toast {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: hsl(145 60% 85%);
+  background-color: hsl(145 45% 22% / 0.95);
+  border: 1px solid hsl(145 50% 40% / 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  animation: toast-life 2500ms both;
+}
+
+@keyframes toast-life {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  8% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
 @media (max-width: 720px) {
   .text {
     font-size: 20px;

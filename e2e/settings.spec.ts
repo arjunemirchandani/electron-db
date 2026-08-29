@@ -17,7 +17,7 @@ test('backup retention setting controls pruning and survives relaunch', async ({
   await expect(
     page.locator('.settings-retention button[aria-label="Fewer backups"]')
   ).toBeDisabled()
-  await expect(page.locator('.settings-status')).toHaveText('Saved')
+  await expect(page.locator('.toast').last()).toHaveText('Saved')
 
   // Pruning honors the live value: two backups, only the newest kept.
   await page.click('.sidebar-item[data-view="backups"]')

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AppSettings } from '../../../shared/types'
+import { useToast } from './toast'
 
 const RETENTION_MIN = 1
 const RETENTION_MAX = 10
@@ -8,8 +9,8 @@ const RETENTION_MAX = 10
  *  database, so restores and imports never change them. */
 function SettingsView(): React.JSX.Element {
   const [settings, setSettings] = useState<AppSettings | null>(null)
-  const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     let cancelled = false
@@ -27,13 +28,12 @@ function SettingsView(): React.JSX.Element {
   }, [])
 
   const applyRetention = async (value: number): Promise<void> => {
-    setStatus(null)
     setError(null)
     try {
       // The main process clamps and returns the sanitized result.
       const next = await window.api.setSettings({ backupRetention: value })
       setSettings(next)
-      setStatus('Saved')
+      toast('Saved')
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     }
@@ -80,7 +80,6 @@ function SettingsView(): React.JSX.Element {
               +
             </button>
           </div>
-          {status && <span className="backup-status settings-status">{status}</span>}
         </div>
       )}
     </div>
