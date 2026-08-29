@@ -2,8 +2,9 @@ import { ipcMain } from 'electron'
 import { and, desc, eq, inArray, notInArray, sql } from 'drizzle-orm'
 import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
 import { cleanMetadata, exportToFile, importFromFile } from './transfer'
+import { readSettings, updateSettings } from './settings'
 import { notes, noteTags, tags } from './db/schema'
-import type { BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
+import type { AppSettings, BackupInfo, NewNoteInput, Note, Tag } from '../shared/types'
 
 function withDefaults<T extends { metadata: Record<string, string> | null }>(
   note: T
@@ -243,5 +244,12 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('backups:delete', (_event, filename: string): void => {
     if (typeof filename !== 'string') throw new Error('Invalid backup filename')
     deleteBackup(filename)
+  })
+
+  ipcMain.handle('settings:get', (): AppSettings => readSettings())
+
+  ipcMain.handle('settings:set', (_event, patch: Partial<AppSettings>): AppSettings => {
+    if (patch === null || typeof patch !== 'object') throw new Error('Invalid settings patch')
+    return updateSettings(patch)
   })
 }

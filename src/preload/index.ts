@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { DbApi, NewNoteInput } from '../shared/types'
+import type { AppSettings, DbApi, NewNoteInput } from '../shared/types'
 
 // Custom APIs for renderer
 const api: DbApi = {
@@ -25,7 +25,9 @@ const api: DbApi = {
   backupNow: () => ipcRenderer.invoke('db:backup'),
   listBackups: () => ipcRenderer.invoke('backups:list'),
   restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),
-  deleteBackup: (filename: string) => ipcRenderer.invoke('backups:delete', filename)
+  deleteBackup: (filename: string) => ipcRenderer.invoke('backups:delete', filename),
+  getSettings: () => ipcRenderer.invoke('settings:get'),
+  setSettings: (patch: Partial<AppSettings>) => ipcRenderer.invoke('settings:set', patch)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

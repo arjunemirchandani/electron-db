@@ -4,6 +4,7 @@ import { join } from 'path'
 import Database from 'better-sqlite3'
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
+import { readSettings } from '../settings'
 import * as schema from './schema'
 import type { BackupInfo } from '../../shared/types'
 
@@ -11,7 +12,6 @@ export type DB = BetterSQLite3Database<typeof schema>
 
 const DB_FILENAME = 'electrondb.sqlite3'
 const BACKUP_PREFIX = 'electrondb.backup-'
-const BACKUPS_TO_KEEP = 3
 // electrondb.backup-<ISO stamp with : and . replaced by ->-v<version>.sqlite3
 const BACKUP_RE =
   /^electrondb\.backup-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)-v([^/\\]+)\.sqlite3$/
@@ -64,10 +64,11 @@ async function backupDatabase(conn: Database.Database, userDataDir: string): Pro
 }
 
 function pruneOldBackups(userDataDir: string): void {
+  const keep = readSettings().backupRetention
   const backups = readdirSync(userDataDir)
     .filter((f) => f.startsWith(BACKUP_PREFIX) && f.endsWith('.sqlite3'))
     .sort()
-  for (const file of backups.slice(0, Math.max(0, backups.length - BACKUPS_TO_KEEP))) {
+  for (const file of backups.slice(0, Math.max(0, backups.length - keep))) {
     unlinkSync(join(userDataDir, file))
   }
 }

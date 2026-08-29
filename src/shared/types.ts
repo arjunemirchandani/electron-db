@@ -41,6 +41,11 @@ export interface BackupInfo {
   sizeBytes: number
 }
 
+export interface AppSettings {
+  /** How many backups to keep before pruning the oldest (1-10). */
+  backupRetention: number
+}
+
 export interface DbApi {
   listNotes: () => Promise<Note[]>
   createNote: (input: NewNoteInput) => Promise<Note>
@@ -77,4 +82,8 @@ export interface DbApi {
   /** Replace the live database with a backup (a safety snapshot is taken first). */
   restoreBackup: (filename: string) => Promise<void>
   deleteBackup: (filename: string) => Promise<void>
+  /** App-level preferences from userData/settings.json (not the database). */
+  getSettings: () => Promise<AppSettings>
+  /** Merge a partial update into settings; returns the sanitized result. */
+  setSettings: (patch: Partial<AppSettings>) => Promise<AppSettings>
 }
