@@ -1,4 +1,25 @@
+/* Tailwind v4, WITHOUT Preflight: we import theme + utilities layers only,
+   omitting preflight.css so Tailwind's global reset never fights the
+   app's existing token CSS. base.css remains the reset of record.
+   Note: legacy unlayered rules below outrank layered utilities by CSS
+   layer precedence — migration REPLACES rules, it doesn't override them. */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
 @import './base.css';
+
+/* Bridge the house design tokens into Tailwind's theme so utilities
+   speak palette A: bg-accent, rounded-md, etc. match the app exactly.
+   The legacy :root tokens below coexist during the migration and retire
+   as the last bespoke rules referencing them are converted. */
+@theme {
+  --color-accent: #6988e6;
+  --color-accent-hover: #7b97ea;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
 
 :root {
   /* Layout tokens — the shared vocabulary for every component */
@@ -215,10 +236,6 @@ code {
 
 .sidebar-collapsed .sidebar-label {
   display: none;
-}
-
-.app-header-text {
-  flex: 1;
 }
 
 .logo {

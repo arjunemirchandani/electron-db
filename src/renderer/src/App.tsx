@@ -47,7 +47,7 @@ function App(): React.JSX.Element {
         <main className="app-main">
           <header className="app-header">
             <img alt="logo" className="logo" src={electronLogo} />
-            <div className="app-header-text">
+            <div className="flex-1">
               <div className="creator">ElectronDB</div>
               <div className="text">
                 Electron + <span className="react">React</span> + <span className="ts">SQLite</span>
