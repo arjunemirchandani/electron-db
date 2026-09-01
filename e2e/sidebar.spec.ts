@@ -21,6 +21,10 @@ test('sidebar switches views and marks the active item', async ({ launch }) => {
 
   await page.click('.sidebar-item[data-view="notes"]')
   await expect(page.locator('.notes h2')).toHaveText('Notes')
+
+  // Real tooltips replaced native titles: hover shows the label.
+  await page.hover('.sidebar-toggle')
+  await expect(page.locator('[data-slot="tooltip-content"]')).toHaveText('Collapse sidebar')
 })
 
 test('sidebar collapse is remembered across relaunches', async ({ launch }) => {

@@ -1,4 +1,5 @@
 import { ArchiveIcon, GearIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 export type View = 'notes' | 'backups' | 'tags' | 'settings'
 
@@ -38,39 +39,52 @@ function Sidebar({ view, collapsed, onSelect, onToggle }: SidebarProps): React.J
       <div
         className={`flex ${collapsed ? 'justify-center' : 'justify-end'} max-[520px]:justify-center`}
       >
-        <button
-          className={`sidebar-toggle ${railButton} inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 text-fg-muted hover:bg-white/[0.06] hover:text-fg`}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-expanded={!collapsed}
-          onClick={onToggle}
-        >
-          <PanelLeftIcon size={16} />
-        </button>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                className={`sidebar-toggle ${railButton} inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 text-fg-muted hover:bg-white/[0.06] hover:text-fg`}
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-expanded={!collapsed}
+                onClick={onToggle}
+              />
+            }
+          >
+            <PanelLeftIcon size={16} />
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            {collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          </TooltipContent>
+        </Tooltip>
       </div>
       <nav className="flex flex-1 flex-col gap-[2px]" aria-label="Views">
         {ITEMS.map((item) => {
           const active = view === item.view
           return (
-            <button
-              key={item.view}
-              className={`sidebar-item ${railButton} flex w-full items-center gap-2.5 py-2 text-[13px] font-semibold whitespace-nowrap [&>svg]:shrink-0 ${
-                active
-                  ? 'sidebar-item-active bg-accent/[0.16] text-fg hover:bg-accent/[0.22]'
-                  : 'bg-transparent text-fg-muted hover:bg-white/[0.06] hover:text-fg'
-              } ${collapsed ? 'justify-center px-0' : 'px-2.5'} ${
-                item.view === 'settings' ? 'mt-auto' : ''
-              } max-[520px]:justify-center max-[520px]:px-0`}
-              data-view={item.view}
-              aria-current={active ? 'page' : undefined}
-              title={collapsed ? item.label : undefined}
-              onClick={() => onSelect(item.view)}
-            >
-              {item.icon}
-              <span className={`sidebar-label ${collapsed ? 'hidden' : ''} max-[520px]:hidden`}>
-                {item.label}
-              </span>
-            </button>
+            <Tooltip key={item.view}>
+              <TooltipTrigger
+                render={
+                  <button
+                    className={`sidebar-item ${railButton} flex w-full items-center gap-2.5 py-2 text-[13px] font-semibold whitespace-nowrap [&>svg]:shrink-0 ${
+                      active
+                        ? 'sidebar-item-active bg-accent/[0.16] text-fg hover:bg-accent/[0.22]'
+                        : 'bg-transparent text-fg-muted hover:bg-white/[0.06] hover:text-fg'
+                    } ${collapsed ? 'justify-center px-0' : 'px-2.5'} ${
+                      item.view === 'settings' ? 'mt-auto' : ''
+                    } max-[520px]:justify-center max-[520px]:px-0`}
+                    data-view={item.view}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => onSelect(item.view)}
+                  />
+                }
+              >
+                {item.icon}
+                <span className={`sidebar-label ${collapsed ? 'hidden' : ''} max-[520px]:hidden`}>
+                  {item.label}
+                </span>
+              </TooltipTrigger>
+              {collapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
+            </Tooltip>
           )
         })}
       </nav>

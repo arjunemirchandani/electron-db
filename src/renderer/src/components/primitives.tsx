@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 interface WithChildren {
   className?: string
@@ -43,10 +44,8 @@ interface IconButtonProps {
   children: ReactNode
 }
 
-/** Square icon-only button; label doubles as tooltip and accessible name.
- *  Still CSS-styled: as a button inside .notes it sits under the
- *  `.notes button` blanket rule, which outranks layered utilities —
- *  migrates together with the button de-blanketing step. */
+/** Square icon-only button; label is the accessible name and the
+ *  tooltip content (a real tooltip now — no native title). */
 export function IconButton({
   label,
   onClick,
@@ -54,13 +53,19 @@ export function IconButton({
   children
 }: IconButtonProps): React.JSX.Element {
   return (
-    <button
-      className={`icon-button inline-flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-fg-muted opacity-70 transition-[opacity,background-color,color] duration-[120ms] group-hover/row:opacity-100 focus-visible:opacity-100 hover:border-[var(--ev-button-alt-hover-border)] hover:bg-white/[0.06] hover:text-[#f08080] @max-[520px]:opacity-100! ${className ?? ''}`}
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-    >
-      {children}
-    </button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            className={`icon-button inline-flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-fg-muted opacity-70 transition-[opacity,background-color,color] duration-[120ms] group-hover/row:opacity-100 focus-visible:opacity-100 hover:border-[var(--ev-button-alt-hover-border)] hover:bg-white/[0.06] hover:text-[#f08080] @max-[520px]:opacity-100! ${className ?? ''}`}
+            aria-label={label}
+            onClick={onClick}
+          />
+        }
+      >
+        {children}
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   )
 }

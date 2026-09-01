@@ -5,6 +5,7 @@ import BackupsView from './components/BackupsView'
 import TagsView from './components/TagsView'
 import SettingsView from './components/SettingsView'
 import { Toaster } from './components/ui/toast'
+import { TooltipProvider } from './components/ui/tooltip'
 import Sidebar, { type View } from './components/Sidebar'
 import electronLogo from './assets/electron.svg'
 
@@ -41,39 +42,46 @@ function App(): React.JSX.Element {
 
   return (
     <Toaster>
-      <div className="titlebar-drag" aria-hidden="true" />
-      <div className="app-shell flex min-h-0 flex-1 items-stretch gap-4 max-[520px]:gap-2.5">
-        <Sidebar view={view} collapsed={collapsed} onSelect={setView} onToggle={toggleCollapsed} />
-        <main className="flex min-w-0 flex-1 flex-col gap-4">
-          <header className="app-header flex flex-wrap items-center gap-x-5 gap-y-2">
-            <img
-              alt="logo"
-              className="logo h-[72px] w-[72px] transition-[filter] duration-300 will-change-[filter] [-webkit-user-drag:none] hover:drop-shadow-[0_0_1.2em_#6988e6aa]"
-              src={electronLogo}
-            />
-            <div className="flex-1">
-              <div className="mb-1 text-[13px] leading-4 font-semibold text-fg-muted">
-                ElectronDB
+      <TooltipProvider>
+        <div className="titlebar-drag" aria-hidden="true" />
+        <div className="app-shell flex min-h-0 flex-1 items-stretch gap-4 max-[520px]:gap-2.5">
+          <Sidebar
+            view={view}
+            collapsed={collapsed}
+            onSelect={setView}
+            onToggle={toggleCollapsed}
+          />
+          <main className="flex min-w-0 flex-1 flex-col gap-4">
+            <header className="app-header flex flex-wrap items-center gap-x-5 gap-y-2">
+              <img
+                alt="logo"
+                className="logo h-[72px] w-[72px] transition-[filter] duration-300 will-change-[filter] [-webkit-user-drag:none] hover:drop-shadow-[0_0_1.2em_#6988e6aa]"
+                src={electronLogo}
+              />
+              <div className="flex-1">
+                <div className="mb-1 text-[13px] leading-4 font-semibold text-fg-muted">
+                  ElectronDB
+                </div>
+                <div className="text-[19px] leading-6 font-bold text-fg min-[400px]:whitespace-nowrap max-[720px]:text-[20px]">
+                  Electron +{' '}
+                  <span className="bg-[linear-gradient(135deg,#087ea4_55%,#7c93ee)] bg-clip-text font-bold text-transparent">
+                    React
+                  </span>{' '}
+                  +{' '}
+                  <span className="bg-[linear-gradient(135deg,#3178c6_45%,#f0dc4e)] bg-clip-text font-bold text-transparent">
+                    SQLite
+                  </span>
+                </div>
               </div>
-              <div className="text-[19px] leading-6 font-bold text-fg min-[400px]:whitespace-nowrap max-[720px]:text-[20px]">
-                Electron +{' '}
-                <span className="bg-[linear-gradient(135deg,#087ea4_55%,#7c93ee)] bg-clip-text font-bold text-transparent">
-                  React
-                </span>{' '}
-                +{' '}
-                <span className="bg-[linear-gradient(135deg,#3178c6_45%,#f0dc4e)] bg-clip-text font-bold text-transparent">
-                  SQLite
-                </span>
-              </div>
-            </div>
-            <Versions></Versions>
-          </header>
-          {view === 'notes' && <Notes />}
-          {view === 'backups' && <BackupsView />}
-          {view === 'tags' && <TagsView />}
-          {view === 'settings' && <SettingsView />}
-        </main>
-      </div>
+              <Versions></Versions>
+            </header>
+            {view === 'notes' && <Notes />}
+            {view === 'backups' && <BackupsView />}
+            {view === 'tags' && <TagsView />}
+            {view === 'settings' && <SettingsView />}
+          </main>
+        </div>
+      </TooltipProvider>
     </Toaster>
   )
 }
