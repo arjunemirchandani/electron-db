@@ -178,138 +178,9 @@ code {
   -webkit-app-region: no-drag;
 }
 
-/* Shell: sidebar on the left, header + active view stacked on the right */
-.app-shell {
-  display: flex;
-  align-items: stretch;
-  flex: 1;
-  min-height: 0;
-  gap: 16px;
-}
-
-.app-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  gap: 16px;
-}
-
 .sidebar button:focus-visible {
   outline: 2px solid rgba(105, 136, 230, 0.85);
   outline-offset: 1px;
-}
-
-.logo {
-  -webkit-user-drag: none;
-  height: 72px;
-  width: 72px;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 1.2em #6988e6aa);
-}
-
-.creator {
-  font-size: 13px;
-  line-height: 16px;
-  color: var(--ev-c-text-2);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.text {
-  font-size: 19px;
-  color: var(--ev-c-text-1);
-  font-weight: 700;
-  line-height: 24px;
-}
-
-@media (min-width: 400px) {
-  .text {
-    white-space: nowrap;
-  }
-}
-
-.tip {
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--ev-c-text-2);
-  font-weight: 600;
-}
-
-.react {
-  background: -webkit-linear-gradient(315deg, #087ea4 55%, #7c93ee);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-
-.ts {
-  background: -webkit-linear-gradient(315deg, #3178c6 45%, #f0dc4e);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-
-.actions {
-  display: flex;
-  padding-top: 32px;
-  margin: -6px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.action {
-  flex-shrink: 0;
-  padding: 6px;
-}
-
-.action a {
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  border: 1px solid transparent;
-  text-align: center;
-  font-weight: 600;
-  white-space: nowrap;
-  border-radius: 20px;
-  padding: 0 20px;
-  line-height: 38px;
-  font-size: 14px;
-  border-color: var(--ev-button-alt-border);
-  color: var(--ev-button-alt-text);
-  background-color: var(--ev-button-alt-bg);
-}
-
-.action a:hover {
-  border-color: var(--ev-button-alt-hover-border);
-  color: var(--ev-button-alt-hover-text);
-  background-color: var(--ev-button-alt-hover-bg);
-}
-
-.versions {
-  padding: 10px 0;
-  font-family: 'Menlo', 'Lucida Console', monospace;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 7px;
-  overflow: hidden;
-  border-radius: 14px;
-  background-color: #202127;
-  backdrop-filter: blur(24px);
-}
-
-.versions li {
-  display: block;
-  padding: 0 14px;
-  font-size: 10px;
-  line-height: 10px;
-  opacity: 0.8;
 }
 
 .notes :is(button, select):focus-visible {
@@ -374,33 +245,10 @@ code {
   }
 }
 
-@media (max-width: 720px) {
-  .text {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 620px) {
-  .versions {
-    display: none;
-  }
-}
-
-@media (max-width: 350px) {
-  .tip,
-  .actions {
-    display: none;
-  }
-}
-
 /* Thin-column mode: the sidebar always shows as an icon rail so the
    320px content floor keeps room for the actual view */
 @media (max-width: 520px) {
   #root {
     padding-inline: 12px;
-  }
-
-  .app-shell {
-    gap: 10px;
   }
 }
