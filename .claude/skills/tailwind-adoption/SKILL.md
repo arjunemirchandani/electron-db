@@ -97,6 +97,20 @@ legacy rules to out-specificity them.
   reads mid-flight values (a width transition frozen at 175px looks
   exactly like a failed utility). el.style.transition='none' first,
   then getComputedStyle. Chased twice; expensive both times.
+- **Container queries migrate to @max-[N]: variants** (with a
+  `@container` class replacing container-type on the ancestor) — but a
+  container/media variant of a property CONFLICTS with its own base
+  utility, and the variant can sort earlier and lose (opacity-70 beat
+  @max-[520px]:opacity-100). Exclusive branches can't help — container
+  state isn't visible to JS — so this is the one legitimate use of the
+  per-utility important marker: `@max-[520px]:opacity-100!`.
+- **Old compact blocks are mostly duplicates**: a bespoke @container
+  block often re-declares base rules wholesale; diff it against the
+  base before converting — usually only 3-4 declarations are real
+  responsive differences.
+- **When a spec breaks, restore the hook, not the spec**: dropping
+  .note-content for pure utilities broke search.spec — the class went
+  back as a bare hook beside the utilities. Specs are the contract.
 - Spacing map for a 4px-grid house scale: 4→`1`, 8→`2`, 10→`2.5`,
   12→`3`, 16→`4`, 24→`6`. Odd values stay arbitrary (`text-[13px]`).
 - **A primitive's base classes are promises**: only put a property in a

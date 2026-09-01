@@ -3,7 +3,7 @@ import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
-import { IconButton } from './primitives'
+import { IconButton, metaPillClass } from './primitives'
 import { PencilIcon, TrashIcon } from './icons'
 
 // Search matches arrive wrapped in \u0001…\u0002; render them as <mark>
@@ -11,7 +11,15 @@ import { PencilIcon, TrashIcon } from './icons'
 function renderMarked(text: string): React.ReactNode {
   // eslint-disable-next-line no-control-regex -- the markers are deliberately control chars so they can't occur in note text
   const parts = text.split(/\u0001(.*?)\u0002/g)
-  return parts.map((part, i) => (i % 2 === 1 ? <mark key={i}>{part}</mark> : part))
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <mark key={i} className="rounded-[3px] bg-[hsl(228_65%_60%/0.35)] px-[1px] text-inherit">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  )
 }
 
 interface NoteRowProps {
@@ -88,9 +96,10 @@ function NoteRow({
 
   if (editing) {
     return (
-      <li className="note-row note-row-editing">
-        <form className="note-edit" onSubmit={save}>
+      <li className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] note-row-editing block">
+        <form className="note-edit flex flex-wrap gap-2" onSubmit={save}>
           <input
+            className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_160px] px-2.5 py-2 text-[14px]"
             value={draftTitle}
             autoFocus
             placeholder="Title"
@@ -98,15 +107,17 @@ function NoteRow({
             onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
           />
           <input
+            className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_160px] px-2.5 py-2 text-[14px]"
             value={draftContent}
             placeholder="Content (optional)"
             onChange={(e) => setDraftContent(e.target.value)}
             onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
           />
-          <div className="note-edit-meta">
+          <div className="note-edit-meta flex basis-full flex-col gap-1.5">
             {draftMeta.map((row, i) => (
-              <div key={i} className="note-edit-meta-row">
+              <div key={i} className="flex items-center gap-1.5">
                 <input
+                  className="min-w-0 rounded-sm border border-border-input bg-surface-input text-fg flex-[1_1_100px] px-2 py-[5px] text-[12px]"
                   value={row.key}
                   placeholder="Property"
                   aria-label="Property name"
@@ -117,6 +128,7 @@ function NoteRow({
                   }
                 />
                 <input
+                  className="min-w-0 rounded-sm border border-border-input bg-surface-input text-fg flex-[1_1_100px] px-2 py-[5px] text-[12px]"
                   value={row.value}
                   placeholder="Value"
                   aria-label="Property value"
@@ -138,7 +150,7 @@ function NoteRow({
             ))}
             <button
               type="button"
-              className="btn meta-add"
+              className="btn meta-add self-start border-dashed bg-transparent px-2.5 py-[3px] text-[12px]"
               onClick={() => setDraftMeta((rows) => [...rows, { key: '', value: '' }])}
             >
               + Property
@@ -157,17 +169,17 @@ function NoteRow({
   }
 
   return (
-    <li className="note-row group/row">
-      <div className="note-main">
-        <div className="note-title-line">
+    <li className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] group/row @max-[520px]:flex-col @max-[520px]:gap-2 @max-[520px]:py-3">
+      <div className="note-main flex min-w-0 flex-auto flex-col gap-1.5">
+        <div className="note-title-line [overflow-wrap:anywhere]">
           <strong>
             {note.highlightedTitle ? renderMarked(note.highlightedTitle) : note.title}
           </strong>
           {note.contentSnippet
             ? note.contentSnippet.length > 0 && (
-                <span className="note-content"> — {renderMarked(note.contentSnippet)}</span>
+                <span className="note-content text-fg-muted"> — {renderMarked(note.contentSnippet)}</span>
               )
-            : note.content && <span className="note-content"> — {note.content}</span>}
+            : note.content && <span className="note-content text-fg-muted"> — {note.content}</span>}
         </div>
         <span className="note-tags ml-1.5 inline-flex flex-wrap items-center gap-1">
           {note.tags.map((tag) => (
@@ -204,23 +216,23 @@ function NoteRow({
           )}
         </span>
         {Object.keys(note.metadata).length > 0 && (
-          <span className="note-meta">
+          <span className="note-meta inline-flex flex-wrap gap-1">
             {Object.entries(note.metadata).map(([key, value]) => (
               <button
                 key={key}
-                className="meta-pill"
+                className={`meta-pill ${metaPillClass(false)}`}
                 title={`Filter by ${key}: ${value}`}
                 onClick={() => onFilterMeta(key, value)}
               >
-                <span className="meta-key">{key}</span>
+                <span className="meta-key font-semibold text-fg-muted">{key}</span>
                 {value}
               </button>
             ))}
           </span>
         )}
       </div>
-      <div className="note-foot">
-        <time className="notes-date" title={formatFull(note.updatedAt ?? note.createdAt)}>
+      <div className="note-foot flex shrink-0 items-center gap-2 @max-[520px]:w-full @max-[520px]:justify-between">
+        <time className="notes-date cursor-default text-[12px] whitespace-nowrap text-fg-muted" title={formatFull(note.updatedAt ?? note.createdAt)}>
           {note.updatedAt
             ? `edited ${formatRelative(note.updatedAt)}`
             : formatRelative(note.createdAt)}

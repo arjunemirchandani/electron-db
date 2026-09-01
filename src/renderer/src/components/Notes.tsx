@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
 import NoteRow from './NoteRow'
-import { Toolbar } from './primitives'
+import { metaPillClass, Toolbar } from './primitives'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
@@ -172,11 +172,11 @@ function Notes(): React.JSX.Element {
         )}
         {metaFilter && (
           <button
-            className="meta-pill meta-pill-active"
+            className={`meta-pill meta-pill-active ${metaPillClass(true)}`}
             title="Clear property filter"
             onClick={() => setMetaFilter(null)}
           >
-            <span className="meta-key">{metaFilter.key}</span>
+            <span className="meta-key font-semibold text-fg-muted">{metaFilter.key}</span>
             {metaFilter.value} ×
           </button>
         )}
