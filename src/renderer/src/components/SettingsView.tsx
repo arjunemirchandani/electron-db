@@ -48,14 +48,16 @@ function SettingsView(): React.JSX.Element {
       </p>
       {error && <p className="notes-error">{error}</p>}
       {settings && (
-        <div className="settings-row">
-          <div className="settings-row-main">
-            <strong>Backups to keep</strong>
-            <p>When a new backup is taken, the oldest ones beyond this count are deleted.</p>
+        <div className="settings-row flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border-subtle py-3">
+          <div className="min-w-0 flex-[1_1_240px]">
+            <strong className="text-[14px] text-fg">Backups to keep</strong>
+            <p className="mt-[2px] text-[12px] text-fg-muted">
+              When a new backup is taken, the oldest ones beyond this count are deleted.
+            </p>
           </div>
-          <div className="settings-retention">
+          <div className="settings-retention flex items-center gap-1.5">
             <button
-              className="btn"
+              className="btn w-[30px] px-0 text-center"
               aria-label="Fewer backups"
               disabled={settings.backupRetention <= RETENTION_MIN}
               onClick={() => applyRetention(settings.backupRetention - 1)}
@@ -63,6 +65,7 @@ function SettingsView(): React.JSX.Element {
               −
             </button>
             <input
+              className="w-14 rounded-md border border-border-input bg-surface-input px-1 py-1.5 text-center text-[14px] text-fg"
               type="number"
               min={RETENTION_MIN}
               max={RETENTION_MAX}
@@ -74,7 +77,7 @@ function SettingsView(): React.JSX.Element {
               }}
             />
             <button
-              className="btn"
+              className="btn w-[30px] px-0 text-center"
               aria-label="More backups"
               disabled={settings.backupRetention >= RETENTION_MAX}
               onClick={() => applyRetention(settings.backupRetention + 1)}
