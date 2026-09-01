@@ -65,3 +65,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Minimal Preflight subset for vendored (shadcn) components, which
+   assume form elements start unstyled. Layered base: everything above
+   it in components/utilities still wins. */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background-color: transparent;
+}

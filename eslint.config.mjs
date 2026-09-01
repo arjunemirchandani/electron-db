@@ -29,6 +29,15 @@ export default defineConfig(
     }
   },
   {
+    // Vendored shadcn components keep upstream style so they stay
+    // diffable against the registry; house-specific rules don't apply.
+    files: ['src/renderer/src/components/ui/**'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      'react-refresh/only-export-components': 'off'
+    }
+  },
+  {
     // Playwright fixtures use empty destructuring and a `use` callback that
     // the React hooks rules misread as a hook.
     files: ['e2e/**/*.ts', 'playwright.config.ts'],

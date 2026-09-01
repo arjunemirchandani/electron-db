@@ -1,11 +1,10 @@
-import { createContext, useContext } from 'react'
+import { toast as manager } from './ui/toast'
 
-// Lives apart from ToastProvider so component files export only
-// components (react-refresh/only-export-components — mixed exports
-// break Vite fast refresh for the whole file).
-export const ToastContext = createContext<(message: string) => void>(() => {})
-
-/** Returns a function that shows a transient success toast. */
+// Facade over the vendored shadcn/Base UI toast manager. Same contract
+// as the original house toast: successes only — errors stay inline
+// next to their control, persistent.
 export function useToast(): (message: string) => void {
-  return useContext(ToastContext)
+  return (message: string) => {
+    manager.add({ title: message, type: 'success', timeout: 2500 })
+  }
 }

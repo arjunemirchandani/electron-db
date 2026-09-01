@@ -4,7 +4,7 @@ import Notes from './components/Notes'
 import BackupsView from './components/BackupsView'
 import TagsView from './components/TagsView'
 import SettingsView from './components/SettingsView'
-import { ToastProvider } from './components/toast'
+import { Toaster } from './components/ui/toast'
 import Sidebar, { type View } from './components/Sidebar'
 import electronLogo from './assets/electron.svg'
 
@@ -40,7 +40,7 @@ function App(): React.JSX.Element {
   }, [])
 
   return (
-    <ToastProvider>
+    <Toaster>
       <div className="titlebar-drag" aria-hidden="true" />
       <div className="app-shell flex min-h-0 flex-1 items-stretch gap-4 max-[520px]:gap-2.5">
         <Sidebar view={view} collapsed={collapsed} onSelect={setView} onToggle={toggleCollapsed} />
@@ -74,7 +74,7 @@ function App(): React.JSX.Element {
           {view === 'settings' && <SettingsView />}
         </main>
       </div>
-    </ToastProvider>
+    </Toaster>
   )
 }
 

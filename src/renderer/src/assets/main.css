@@ -58,7 +58,6 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent-hover-bg: var(--accent-hover-bg);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -78,7 +77,6 @@
   --secondary-foreground: var(--ev-c-text-1);
   --muted: var(--ev-c-black-mute);
   --muted-foreground: var(--ev-c-text-2);
-  --accent-hover-bg: rgba(255, 255, 255, 0.06);
   --destructive: #e66666;
   --border: var(--ev-button-alt-border);
   --input: rgba(255, 255, 255, 0.14);
@@ -215,58 +213,6 @@ code {
 .notes input:focus-visible {
   outline: none;
   border-color: rgba(105, 136, 230, 0.75);
-}
-
-
-/* Success toasts: bottom-right overlay, out of layout flow so feedback
-   never displaces controls. Lifetime must match TOAST_LIFETIME_MS. */
-.toast-region {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  pointer-events: none;
-}
-
-.toast {
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: hsl(145 60% 85%);
-  background-color: hsl(145 45% 22% / 0.95);
-  border: 1px solid hsl(145 50% 40% / 0.6);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-  animation: toast-life 2500ms both;
-}
-
-@keyframes toast-life {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  8% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .toast {
-    animation: none;
-  }
 }
 
 /* Thin-column mode: the sidebar always shows as an icon rail so the
