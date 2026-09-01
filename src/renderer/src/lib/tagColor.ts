@@ -20,7 +20,8 @@ const CHIP_BASE =
   'inline-flex items-center gap-[5px] rounded-full border px-[9px] py-1 text-[12px] leading-none font-semibold'
 const CHIP_TINT =
   'border-[hsl(var(--tag-h)_60%_55%/0.45)] bg-[hsl(var(--tag-h)_60%_55%/0.18)] text-[hsl(var(--tag-h)_70%_82%)]'
-const CHIP_INTERACTIVE = 'cursor-pointer transition-[background-color,border-color] duration-[120ms]'
+const CHIP_INTERACTIVE =
+  'cursor-pointer transition-[background-color,border-color] duration-[120ms]'
 
 export function tagChipClass(kind: 'static' | 'inactive' | 'active'): string {
   if (kind === 'static') return `group/chip cursor-default ${CHIP_BASE} ${CHIP_TINT}`

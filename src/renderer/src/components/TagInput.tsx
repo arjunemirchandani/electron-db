@@ -137,7 +137,10 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
                 setOpen(false)
               }}
             >
-              <span className={`tag-chip tag-chip-static ${tagChipClass('static')}`} style={tagStyle(name, hueFor?.(name))}>
+              <span
+                className={`tag-chip tag-chip-static ${tagChipClass('static')}`}
+                style={tagStyle(name, hueFor?.(name))}
+              >
                 {name}
               </span>
             </li>

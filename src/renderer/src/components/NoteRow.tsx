@@ -3,7 +3,8 @@ import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
-import { IconButton, metaPillClass } from './primitives'
+import { IconButton } from './primitives'
+import { metaPillClass } from '../lib/pillStyle'
 import { PencilIcon, TrashIcon } from './icons'
 
 // Search matches arrive wrapped in \u0001…\u0002; render them as <mark>
@@ -162,7 +163,11 @@ function NoteRow({
           <button type="button" className="btn" onClick={() => setEditing(false)} disabled={saving}>
             Cancel
           </button>
-          {editError && <p className="notes-error note-edit-error m-0 basis-full text-[13px] text-[#e66]">{editError}</p>}
+          {editError && (
+            <p className="notes-error note-edit-error m-0 basis-full text-[13px] text-[#e66]">
+              {editError}
+            </p>
+          )}
         </form>
       </li>
     )
@@ -177,7 +182,10 @@ function NoteRow({
           </strong>
           {note.contentSnippet
             ? note.contentSnippet.length > 0 && (
-                <span className="note-content text-fg-muted"> — {renderMarked(note.contentSnippet)}</span>
+                <span className="note-content text-fg-muted">
+                  {' '}
+                  — {renderMarked(note.contentSnippet)}
+                </span>
               )
             : note.content && <span className="note-content text-fg-muted"> — {note.content}</span>}
         </div>
@@ -210,7 +218,11 @@ function NoteRow({
               onDismiss={onCancelAddTag}
             />
           ) : (
-            <button className="tag-add h-[22px] w-[22px] cursor-pointer rounded-full border border-dashed border-[var(--ev-c-gray-1)] bg-transparent p-0 text-[14px] leading-none text-fg-muted opacity-55 group-hover/row:opacity-100 focus-visible:opacity-100" title="Add tag" onClick={onStartAddTag}>
+            <button
+              className="tag-add h-[22px] w-[22px] cursor-pointer rounded-full border border-dashed border-[var(--ev-c-gray-1)] bg-transparent p-0 text-[14px] leading-none text-fg-muted opacity-55 group-hover/row:opacity-100 focus-visible:opacity-100"
+              title="Add tag"
+              onClick={onStartAddTag}
+            >
               +
             </button>
           )}
@@ -232,7 +244,10 @@ function NoteRow({
         )}
       </div>
       <div className="note-foot flex shrink-0 items-center gap-2 @max-[520px]:w-full @max-[520px]:justify-between">
-        <time className="notes-date cursor-default text-[12px] whitespace-nowrap text-fg-muted" title={formatFull(note.updatedAt ?? note.createdAt)}>
+        <time
+          className="notes-date cursor-default text-[12px] whitespace-nowrap text-fg-muted"
+          title={formatFull(note.updatedAt ?? note.createdAt)}
+        >
           {note.updatedAt
             ? `edited ${formatRelative(note.updatedAt)}`
             : formatRelative(note.createdAt)}

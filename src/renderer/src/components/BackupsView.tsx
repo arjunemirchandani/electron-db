@@ -109,7 +109,11 @@ function BackupsView(): React.JSX.Element {
         <button className="btn import-button whitespace-nowrap" onClick={importNotes}>
           Import…
         </button>
-        {status && <span className="backup-status overflow-hidden rounded-full border border-border-subtle bg-white/[0.05] px-3 py-1 text-[12px] text-ellipsis whitespace-nowrap text-fg-muted">{status}</span>}
+        {status && (
+          <span className="backup-status overflow-hidden rounded-full border border-border-subtle bg-white/[0.05] px-3 py-1 text-[12px] text-ellipsis whitespace-nowrap text-fg-muted">
+            {status}
+          </span>
+        )}
       </Toolbar>
       <BackupsPanel backups={backups} onRestore={restoreBackup} onDelete={deleteBackup} />
     </div>

@@ -63,12 +63,19 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           onBlur={() => void commitRename(tag)}
         />
       ) : (
-        <span className={`tag-chip tag-chip-static ${tagChipClass('static')}`} style={tagStyle(tag.name, tag.hue)}>
+        <span
+          className={`tag-chip tag-chip-static ${tagChipClass('static')}`}
+          style={tagStyle(tag.name, tag.hue)}
+        >
           {tag.name}
           <span className="tag-count text-[11px] opacity-70">{counts.get(tag.name) ?? 0}</span>
         </span>
       )}
-      <span className="manage-tag-palette inline-flex flex-wrap items-center gap-1" role="group" aria-label={`Color for ${tag.name}`}>
+      <span
+        className="manage-tag-palette inline-flex flex-wrap items-center gap-1"
+        role="group"
+        aria-label={`Color for ${tag.name}`}
+      >
         {PALETTE.map((hue) => (
           <button
             key={hue}
@@ -132,7 +139,9 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
     if (pendingDeleteId === tag.id) {
       return (
         <>
-          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">Remove from all notes?</span>
+          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">
+            Remove from all notes?
+          </span>
           <button
             className="btn backup-confirm"
             onClick={() =>
@@ -177,7 +186,11 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
   return (
     <div className="manage-tags flex min-h-0 flex-1 flex-col">
       {error && <p className="notes-error mb-2.5 text-[13px] text-[#e66]">{error}</p>}
-      {tags.length === 0 && <p className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">No tags yet.</p>}
+      {tags.length === 0 && (
+        <p className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">
+          No tags yet.
+        </p>
+      )}
       <ul className="manage-tags-list min-h-0 flex-1 list-none overflow-y-auto p-0">
         {tags.map((tag) => (
           <ListRow key={tag.id} main={renderMain(tag)} actions={renderActions(tag)} />
