@@ -33,7 +33,7 @@ function SettingsView(): React.JSX.Element {
       // The main process clamps and returns the sanitized result.
       const next = await window.api.setSettings({ backupRetention: value })
       setSettings(next)
-      toast('Saved')
+      toast('Saved', `Backups to keep: ${next.backupRetention}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     }

@@ -17,7 +17,10 @@ test('backup retention setting controls pruning and survives relaunch', async ({
   await expect(
     page.locator('.settings-retention button[aria-label="Fewer backups"]')
   ).toBeDisabled()
-  await expect(page.locator('.toast').last()).toHaveText('Saved')
+  // Toasts stack and expire (2500ms): select by distinguishing content
+  // rather than DOM position, and assert within one auto-waiting locator.
+  const savedToast = page.locator('.toast', { hasText: 'Backups to keep: 1' })
+  await expect(savedToast.locator('[data-slot="toast-title"]')).toHaveText('Saved')
 
   // Pruning honors the live value: two backups, only the newest kept.
   await page.click('.sidebar-item[data-view="backups"]')
