@@ -46,6 +46,30 @@ legacy rules to out-specificity them.
 
 ## Migration rules (phase 2 — component by component)
 
+- **De-blanket before migrating leaves**: bespoke systems style by
+  element-in-context (`.notes button`, `.notes input`). Any element a
+  blanket rule touches CANNOT migrate to utilities until the blanket is
+  dealt with — unlayered blankets beat layered utilities. First live
+  case: IconButton (a button inside .notes) deferred until the button
+  de-blanketing commit. Survey blankets up front; they set the order.
+- **Migration is an audit**: converting the primitives surfaced that the
+  Section primitive had zero consumers (dead since the views took over
+  their own headers). Expect to find dead code; delete it in the same
+  commit — the migration IS the review.
+- **Extend the @theme bridge on demand**, not up front — add tokens when
+  the component being migrated needs them (e.g. `--color-fg:
+  var(--ev-c-text-1)` via `@theme inline` for runtime-var references).
+  Pruning means unused bridge entries are dead weight in the source.
+- **Verify with computed styles, not eyeballs**: after converting, read
+  back getComputedStyle in the running app and compare to the old rule
+  byte for byte (gap "8px 10px", radius "8px", …). Screenshots confirm
+  layout; computed styles confirm fidelity.
+- Spacing map for a 4px-grid house scale: 4→`1`, 8→`2`, 10→`2.5`,
+  12→`3`, 16→`4`, 24→`6`. Odd values stay arbitrary (`text-[13px]`).
+- Caller-override pattern survives: a Toolbar consumer's unlayered
+  class (.tag-filter gap: 6px) still outranks the primitive's gap-2
+  utility — intentional during migration; convert callers later.
+
 - Preserve class names that e2e specs target (`.sidebar-item`,
   `.notes-form`, …) as stable hooks even after their styles move to
   utilities; or migrate specs to data-testid first.

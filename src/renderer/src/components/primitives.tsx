@@ -5,9 +5,12 @@ interface WithChildren {
   children: ReactNode
 }
 
-/** Wrapping row of related controls. */
+/** Wrapping row of related controls. The `toolbar` class is a hook for
+ *  callers' own overrides (e.g. .tag-filter tightens the gap). */
 export function Toolbar({ className, children }: WithChildren): React.JSX.Element {
-  return <div className={`toolbar ${className ?? ''}`}>{children}</div>
+  return (
+    <div className={`toolbar flex flex-wrap items-center gap-2 ${className ?? ''}`}>{children}</div>
+  )
 }
 
 interface ListRowProps {
@@ -18,36 +21,18 @@ interface ListRowProps {
   actions?: ReactNode
 }
 
-/** Media-object list item: content on the left, actions trailing. */
+/** Media-object list item: content on the left, actions trailing.
+ *  `list-row` stays as a stable hook — e2e specs count rows by it. */
 export function ListRow({ className, main, actions }: ListRowProps): React.JSX.Element {
   return (
-    <li className={`list-row ${className ?? ''}`}>
-      <div className="list-row-main">{main}</div>
-      {actions && <div className="list-row-actions">{actions}</div>}
+    <li
+      className={`list-row flex flex-wrap items-center justify-between gap-x-2.5 gap-y-2 rounded-md p-2 text-[13px] text-fg transition-colors duration-[120ms] hover:bg-white/[0.035] ${className ?? ''}`}
+    >
+      <div className="list-row-main flex min-w-0 flex-wrap items-center gap-2.5">{main}</div>
+      {actions && (
+        <div className="list-row-actions ml-auto flex flex-wrap items-center gap-1.5">{actions}</div>
+      )}
     </li>
-  )
-}
-
-interface SectionProps extends WithChildren {
-  title: string
-  description?: string
-}
-
-/** Titled panel section, used for the expanding footer panels. */
-export function Section({
-  title,
-  description,
-  className,
-  children
-}: SectionProps): React.JSX.Element {
-  return (
-    <section className={`panel-section ${className ?? ''}`}>
-      <header className="panel-section-header">
-        <h3>{title}</h3>
-        {description && <p>{description}</p>}
-      </header>
-      {children}
-    </section>
   )
 }
 
@@ -58,7 +43,10 @@ interface IconButtonProps {
   children: ReactNode
 }
 
-/** Square icon-only button; label doubles as tooltip and accessible name. */
+/** Square icon-only button; label doubles as tooltip and accessible name.
+ *  Still CSS-styled: as a button inside .notes it sits under the
+ *  `.notes button` blanket rule, which outranks layered utilities —
+ *  migrates together with the button de-blanketing step. */
 export function IconButton({
   label,
   onClick,

@@ -21,6 +21,13 @@
   --radius-lg: 12px;
 }
 
+/* inline: these reference runtime vars from base.css, so the utility
+   must carry the var() itself rather than a resolved value */
+@theme inline {
+  --color-fg: var(--ev-c-text-1);
+  --color-fg-muted: var(--ev-c-text-2);
+}
+
 :root {
   /* Layout tokens — the shared vocabulary for every component */
   --space-1: 4px;
@@ -849,13 +856,6 @@ code {
   cursor: default;
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
 .tag-filter {
   gap: 6px;
   margin-bottom: var(--space-3);
@@ -1017,57 +1017,6 @@ code {
 .notes-backup button {
   white-space: nowrap;
   flex-shrink: 0;
-}
-
-.list-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2) 10px;
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  transition: background-color 120ms;
-  font-size: 13px;
-  color: var(--ev-c-text-1);
-}
-
-.list-row:hover {
-  background-color: rgba(255, 255, 255, 0.035);
-}
-
-.list-row-main {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  min-width: 0;
-}
-
-.list-row-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-}
-
-.panel-section {
-  margin-top: 10px;
-  border-top: 1px solid var(--border-subtle);
-  padding-top: var(--space-3);
-}
-
-.panel-section-header h3 {
-  font-size: var(--fs-body);
-  font-weight: 600;
-  color: var(--ev-c-text-1);
-}
-
-.panel-section-header p {
-  font-size: var(--fs-caption);
-  color: var(--ev-c-text-2);
-  margin: 2px 0 var(--space-2);
 }
 
 /* Panels own a whole view now; their lists take the remaining height */
