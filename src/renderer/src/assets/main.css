@@ -74,6 +74,12 @@
     background-color: var(--color-accent-hover);
     border-color: var(--color-accent-hover);
   }
+
+  .btn.backup-confirm {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
 }
 
 :root {
@@ -913,86 +919,6 @@ code {
 
 .tag-remove:hover {
   color: #fff;
-}
-
-/* Panel owns a whole view; its list takes the remaining height */
-.manage-tags {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
-.backup-confirm-text {
-  font-size: 12px;
-  color: #e6b366;
-  margin-right: 4px;
-}
-
-.backup-confirm {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
-.manage-tags .manage-tags-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.manage-tags-list {
-  list-style: none;
-  padding: 0;
-}
-
-.manage-tag-rename {
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border-input);
-  background-color: rgba(27, 27, 31, 0.65);
-  color: var(--ev-c-text-1);
-  font-size: 12px;
-  width: 140px;
-}
-
-.manage-tag-palette {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-}
-
-.notes .swatch {
-  cursor: pointer;
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  background-color: hsl(var(--tag-h) 60% 55%);
-  font-size: 9px;
-  line-height: 1;
-  color: var(--ev-c-text-2);
-}
-
-.notes .swatch-auto {
-  background: none;
-  border-color: var(--ev-c-gray-1);
-}
-
-.notes .swatch-active {
-  border-color: #fff;
-}
-
-.manage-tag-select {
-  padding: 4px 6px;
-  border-radius: 8px;
-  border: 1px solid var(--ev-button-alt-border);
-  background-color: rgba(27, 27, 31, 0.9);
-  color: var(--ev-c-text-1);
-  font-size: 12px;
 }
 
 /* Success toasts: bottom-right overlay, out of layout flow so feedback

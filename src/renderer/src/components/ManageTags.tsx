@@ -52,7 +52,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
     <>
       {renamingId === tag.id ? (
         <input
-          className="manage-tag-rename"
+          className="manage-tag-rename w-[140px] rounded-full border border-border-input bg-surface-input px-2 py-[3px] text-[12px] text-fg"
           value={renameDraft}
           autoFocus
           onChange={(e) => setRenameDraft(e.target.value)}
@@ -68,18 +68,18 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           <span className="tag-count">{counts.get(tag.name) ?? 0}</span>
         </span>
       )}
-      <span className="manage-tag-palette" role="group" aria-label={`Color for ${tag.name}`}>
+      <span className="manage-tag-palette inline-flex flex-wrap items-center gap-1" role="group" aria-label={`Color for ${tag.name}`}>
         {PALETTE.map((hue) => (
           <button
             key={hue}
-            className={`swatch ${tag.hue === hue ? 'swatch-active' : ''}`}
+            className={`swatch h-4 w-4 shrink-0 cursor-pointer rounded-full border-2 bg-[hsl(var(--tag-h)_60%_55%)] p-0 text-[9px] leading-none text-fg-muted ${tag.hue === hue ? 'swatch-active border-white' : 'border-transparent'}`}
             style={{ '--tag-h': hue } as React.CSSProperties}
             title={`Hue ${hue}`}
             onClick={() => run(() => window.api.setTagHue(tag.id, hue))}
           />
         ))}
         <button
-          className={`swatch swatch-auto ${tag.hue === null ? 'swatch-active' : ''}`}
+          className={`swatch swatch-auto h-4 w-4 shrink-0 cursor-pointer rounded-full border-2 bg-transparent p-0 text-[9px] leading-none text-fg-muted ${tag.hue === null ? 'swatch-active border-white' : 'border-[var(--ev-c-gray-1)]'}`}
           title="Automatic color"
           onClick={() => run(() => window.api.setTagHue(tag.id, null))}
         >
@@ -93,9 +93,9 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
     if (mergingId === tag.id) {
       return (
         <>
-          <span className="backup-confirm-text">Merge into</span>
+          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">Merge into</span>
           <select
-            className="manage-tag-select"
+            className="manage-tag-select rounded-md border border-border-subtle bg-[rgba(27,27,31,0.9)] px-1.5 py-1 text-[12px] text-fg"
             value={mergeTargetId ?? ''}
             onChange={(e) => setMergeTargetId(Number(e.target.value))}
           >
@@ -132,7 +132,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
     if (pendingDeleteId === tag.id) {
       return (
         <>
-          <span className="backup-confirm-text">Remove from all notes?</span>
+          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">Remove from all notes?</span>
           <button
             className="btn backup-confirm"
             onClick={() =>
@@ -175,10 +175,10 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
   }
 
   return (
-    <div className="manage-tags">
+    <div className="manage-tags flex min-h-0 flex-1 flex-col">
       {error && <p className="notes-error">{error}</p>}
       {tags.length === 0 && <p className="notes-empty">No tags yet.</p>}
-      <ul className="manage-tags-list">
+      <ul className="manage-tags-list min-h-0 flex-1 list-none overflow-y-auto p-0">
         {tags.map((tag) => (
           <ListRow key={tag.id} main={renderMain(tag)} actions={renderActions(tag)} />
         ))}
