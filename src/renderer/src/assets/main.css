@@ -6,6 +6,10 @@
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
+/* shadcn component support: v4-native keyframes/utilities (no Preflight
+   in either file — our no-reset architecture holds) */
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 /* base.css joins the base layer so its universal reset (e.g. the
    `* { font-weight: normal }` rule) sits BELOW components and
@@ -35,6 +39,50 @@
   --color-fg: var(--ev-c-text-1);
   --color-fg-muted: var(--ev-c-text-2);
   --color-border-subtle: var(--ev-button-alt-border);
+}
+
+/* shadcn's semantic color contract, fed from the house palette so
+   vendored components arrive wearing palette A. The app is single-theme
+   dark, so the values live on :root directly (no .dark variant). Their
+   radius mapping is deliberately NOT adopted — rounded-md stays our 8px. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-hover-bg: var(--accent-hover-bg);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --background: var(--ev-c-black);
+  --foreground: var(--ev-c-text-1);
+  --card: rgba(34, 34, 40, 0.92);
+  --card-foreground: var(--ev-c-text-1);
+  --popover: rgba(27, 27, 31, 0.96);
+  --popover-foreground: var(--ev-c-text-1);
+  --primary: #6988e6;
+  --primary-foreground: #ffffff;
+  --secondary: var(--ev-button-alt-bg);
+  --secondary-foreground: var(--ev-c-text-1);
+  --muted: var(--ev-c-black-mute);
+  --muted-foreground: var(--ev-c-text-2);
+  --accent-hover-bg: rgba(255, 255, 255, 0.06);
+  --destructive: #e66666;
+  --border: var(--ev-button-alt-border);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: rgba(105, 136, 230, 0.85);
 }
 
 /* The standard button recipe — the de-blanketed successor of the old
