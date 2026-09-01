@@ -64,6 +64,25 @@ legacy rules to out-specificity them.
   back getComputedStyle in the running app and compare to the old rule
   byte for byte (gap "8px 10px", radius "8px", …). Screenshots confirm
   layout; computed styles confirm fidelity.
+- **Layer your own reset, or it eats every utility**: an app's existing
+  reset (`* { font-weight: normal }` and friends) is unlayered, and an
+  unlayered `*` rule at zero specificity still beats every layered rule.
+  Old blanket classes won by specificity; migrated recipes lose by
+  layer. Fix: `@import './base.css' layer(base);` — layered author CSS
+  still outranks user-agent defaults, so all resets keep working while
+  components/utilities finally outrank them. Found via a font-weight
+  600 silently rendering 400.
+- **De-blanketing recipe**: replace `.notes button`-style element
+  blankets with an opt-in `.btn` class in `@layer components` (so
+  utilities can override it). Then audit every specialist that
+  coexisted with the blanket for silently-inherited properties
+  (cursor, font-weight, border) and re-declare them; and strip the
+  `!important`s whose only purpose was beating the blanket.
+- **The theme bridge changes what utility names mean**: after mapping
+  `--radius-lg: 12px`, `rounded-lg` is 12px in THIS app — not
+  Tailwind's default 8px. Pick utilities against the bridge, not from
+  memory of the default scale. (Bitten once: an icon button grew 4px of
+  radius.)
 - Spacing map for a 4px-grid house scale: 4→`1`, 8→`2`, 10→`2.5`,
   12→`3`, 16→`4`, 24→`6`. Odd values stay arbitrary (`text-[13px]`).
 - Caller-override pattern survives: a Toolbar consumer's unlayered

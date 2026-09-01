@@ -144,7 +144,7 @@ function Notes(): React.JSX.Element {
           hueFor={hueFor}
           placeholder="Tags"
         />
-        <button type="submit" className="button-primary">
+        <button type="submit" className="btn button-primary">
           Add
         </button>
       </form>

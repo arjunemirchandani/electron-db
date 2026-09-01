@@ -48,20 +48,28 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
                 <>
                   <span className="backup-confirm-text">Replace current data?</span>
                   <button
-                    className="backup-confirm"
+                    className="btn backup-confirm"
                     onClick={() => confirmRestore(backup.filename)}
                     disabled={restoring}
                   >
                     {restoring ? 'Restoring…' : 'Confirm'}
                   </button>
-                  <button onClick={() => setPendingRestore(null)} disabled={restoring}>
+                  <button
+                    className="btn"
+                    onClick={() => setPendingRestore(null)}
+                    disabled={restoring}
+                  >
                     Cancel
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => setPendingRestore(backup.filename)}>Restore</button>
-                  <button onClick={() => onDelete(backup.filename)}>Delete</button>
+                  <button className="btn" onClick={() => setPendingRestore(backup.filename)}>
+                    Restore
+                  </button>
+                  <button className="btn" onClick={() => onDelete(backup.filename)}>
+                    Delete
+                  </button>
                 </>
               )
             }

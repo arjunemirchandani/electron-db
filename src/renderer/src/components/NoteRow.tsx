@@ -138,16 +138,16 @@ function NoteRow({
             ))}
             <button
               type="button"
-              className="meta-add"
+              className="btn meta-add"
               onClick={() => setDraftMeta((rows) => [...rows, { key: '', value: '' }])}
             >
               + Property
             </button>
           </div>
-          <button type="submit" className="button-primary" disabled={saving}>
+          <button type="submit" className="btn button-primary" disabled={saving}>
             {saving ? 'Saving…' : 'Save'}
           </button>
-          <button type="button" onClick={() => setEditing(false)} disabled={saving}>
+          <button type="button" className="btn" onClick={() => setEditing(false)} disabled={saving}>
             Cancel
           </button>
           {editError && <p className="notes-error note-edit-error">{editError}</p>}

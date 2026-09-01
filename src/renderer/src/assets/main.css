@@ -7,7 +7,12 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@import './base.css';
+/* base.css joins the base layer so its universal reset (e.g. the
+   `* { font-weight: normal }` rule) sits BELOW components and
+   utilities — an unlayered reset would beat both, at any specificity.
+   Layered author styles still outrank user-agent defaults, so every
+   reset in it keeps working. */
+@import './base.css' layer(base);
 
 /* Bridge the house design tokens into Tailwind's theme so utilities
    speak palette A: bg-accent, rounded-md, etc. match the app exactly.
@@ -26,6 +31,45 @@
 @theme inline {
   --color-fg: var(--ev-c-text-1);
   --color-fg-muted: var(--ev-c-text-2);
+}
+
+/* The standard button recipe — the de-blanketed successor of the old
+   `.notes button` element rule. Opt-in via class; lives in the
+   components layer so utilities can override it. .button-primary keeps
+   its name as an e2e hook; .btn.button-primary outranks .btn:hover so
+   primary stays accent while hovered (as the blanket cascade did). */
+@layer components {
+  .btn {
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ev-button-alt-text);
+    background-color: var(--ev-button-alt-bg);
+    transition:
+      background-color 120ms,
+      border-color 120ms,
+      color 120ms;
+  }
+
+  .btn:hover {
+    border-color: var(--ev-button-alt-hover-border);
+    background-color: var(--ev-button-alt-hover-bg);
+  }
+
+  .btn.button-primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .btn.button-primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
 }
 
 :root {
@@ -490,38 +534,6 @@ code {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-.notes button {
-  cursor: pointer;
-  flex-shrink: 0;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ev-button-alt-text);
-  background-color: var(--ev-button-alt-bg);
-  transition:
-    background-color 120ms,
-    border-color 120ms,
-    color 120ms;
-}
-
-.notes button.button-primary {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
-.notes button.button-primary:hover {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.notes button:hover {
-  border-color: var(--ev-button-alt-hover-border);
-  background-color: var(--ev-button-alt-hover-bg);
-}
-
 .notes :is(button, select):focus-visible {
   outline: 2px solid rgba(105, 136, 230, 0.85);
   outline-offset: 1px;
@@ -640,6 +652,10 @@ code {
   white-space: nowrap;
 }
 
+.notes button.meta-pill {
+  cursor: pointer;
+}
+
 .notes button.meta-pill:hover {
   border-color: var(--ev-button-alt-hover-border);
   background-color: rgba(255, 255, 255, 0.08);
@@ -696,24 +712,6 @@ code {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-}
-
-.notes .icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: none;
-  color: var(--ev-c-text-2);
-  opacity: 0.7;
-  transition:
-    opacity 120ms,
-    background-color 120ms,
-    color 120ms;
 }
 
 .note-row:hover .icon-button,
@@ -868,6 +866,7 @@ code {
 
 .notes .tag-chip {
   --tag-h: 220;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -918,6 +917,7 @@ code {
 }
 
 .notes .filter-mode button {
+  cursor: pointer;
   border: none;
   border-radius: 0;
   padding: 2px 9px;
@@ -933,12 +933,12 @@ code {
 }
 
 .tag-filter-clear {
-  border: none !important;
-  background: none !important;
-  padding: 0 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: #8fa8ff !important;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #8fa8ff;
   cursor: pointer;
 }
 
@@ -959,6 +959,7 @@ code {
 }
 
 .notes .tag-add {
+  cursor: pointer;
   width: 22px;
   height: 22px;
   padding: 0;
@@ -988,10 +989,10 @@ code {
 }
 
 .tag-remove {
-  border: none !important;
-  background: none !important;
-  padding: 0 !important;
-  font-size: 13px !important;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13px;
   line-height: 1;
   color: inherit;
   cursor: pointer;
@@ -1054,9 +1055,9 @@ code {
 }
 
 .backup-confirm {
-  background-color: #6988e6 !important;
-  border-color: #6988e6 !important;
-  color: #fff !important;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .manage-tags .manage-tags-list {
@@ -1088,6 +1089,7 @@ code {
 }
 
 .notes .swatch {
+  cursor: pointer;
   flex-shrink: 0;
   width: 16px;
   height: 16px;

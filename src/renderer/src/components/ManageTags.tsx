@@ -111,7 +111,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
               ))}
           </select>
           <button
-            className="backup-confirm"
+            className="btn backup-confirm"
             disabled={mergeTargetId === null}
             onClick={() =>
               run(async () => {
@@ -123,7 +123,9 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           >
             Confirm
           </button>
-          <button onClick={() => setMergingId(null)}>Cancel</button>
+          <button className="btn" onClick={() => setMergingId(null)}>
+            Cancel
+          </button>
         </>
       )
     }
@@ -132,7 +134,7 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
         <>
           <span className="backup-confirm-text">Remove from all notes?</span>
           <button
-            className="backup-confirm"
+            className="btn backup-confirm"
             onClick={() =>
               run(async () => {
                 await window.api.deleteTag(tag.id)
@@ -142,14 +144,19 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           >
             Confirm
           </button>
-          <button onClick={() => setPendingDeleteId(null)}>Cancel</button>
+          <button className="btn" onClick={() => setPendingDeleteId(null)}>
+            Cancel
+          </button>
         </>
       )
     }
     return (
       <>
-        <button onClick={() => startRename(tag)}>Rename</button>
+        <button className="btn" onClick={() => startRename(tag)}>
+          Rename
+        </button>
         <button
+          className="btn"
           disabled={tags.length < 2}
           onClick={() => {
             setMergingId(tag.id)
@@ -160,7 +167,9 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
         >
           Merge
         </button>
-        <button onClick={() => setPendingDeleteId(tag.id)}>Delete</button>
+        <button className="btn" onClick={() => setPendingDeleteId(tag.id)}>
+          Delete
+        </button>
       </>
     )
   }

@@ -55,6 +55,7 @@ function SettingsView(): React.JSX.Element {
           </div>
           <div className="settings-retention">
             <button
+              className="btn"
               aria-label="Fewer backups"
               disabled={settings.backupRetention <= RETENTION_MIN}
               onClick={() => applyRetention(settings.backupRetention - 1)}
@@ -73,6 +74,7 @@ function SettingsView(): React.JSX.Element {
               }}
             />
             <button
+              className="btn"
               aria-label="More backups"
               disabled={settings.backupRetention >= RETENTION_MAX}
               onClick={() => applyRetention(settings.backupRetention + 1)}

@@ -30,7 +30,9 @@ export function ListRow({ className, main, actions }: ListRowProps): React.JSX.E
     >
       <div className="list-row-main flex min-w-0 flex-wrap items-center gap-2.5">{main}</div>
       {actions && (
-        <div className="list-row-actions ml-auto flex flex-wrap items-center gap-1.5">{actions}</div>
+        <div className="list-row-actions ml-auto flex flex-wrap items-center gap-1.5">
+          {actions}
+        </div>
       )}
     </li>
   )
@@ -55,7 +57,7 @@ export function IconButton({
 }: IconButtonProps): React.JSX.Element {
   return (
     <button
-      className={`icon-button ${className ?? ''}`}
+      className={`icon-button inline-flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-fg-muted opacity-70 transition-[opacity,background-color,color] duration-[120ms] ${className ?? ''}`}
       aria-label={label}
       title={label}
       onClick={onClick}
