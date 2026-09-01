@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { ToastContext } from './toast-context'
 
 // Success feedback only: a toast that fades away is fine for "Saved",
 // never for errors — those stay inline next to the control, persistent.
@@ -10,13 +11,6 @@ const TOAST_LIFETIME_MS = 2500
 interface ToastItem {
   id: number
   message: string
-}
-
-const ToastContext = createContext<(message: string) => void>(() => {})
-
-/** Returns a function that shows a transient success toast. */
-export function useToast(): (message: string) => void {
-  return useContext(ToastContext)
 }
 
 export function ToastProvider({ children }: { children: ReactNode }): React.JSX.Element {

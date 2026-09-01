@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AppSettings } from '../../../shared/types'
-import { useToast } from './toast'
+import { useToast } from './toast-context'
 
 const RETENTION_MIN = 1
 const RETENTION_MAX = 10
