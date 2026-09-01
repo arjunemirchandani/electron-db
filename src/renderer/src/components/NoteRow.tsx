@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from './ui/alert-dialog'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { IconButton } from './primitives'
@@ -56,6 +66,7 @@ function NoteRow({
   onDelete
 }: NoteRowProps): React.JSX.Element {
   const [editing, setEditing] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [draftTitle, setDraftTitle] = useState('')
   const [draftContent, setDraftContent] = useState('')
   const [draftMeta, setDraftMeta] = useState<Array<{ key: string; value: string }>>([])
@@ -255,9 +266,31 @@ function NoteRow({
         <IconButton label="Edit" onClick={startEdit}>
           <PencilIcon />
         </IconButton>
-        <IconButton label="Delete" onClick={onDelete}>
+        <IconButton label="Delete" onClick={() => setConfirmingDelete(true)}>
           <TrashIcon />
         </IconButton>
+        <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this note?</AlertDialogTitle>
+              <AlertDialogDescription>
+                &ldquo;{note.title}&rdquo; will be removed permanently.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => {
+                  setConfirmingDelete(false)
+                  onDelete()
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </li>
   )

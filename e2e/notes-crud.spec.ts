@@ -12,6 +12,7 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   await expect(item).toContainText('hello sqlite')
 
   await item.getByRole('button', { name: 'Delete' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(item).toHaveCount(0)
   await expect(page.locator('.notes-empty')).toBeVisible()
 })

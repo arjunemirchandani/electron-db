@@ -92,6 +92,7 @@ test('note rows become stacked cards in a narrow panel, with relative dates', as
   await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('column')
 
   await row.getByRole('button', { name: 'Delete' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(page.locator('.notes-empty')).toContainText('No notes yet')
 })
 

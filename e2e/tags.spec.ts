@@ -43,5 +43,6 @@ test('notes can be tagged, filtered, and untagged with orphan pruning', async ({
     .locator('.notes-list li', { hasText: 'Plan sprint' })
     .getByRole('button', { name: 'Delete' })
     .click()
+  await relaunched.page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(relaunched.page.locator('.tag-filter')).toHaveCount(0)
 })
