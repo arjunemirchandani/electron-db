@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
-import { tagStyle } from '../lib/tagColor'
+import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { IconButton } from './primitives'
 import { PencilIcon, TrashIcon } from './icons'
@@ -128,7 +128,7 @@ function NoteRow({
                 />
                 <button
                   type="button"
-                  className="tag-remove meta-remove"
+                  className="tag-remove meta-remove cursor-pointer border-0 bg-transparent p-0 text-[13px] leading-none text-inherit opacity-70 hover:text-white"
                   title="Remove property"
                   onClick={() => setDraftMeta((rows) => rows.filter((_, j) => j !== i))}
                 >
@@ -157,7 +157,7 @@ function NoteRow({
   }
 
   return (
-    <li className="note-row">
+    <li className="note-row group/row">
       <div className="note-main">
         <div className="note-title-line">
           <strong>
@@ -169,16 +169,16 @@ function NoteRow({
               )
             : note.content && <span className="note-content"> — {note.content}</span>}
         </div>
-        <span className="note-tags">
+        <span className="note-tags ml-1.5 inline-flex flex-wrap items-center gap-1">
           {note.tags.map((tag) => (
             <span
               key={tag.id}
-              className="tag-chip tag-chip-static"
+              className={`tag-chip tag-chip-static ${tagChipClass('static')}`}
               style={tagStyle(tag.name, tag.hue)}
             >
               {tag.name}
               <button
-                className="tag-remove"
+                className="tag-remove cursor-pointer border-0 bg-transparent p-0 text-[13px] leading-none text-inherit opacity-0 transition-opacity duration-[120ms] group-hover/chip:opacity-85 group-focus-within/chip:opacity-85 hover:text-white"
                 title={`Remove tag ${tag.name}`}
                 onClick={() => onRemoveTag(tag.id)}
               >
@@ -188,7 +188,7 @@ function NoteRow({
           ))}
           {addingTag ? (
             <TagInput
-              className="tag-input-inline"
+              className="tag-input-inline min-w-[140px] flex-initial px-1.5 py-[2px] [&_.notes-tags-input]:p-[2px] [&_.notes-tags-input]:text-[13px]"
               value={[]}
               onChange={onAddTags}
               suggestions={tagSuggestions.filter((name) => !note.tags.some((t) => t.name === name))}
@@ -198,7 +198,7 @@ function NoteRow({
               onDismiss={onCancelAddTag}
             />
           ) : (
-            <button className="tag-add" title="Add tag" onClick={onStartAddTag}>
+            <button className="tag-add h-[22px] w-[22px] cursor-pointer rounded-full border border-dashed border-[var(--ev-c-gray-1)] bg-transparent p-0 text-[14px] leading-none text-fg-muted opacity-55 group-hover/row:opacity-100 focus-visible:opacity-100" title="Add tag" onClick={onStartAddTag}>
               +
             </button>
           )}

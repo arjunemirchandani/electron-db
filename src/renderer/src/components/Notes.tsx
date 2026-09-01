@@ -3,7 +3,7 @@ import type { Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
 import NoteRow from './NoteRow'
 import { Toolbar } from './primitives'
-import { tagStyle } from '../lib/tagColor'
+import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
 function Notes(): React.JSX.Element {
@@ -139,7 +139,7 @@ function Notes(): React.JSX.Element {
         />
         <TagInput
           ref={tagInputRef}
-          className="notes-form-tags"
+          className="notes-form-tags flex-[1_1_160px] px-2 py-[5px]"
           value={newTags}
           onChange={setNewTags}
           suggestions={allTags.map((t) => t.name)}
@@ -166,7 +166,7 @@ function Notes(): React.JSX.Element {
           </span>
         )}
         {searchQuery && (
-          <button className="tag-filter-clear" onClick={() => setSearchQuery('')}>
+          <button className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline" onClick={() => setSearchQuery('')}>
             Clear
           </button>
         )}
@@ -182,31 +182,31 @@ function Notes(): React.JSX.Element {
         )}
       </div>
       {allTags.length > 0 && (
-        <Toolbar className="tag-filter">
-          <span className="tag-filter-label">Filter:</span>
+        <Toolbar className="tag-filter mb-3 gap-1.5">
+          <span className="tag-filter-label text-[12px] text-fg-muted">Filter:</span>
           {allTags.map((tag) => (
             <button
               key={tag.id}
-              className={`tag-chip ${filterTags.includes(tag.name) ? 'tag-chip-active' : ''}`}
+              className={`tag-chip ${filterTags.includes(tag.name) ? `tag-chip-active ${tagChipClass('active')}` : tagChipClass('inactive')}`}
               style={tagStyle(tag.name, tag.hue)}
               onClick={() => toggleFilter(tag.name)}
             >
               {tag.name}
-              <span className="tag-count">{tagCounts.get(tag.name) ?? 0}</span>
+              <span className="tag-count text-[11px] opacity-70">{tagCounts.get(tag.name) ?? 0}</span>
             </button>
           ))}
           {filterTags.length > 0 && (
-            <span className="tag-filter-state">
+            <span className="tag-filter-state ml-1.5 inline-flex items-center gap-2 text-[12px] text-fg-muted">
               {filterTags.length > 1 && (
-                <span className="filter-mode" role="group" aria-label="Match mode">
+                <span className="filter-mode inline-flex overflow-hidden rounded-full border border-border-subtle" role="group" aria-label="Match mode">
                   <button
-                    className={filterMode === 'all' ? 'filter-mode-active' : ''}
+                    className={`cursor-pointer rounded-none border-0 bg-transparent px-[9px] py-[2px] text-[11px] font-medium ${filterMode === 'all' ? 'filter-mode-active bg-white/[0.12] text-fg' : 'text-fg-muted'}`}
                     onClick={() => setFilterMode('all')}
                   >
                     all
                   </button>
                   <button
-                    className={filterMode === 'any' ? 'filter-mode-active' : ''}
+                    className={`cursor-pointer rounded-none border-0 bg-transparent px-[9px] py-[2px] text-[11px] font-medium ${filterMode === 'any' ? 'filter-mode-active bg-white/[0.12] text-fg' : 'text-fg-muted'}`}
                     onClick={() => setFilterMode('any')}
                   >
                     any
@@ -214,7 +214,7 @@ function Notes(): React.JSX.Element {
                 </span>
               )}
               {visibleNotes.length} of {notes.length}
-              <button className="tag-filter-clear" onClick={() => setFilterTags([])}>
+              <button className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline" onClick={() => setFilterTags([])}>
                 Clear
               </button>
             </span>
@@ -229,7 +229,7 @@ function Notes(): React.JSX.Element {
                 <strong>No notes match “{searchQuery.trim()}”.</strong>
                 <span>
                   Search covers titles and content.{' '}
-                  <button className="tag-filter-clear" onClick={() => setSearchQuery('')}>
+                  <button className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline" onClick={() => setSearchQuery('')}>
                     Clear the search
                   </button>
                   .
@@ -243,7 +243,7 @@ function Notes(): React.JSX.Element {
                 </strong>
                 <span>
                   Try switching to {filterMode === 'all' ? '“any”' : '“all”'} or{' '}
-                  <button className="tag-filter-clear" onClick={() => setFilterTags([])}>
+                  <button className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline" onClick={() => setFilterTags([])}>
                     clear the filter
                   </button>
                   .

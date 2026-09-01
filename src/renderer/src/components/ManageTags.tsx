@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Tag } from '../../../shared/types'
-import { tagStyle } from '../lib/tagColor'
+import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { ListRow } from './primitives'
 
 const PALETTE = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
@@ -63,9 +63,9 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           onBlur={() => void commitRename(tag)}
         />
       ) : (
-        <span className="tag-chip tag-chip-static" style={tagStyle(tag.name, tag.hue)}>
+        <span className={`tag-chip tag-chip-static ${tagChipClass('static')}`} style={tagStyle(tag.name, tag.hue)}>
           {tag.name}
-          <span className="tag-count">{counts.get(tag.name) ?? 0}</span>
+          <span className="tag-count text-[11px] opacity-70">{counts.get(tag.name) ?? 0}</span>
         </span>
       )}
       <span className="manage-tag-palette inline-flex flex-wrap items-center gap-1" role="group" aria-label={`Color for ${tag.name}`}>

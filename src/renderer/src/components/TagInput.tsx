@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { tagStyle } from '../lib/tagColor'
+import { tagChipClass, tagStyle } from '../lib/tagColor'
 
 export interface TagInputHandle {
   /** Commit any text still in the box as tags and return the full list. */
@@ -87,17 +87,19 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
   }
 
   return (
-    <div className={`tag-input ${className ?? ''}`}>
+    <div
+      className={`tag-input relative flex min-w-0 flex-wrap items-center gap-[5px] rounded-md border border-border-input bg-surface-input focus-within:border-[rgba(105,136,230,0.75)] ${className ?? ''}`}
+    >
       {value.map((name) => (
         <span
           key={name}
-          className="tag-chip tag-chip-static tag-chip-editable"
+          className={`tag-chip tag-chip-static tag-chip-editable ${tagChipClass('static')}`}
           style={tagStyle(name)}
         >
           {name}
           <button
             type="button"
-            className="tag-remove"
+            className="tag-remove cursor-pointer border-0 bg-transparent p-0 text-[13px] leading-none text-inherit opacity-0 transition-opacity duration-[120ms] group-hover/chip:opacity-85 group-focus-within/chip:opacity-85 hover:text-white"
             title={`Remove ${name}`}
             onClick={() => onChange(value.filter((v) => v !== name))}
           >
@@ -106,7 +108,7 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
         </span>
       ))}
       <input
-        className="notes-tags-input"
+        className="notes-tags-input min-w-0 flex-[1_1_70px] border-0 bg-transparent px-[2px] py-[3px] text-[14px] text-fg outline-none"
         value={draft}
         placeholder={value.length === 0 ? placeholder : ''}
         autoFocus={autoFocus}
@@ -122,11 +124,11 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
         }}
       />
       {open && matches.length > 0 && (
-        <ul className="tag-suggestions">
+        <ul className="tag-suggestions absolute top-[calc(100%+4px)] left-0 z-10 min-w-[160px] list-none rounded-md border border-border-subtle bg-[rgba(27,27,31,0.96)] p-1 backdrop-blur-[12px]">
           {matches.map((name, i) => (
             <li
               key={name}
-              className={i === highlight ? 'tag-suggestion-active' : ''}
+              className={`cursor-pointer rounded-[6px] px-1.5 py-1 hover:bg-white/[0.08] ${i === highlight ? 'tag-suggestion-active bg-white/[0.08]' : ''}`}
               // mousedown so the click lands before the input's blur closes the list
               onMouseDown={(e) => {
                 e.preventDefault()
@@ -135,7 +137,7 @@ const TagInput = forwardRef<TagInputHandle, TagInputProps>(function TagInput(
                 setOpen(false)
               }}
             >
-              <span className="tag-chip tag-chip-static" style={tagStyle(name, hueFor?.(name))}>
+              <span className={`tag-chip tag-chip-static ${tagChipClass('static')}`} style={tagStyle(name, hueFor?.(name))}>
                 {name}
               </span>
             </li>
