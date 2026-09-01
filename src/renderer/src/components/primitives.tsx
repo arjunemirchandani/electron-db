@@ -5,12 +5,10 @@ interface WithChildren {
   children: ReactNode
 }
 
-/** Wrapping row of related controls. The `toolbar` class is a hook for
- *  callers' own overrides (e.g. .tag-filter tightens the gap). */
+/** Wrapping row of related controls. Callers own their gap — a shared
+ *  default would fight caller overrides by stylesheet order. */
 export function Toolbar({ className, children }: WithChildren): React.JSX.Element {
-  return (
-    <div className={`toolbar flex flex-wrap items-center gap-2 ${className ?? ''}`}>{children}</div>
-  )
+  return <div className={`toolbar flex flex-wrap items-center ${className ?? ''}`}>{children}</div>
 }
 
 interface ListRowProps {

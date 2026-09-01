@@ -29,16 +29,16 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
   }
 
   return (
-    <div className="backups-panel">
-      <ul className="backups-list">
+    <div className="backups-panel flex min-h-0 flex-1 flex-col">
+      <ul className="backups-list min-h-0 flex-1 list-none overflow-y-auto p-0">
         {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}
         {backups.map((backup) => (
           <ListRow
             key={backup.filename}
             main={
-              <div className="backup-meta">
+              <div className="flex flex-col gap-[2px]">
                 <strong>{new Date(backup.createdAt).toLocaleString()}</strong>
-                <span className="backup-detail">
+                <span className="text-[12px] text-fg-muted">
                   v{backup.appVersion} · {formatSize(backup.sizeBytes)}
                 </span>
               </div>

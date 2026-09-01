@@ -99,6 +99,11 @@ legacy rules to out-specificity them.
   then getComputedStyle. Chased twice; expensive both times.
 - Spacing map for a 4px-grid house scale: 4→`1`, 8→`2`, 10→`2.5`,
   12→`3`, 16→`4`, 24→`6`. Odd values stay arbitrary (`text-[13px]`).
+- **A primitive's base classes are promises**: only put a property in a
+  shared primitive's base if callers never override it (Toolbar's gap-2
+  default was overridden by every caller — it moved to the callers).
+  Same-property conflicts between base and caller resolve by stylesheet
+  order, which is luck, not design.
 - Caller-override pattern survives: a Toolbar consumer's unlayered
   class (.tag-filter gap: 6px) still outranks the primitive's gap-2
   utility — intentional during migration; convert callers later.

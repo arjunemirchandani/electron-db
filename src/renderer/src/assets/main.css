@@ -915,42 +915,12 @@ code {
   color: #fff;
 }
 
-.notes-backup {
-  gap: 10px;
-  margin-bottom: var(--space-3);
-}
-
-.notes-backup button {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Panels own a whole view now; their lists take the remaining height */
-.backups-panel,
+/* Panel owns a whole view; its list takes the remaining height */
 .manage-tags {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-}
-
-.backups-list {
-  list-style: none;
-  padding: 0;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.backup-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.backup-detail {
-  font-size: 12px;
-  color: var(--ev-c-text-2);
 }
 
 .backup-confirm-text {
@@ -1023,18 +993,6 @@ code {
   background-color: rgba(27, 27, 31, 0.9);
   color: var(--ev-c-text-1);
   font-size: 12px;
-}
-
-.backup-status {
-  font-size: 12px;
-  color: var(--ev-c-text-2);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  padding: 4px 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Success toasts: bottom-right overlay, out of layout flow so feedback

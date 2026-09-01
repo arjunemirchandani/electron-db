@@ -99,17 +99,17 @@ function BackupsView(): React.JSX.Element {
       <p className="notes-subtitle">
         Snapshots, export, and import. Restoring or importing takes a safety snapshot first.
       </p>
-      <Toolbar className="notes-backup">
-        <button className="btn" onClick={backupNow} disabled={backingUp}>
+      <Toolbar className="notes-backup mb-3 gap-2.5">
+        <button className="btn whitespace-nowrap" onClick={backupNow} disabled={backingUp}>
           {backingUp ? 'Backing up…' : 'Back Up Database'}
         </button>
-        <button className="btn export-button" onClick={exportNotes}>
+        <button className="btn export-button whitespace-nowrap" onClick={exportNotes}>
           Export…
         </button>
-        <button className="btn import-button" onClick={importNotes}>
+        <button className="btn import-button whitespace-nowrap" onClick={importNotes}>
           Import…
         </button>
-        {status && <span className="backup-status">{status}</span>}
+        {status && <span className="backup-status overflow-hidden rounded-full border border-border-subtle bg-white/[0.05] px-3 py-1 text-[12px] text-ellipsis whitespace-nowrap text-fg-muted">{status}</span>}
       </Toolbar>
       <BackupsPanel backups={backups} onRestore={restoreBackup} onDelete={deleteBackup} />
     </div>
