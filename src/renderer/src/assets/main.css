@@ -14,10 +14,10 @@
    reset in it keeps working. */
 @import './base.css' layer(base);
 
-/* Bridge the house design tokens into Tailwind's theme so utilities
-   speak palette A: bg-accent, rounded-md, etc. match the app exactly.
-   The legacy :root tokens below coexist during the migration and retire
-   as the last bespoke rules referencing them are converted. */
+/* The house design tokens, spoken as Tailwind theme: bg-accent,
+   rounded-md, etc. ARE palette A. The @theme block is the single
+   source of design-token truth (legacy :root tokens retired with the
+   v1.12.0 migration). */
 @theme {
   --color-accent: #6988e6;
   --color-accent-hover: #7b97ea;
@@ -34,7 +34,7 @@
 @theme inline {
   --color-fg: var(--ev-c-text-1);
   --color-fg-muted: var(--ev-c-text-2);
-  --color-border-subtle: var(--border-subtle);
+  --color-border-subtle: var(--ev-button-alt-border);
 }
 
 /* The standard button recipe — the de-blanketed successor of the old
@@ -46,7 +46,7 @@
   .btn {
     cursor: pointer;
     flex-shrink: 0;
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--ev-button-alt-border);
     border-radius: var(--radius-md);
     padding: 6px 14px;
     font-size: 13px;
@@ -80,30 +80,6 @@
     border-color: var(--color-accent);
     color: #fff;
   }
-}
-
-:root {
-  /* Layout tokens — the shared vocabulary for every component */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-pill: 999px;
-  --fs-caption: 12px;
-  --fs-body: 14px;
-  --fs-title: 18px;
-  --surface-input: rgba(27, 27, 31, 0.65);
-  --surface-panel: rgba(34, 34, 40, 0.62);
-  --border-subtle: var(--ev-button-alt-border);
-  /* Resting border for text inputs: lighter than the panel surface so
-     fields read as fields before they're focused */
-  --border-input: rgba(255, 255, 255, 0.14);
-  --accent: #6988e6;
-  --accent-hover: #7b97ea;
 }
 
 body {
@@ -204,14 +180,14 @@ code {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: var(--space-2);
+  gap: 8px;
   pointer-events: none;
 }
 
 .toast {
   padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-caption);
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 600;
   color: hsl(145 60% 85%);
   background-color: hsl(145 45% 22% / 0.95);

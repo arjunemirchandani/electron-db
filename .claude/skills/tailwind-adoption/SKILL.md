@@ -131,6 +131,18 @@ legacy rules to out-specificity them.
 - Legacy `:root` tokens retire only when the last rule referencing
   them is gone.
 
+## Phase 2 complete — what the endgame looks like
+
+ElectronDB's phase 2 landed as 12 commits (foundations → primitives →
+de-blanket → sidebar → settings → backups → tags → notes A/B/C →
+chrome → token retirement): main.css 1,100 → 230 lines, zero visual
+regressions, every commit green on 3-OS CI. The permanent CSS floor —
+what SHOULD stay CSS: document-level rules (body/code/#root),
+platform rules (Electron titlebar drag regions), focus-visible
+blankets, recipe classes (@layer components .btn family), and
+keyframe animations. Retire legacy :root tokens only at the very end,
+with a grep assert that zero var(--legacy) references remain.
+
 ## shadcn (phase 3 — only after the CSS speaks Tailwind)
 
 - shadcn requires Tailwind; adopting it earlier back-doors a styling
