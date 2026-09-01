@@ -40,13 +40,13 @@ function SettingsView(): React.JSX.Element {
   }
 
   return (
-    <div className="notes view-settings">
-      <h2>Settings</h2>
-      <p className="notes-subtitle">
+    <div className="notes @container flex min-h-0 flex-1 flex-col rounded-lg bg-surface-panel px-6 py-5 backdrop-blur-[9px] view-settings">
+      <h2 className="text-[18px] text-fg">Settings</h2>
+      <p className="notes-subtitle mb-3.5 text-[13px] text-fg-muted">
         Preferences for this app on this machine — kept outside the database, so restoring a backup
         or importing never changes them.
       </p>
-      {error && <p className="notes-error">{error}</p>}
+      {error && <p className="notes-error mb-2.5 text-[13px] text-[#e66]">{error}</p>}
       {settings && (
         <div className="settings-row flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border-subtle py-3">
           <div className="min-w-0 flex-[1_1_240px]">

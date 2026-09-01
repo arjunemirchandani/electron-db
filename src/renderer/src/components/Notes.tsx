@@ -120,17 +120,19 @@ function Notes(): React.JSX.Element {
   }
 
   return (
-    <div className="notes">
-      <h2>Notes</h2>
-      <p className="notes-subtitle">Stored in SQLite via better-sqlite3 + Drizzle</p>
-      <form className="notes-form" onSubmit={addNote}>
+    <div className="notes @container flex min-h-0 flex-1 flex-col rounded-lg bg-surface-panel px-6 py-5 backdrop-blur-[9px]">
+      <h2 className="text-[18px] text-fg">Notes</h2>
+      <p className="notes-subtitle mb-3.5 text-[13px] text-fg-muted">Stored in SQLite via better-sqlite3 + Drizzle</p>
+      <form className="notes-form mb-3.5 flex flex-wrap gap-2" onSubmit={addNote}>
         <input
+          className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_130px] px-2.5 py-2 text-[14px]"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
           required
         />
         <input
+          className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_130px] px-2.5 py-2 text-[14px]"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Content (optional)"
@@ -148,17 +150,18 @@ function Notes(): React.JSX.Element {
           Add
         </button>
       </form>
-      {error && <p className="notes-error">{error}</p>}
-      <div className="notes-search">
+      {error && <p className="notes-error mb-2.5 text-[13px] text-[#e66]">{error}</p>}
+      <div className="notes-search mb-3 flex items-center gap-2 text-fg-muted">
         <SearchIcon />
         <input
+          className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_120px] px-2.5 py-1.5 text-[12px]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search notes…"
           aria-label="Search notes"
         />
         {searchActive && searchResults !== null && (
-          <span className="search-count">
+          <span className="search-count text-[12px] whitespace-nowrap">
             {visibleNotes.length} of {notes.length}
           </span>
         )}
@@ -218,9 +221,9 @@ function Notes(): React.JSX.Element {
           )}
         </Toolbar>
       )}
-      <ul className="notes-list">
+      <ul className="notes-list min-h-0 flex-1 list-none overflow-y-auto p-0">
         {visibleNotes.length === 0 && (
-          <li className="notes-empty">
+          <li className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">
             {searchActive && searchResults !== null ? (
               <>
                 <strong>No notes match “{searchQuery.trim()}”.</strong>

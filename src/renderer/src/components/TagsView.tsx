@@ -36,12 +36,12 @@ function TagsView(): React.JSX.Element {
   }
 
   return (
-    <div className="notes view-tags">
-      <h2>Tags</h2>
-      <p className="notes-subtitle">
+    <div className="notes @container flex min-h-0 flex-1 flex-col rounded-lg bg-surface-panel px-6 py-5 backdrop-blur-[9px] view-tags">
+      <h2 className="text-[18px] text-fg">Tags</h2>
+      <p className="notes-subtitle mb-3.5 text-[13px] text-fg-muted">
         Pick colors, rename, merge, or delete — changes apply to every note.
       </p>
-      {error && <p className="notes-error">{error}</p>}
+      {error && <p className="notes-error mb-2.5 text-[13px] text-[#e66]">{error}</p>}
       <ManageTags tags={tags} counts={counts} onChanged={refresh} />
     </div>
   )

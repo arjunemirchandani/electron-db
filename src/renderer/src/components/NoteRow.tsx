@@ -150,7 +150,7 @@ function NoteRow({
           <button type="button" className="btn" onClick={() => setEditing(false)} disabled={saving}>
             Cancel
           </button>
-          {editError && <p className="notes-error note-edit-error">{editError}</p>}
+          {editError && <p className="notes-error note-edit-error m-0 basis-full text-[13px] text-[#e66]">{editError}</p>}
         </form>
       </li>
     )

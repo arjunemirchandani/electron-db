@@ -31,7 +31,7 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
   return (
     <div className="backups-panel flex min-h-0 flex-1 flex-col">
       <ul className="backups-list min-h-0 flex-1 list-none overflow-y-auto p-0">
-        {backups.length === 0 && <li className="notes-empty">No backups yet.</li>}
+        {backups.length === 0 && <li className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">No backups yet.</li>}
         {backups.map((backup) => (
           <ListRow
             key={backup.filename}

@@ -94,9 +94,9 @@ function BackupsView(): React.JSX.Element {
   }
 
   return (
-    <div className="notes view-backups">
-      <h2>Backups</h2>
-      <p className="notes-subtitle">
+    <div className="notes @container flex min-h-0 flex-1 flex-col rounded-lg bg-surface-panel px-6 py-5 backdrop-blur-[9px] view-backups">
+      <h2 className="text-[18px] text-fg">Backups</h2>
+      <p className="notes-subtitle mb-3.5 text-[13px] text-fg-muted">
         Snapshots, export, and import. Restoring or importing takes a safety snapshot first.
       </p>
       <Toolbar className="notes-backup mb-3 gap-2.5">

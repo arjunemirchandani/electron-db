@@ -312,77 +312,6 @@ code {
   opacity: 0.8;
 }
 
-.notes {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  /* Rows adapt to the panel's width (container queries), not the window's */
-  container-type: inline-size;
-  padding: 20px 24px;
-  border-radius: var(--radius-lg);
-  /* Translucent over the wavy background art; the blur keeps text
-     readable while the pattern bleeds through */
-  background-color: var(--surface-panel);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-}
-
-.notes h2 {
-  font-size: 18px;
-  color: var(--ev-c-text-1);
-}
-
-.notes-subtitle {
-  font-size: 13px;
-  color: var(--ev-c-text-2);
-  margin-bottom: 14px;
-}
-
-.notes-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.notes-search {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
-  color: var(--ev-c-text-2);
-}
-
-.notes-search input {
-  flex: 1 1 120px;
-  min-width: 0;
-  padding: 6px 10px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-input);
-  background-color: var(--surface-input);
-  color: var(--ev-c-text-1);
-  font-size: var(--fs-caption);
-}
-
-.search-count {
-  font-size: var(--fs-caption);
-  white-space: nowrap;
-}
-
-.notes-form input {
-  /* min-width: 0 lets inputs shrink below placeholder width so the Add
-     button never overflows the panel; the row wraps when truly cramped */
-  flex: 1 1 130px;
-  min-width: 0;
-  padding: var(--space-2) 10px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-input);
-  background-color: var(--surface-input);
-  color: var(--ev-c-text-1);
-  font-size: var(--fs-body);
-}
-
 .tag-input {
   position: relative;
   display: flex;
@@ -455,20 +384,6 @@ code {
   border-color: rgba(105, 136, 230, 0.75);
 }
 
-.notes-error {
-  color: #e66;
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-
-.notes-list {
-  list-style: none;
-  padding: 0;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 .note-row {
   display: flex;
   align-items: flex-start;
@@ -532,11 +447,6 @@ code {
   background-color: var(--surface-input);
   color: var(--ev-c-text-1);
   font-size: var(--fs-body);
-}
-
-.note-edit-error {
-  flex-basis: 100%;
-  margin: 0;
 }
 
 .note-meta {
@@ -742,20 +652,6 @@ code {
   .notes .icon-button {
     opacity: 1;
   }
-}
-
-.notes-empty {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 18px 0;
-  color: var(--ev-c-text-2);
-  font-size: 14px;
-}
-
-.notes-empty strong {
-  color: var(--ev-c-text-1);
-  font-weight: 500;
 }
 
 .notes-date {

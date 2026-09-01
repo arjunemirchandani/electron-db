@@ -176,8 +176,8 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
 
   return (
     <div className="manage-tags flex min-h-0 flex-1 flex-col">
-      {error && <p className="notes-error">{error}</p>}
-      {tags.length === 0 && <p className="notes-empty">No tags yet.</p>}
+      {error && <p className="notes-error mb-2.5 text-[13px] text-[#e66]">{error}</p>}
+      {tags.length === 0 && <p className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">No tags yet.</p>}
       <ul className="manage-tags-list min-h-0 flex-1 list-none overflow-y-auto p-0">
         {tags.map((tag) => (
           <ListRow key={tag.id} main={renderMain(tag)} actions={renderActions(tag)} />
