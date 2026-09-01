@@ -83,6 +83,20 @@ legacy rules to out-specificity them.
   Tailwind's default 8px. Pick utilities against the bridge, not from
   memory of the default scale. (Bitten once: an icon button grew 4px of
   radius.)
+- **State styling moves from specificity to conditionals**: active/
+  collapsed variants become React ternaries; specificity hacks (the
+  `button.class-active` prefix trick) die with the CSS. Media-query
+  behavior becomes responsive variants (`max-[520px]:w-[52px]`).
+- **Same-property utilities must live in exclusive branches**: when two
+  utilities target one property (bg-transparent in a shared base +
+  bg-accent/[0.16] in an active branch), STYLESHEET order decides, not
+  class-list order — the shared one can silently win. Put the property
+  only in the branches, never in the shared base.
+- **Disable transitions before measuring**: in occluded/automated
+  windows the animation clock freezes, so a transitioning property
+  reads mid-flight values (a width transition frozen at 175px looks
+  exactly like a failed utility). el.style.transition='none' first,
+  then getComputedStyle. Chased twice; expensive both times.
 - Spacing map for a 4px-grid house scale: 4→`1`, 8→`2`, 10→`2.5`,
   12→`3`, 16→`4`, 24→`6`. Odd values stay arbitrary (`text-[13px]`).
 - Caller-override pattern survives: a Toolbar consumer's unlayered
