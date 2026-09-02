@@ -27,15 +27,16 @@ test('backups view lists, restores (reversibly), and deletes backups', async ({
   await goto('backups')
   const row = page.locator('.backups-list .list-row').first()
   await row.getByRole('button', { name: 'Restore' }).click()
-  await expect(row.locator('.backup-confirm-text')).toBeVisible()
-  await row.getByRole('button', { name: 'Cancel' }).click()
+  const dialog = page.getByRole('alertdialog')
+  await expect(dialog).toContainText('Restore this backup?')
+  await dialog.getByRole('button', { name: 'Cancel' }).click()
   await goto('notes')
   await expect(page.locator('.notes-list li')).toHaveCount(2)
 
   // Confirming rolls the data back to the snapshot...
   await goto('backups')
   await row.getByRole('button', { name: 'Restore' }).click()
-  await row.getByRole('button', { name: 'Confirm' }).click()
+  await dialog.getByRole('button', { name: 'Restore' }).click()
   await expect(page.locator('.backup-status')).toContainText('Restored')
 
   // ...and a safety snapshot of the pre-restore state was taken first.
@@ -59,6 +60,7 @@ test('backups view lists, restores (reversibly), and deletes backups', async ({
     .first()
     .getByRole('button', { name: 'Delete' })
     .click()
+  await relaunched.page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(relaunched.page.locator('.backups-list .list-row')).toHaveCount(1)
   expect(backups()).toHaveLength(1)
 })

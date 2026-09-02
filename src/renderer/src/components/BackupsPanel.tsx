@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import type { BackupInfo } from '../../../shared/types'
 import { ListRow } from './primitives'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from './ui/alert-dialog'
 
 function formatSize(bytes: number): string {
   return bytes >= 1024 * 1024
@@ -16,16 +26,29 @@ interface BackupsPanelProps {
 
 function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): React.JSX.Element {
   const [pendingRestore, setPendingRestore] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const [restoring, setRestoring] = useState(false)
 
-  const confirmRestore = async (filename: string): Promise<void> => {
+  const when = (filename: string | null): string => {
+    const backup = backups.find((b) => b.filename === filename)
+    return backup ? new Date(backup.createdAt).toLocaleString() : ''
+  }
+
+  const confirmRestore = async (): Promise<void> => {
+    if (!pendingRestore) return
     setRestoring(true)
     try {
-      await onRestore(filename)
+      await onRestore(pendingRestore)
       setPendingRestore(null)
     } finally {
       setRestoring(false)
     }
+  }
+
+  const confirmDelete = async (): Promise<void> => {
+    if (!pendingDelete) return
+    await onDelete(pendingDelete)
+    setPendingDelete(null)
   }
 
   return (
@@ -48,40 +71,59 @@ function BackupsPanel({ backups, onRestore, onDelete }: BackupsPanelProps): Reac
               </div>
             }
             actions={
-              pendingRestore === backup.filename ? (
-                <>
-                  <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">
-                    Replace current data?
-                  </span>
-                  <button
-                    className="btn backup-confirm"
-                    onClick={() => confirmRestore(backup.filename)}
-                    disabled={restoring}
-                  >
-                    {restoring ? 'Restoring…' : 'Confirm'}
-                  </button>
-                  <button
-                    className="btn"
-                    onClick={() => setPendingRestore(null)}
-                    disabled={restoring}
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className="btn" onClick={() => setPendingRestore(backup.filename)}>
-                    Restore
-                  </button>
-                  <button className="btn" onClick={() => onDelete(backup.filename)}>
-                    Delete
-                  </button>
-                </>
-              )
+              <>
+                <button className="btn" onClick={() => setPendingRestore(backup.filename)}>
+                  Restore
+                </button>
+                <button className="btn" onClick={() => setPendingDelete(backup.filename)}>
+                  Delete
+                </button>
+              </>
             }
           />
         ))}
       </ul>
+
+      <AlertDialog
+        open={pendingRestore !== null}
+        onOpenChange={(open) => !open && !restoring && setPendingRestore(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restore this backup?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Current data will be replaced with the {when(pendingRestore)} snapshot. A safety
+              snapshot of the current data is taken first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={restoring}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRestore} disabled={restoring}>
+              {restoring ? 'Restoring…' : 'Restore'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this backup?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The {when(pendingDelete)} backup file will be removed permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
