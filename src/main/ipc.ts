@@ -54,7 +54,7 @@ export function registerIpcHandlers(): void {
     return getDb()
       .select()
       .from(notes)
-      .orderBy(desc(notes.createdAt), desc(notes.id))
+      .orderBy(desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`), desc(notes.id))
       .all()
       .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
   })
@@ -110,7 +110,7 @@ export function registerIpcHandlers(): void {
       return getDb()
         .select()
         .from(notes)
-        .orderBy(desc(notes.createdAt), desc(notes.id))
+        .orderBy(desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`), desc(notes.id))
         .all()
         .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
     }

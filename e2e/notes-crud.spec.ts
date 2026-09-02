@@ -15,6 +15,14 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   await page.fill('input[placeholder="Title"]', 'Second note')
   await page.click('.notes-form button[type="submit"]')
   await expect(page.locator('.note-row').first()).toContainText('Second note')
+
+  // Freshest activity first: editing an older note bumps it to the top.
+  // Timestamps are second-granularity; cross the boundary so the edit
+  // is strictly newer than the second note's creation.
+  await page.waitForTimeout(1100)
+  await item.getByRole('button', { name: 'Edit' }).click()
+  await page.locator('.note-edit button[type="submit"]').click()
+  await expect(page.locator('.note-row').first()).toContainText('First note')
   await page
     .locator('.notes-list li', { hasText: 'Second note' })
     .getByRole('button', { name: 'Delete' })
