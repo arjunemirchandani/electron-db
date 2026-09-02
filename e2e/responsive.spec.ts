@@ -96,6 +96,26 @@ test('note rows become stacked cards in a narrow panel, with relative dates', as
   await expect(page.locator('.notes-empty')).toContainText('No notes yet')
 })
 
+test('long lists scroll inside the view; the window and sidebar stay put', async ({ launch }) => {
+  const { page } = await launch()
+  await page.evaluate(async () => {
+    for (let i = 1; i <= 25; i++) {
+      await window.api.createNote({ title: `Note ${i}`, content: 'filler' })
+    }
+    location.reload()
+  })
+  await expect(page.locator('.note-row')).toHaveCount(25)
+  const report = await page.evaluate(() => {
+    const doc = document.documentElement
+    const list = document.querySelector('.notes-list')!
+    return {
+      pageScrolls: doc.scrollHeight > doc.clientHeight + 1,
+      listScrolls: list.scrollHeight > list.clientHeight + 1
+    }
+  })
+  expect(report).toEqual({ pageScrolls: false, listScrolls: true })
+})
+
 test('macOS: a real drag element covers the strip beside the traffic lights', async ({
   launch
 }) => {

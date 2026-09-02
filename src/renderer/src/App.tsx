@@ -53,7 +53,7 @@ function App(): React.JSX.Element {
             onSelect={setView}
             onToggle={toggleCollapsed}
           />
-          <main className="flex min-w-0 flex-1 flex-col gap-4">
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
             <header className="app-header flex flex-wrap items-center gap-x-5 gap-y-2">
               <img
                 alt="logo"

@@ -152,7 +152,9 @@ code {
   flex-direction: column;
   align-items: stretch;
   gap: 16px;
-  min-height: 100vh;
+  /* height (not min-height): overflow must resolve to the inner list
+     scrollbars, never to window scroll that carries the sidebar away */
+  height: 100vh;
   padding: 18px 24px 22px;
 }
 
