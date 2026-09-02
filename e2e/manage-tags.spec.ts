@@ -47,7 +47,7 @@ test('tags view colors, renames, merges, and deletes tags', async ({ launch }) =
   // Merge moves notes onto the target and removes the source.
   await rowFor('planning').getByRole('button', { name: 'Merge' }).click()
   await page.locator('.manage-tag-select').selectOption({ label: 'work' })
-  await page.locator('.manage-tags .backup-confirm').click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Confirm' }).click()
   await expect(rowFor('planning')).toHaveCount(0)
   await goto('notes')
   const budget = page.locator('.notes-list li', { hasText: 'Budget' })
@@ -58,7 +58,7 @@ test('tags view colors, renames, merges, and deletes tags', async ({ launch }) =
 
   // Delete detaches the tag from all notes.
   await rowFor('work').getByRole('button', { name: 'Delete' }).click()
-  await page.locator('.manage-tags .backup-confirm').click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(rowFor('work')).toHaveCount(0)
   await goto('notes')
   await expect(sprint.locator('.tag-chip')).toHaveCount(0)

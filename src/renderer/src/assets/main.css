@@ -120,12 +120,6 @@
     background-color: var(--color-accent-hover);
     border-color: var(--color-accent-hover);
   }
-
-  .btn.backup-confirm {
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
-  }
 }
 
 body {

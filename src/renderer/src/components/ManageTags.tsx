@@ -2,6 +2,16 @@ import { useState } from 'react'
 import type { Tag } from '../../../shared/types'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { ListRow } from './primitives'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from './ui/alert-dialog'
 
 const PALETTE = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 
@@ -96,92 +106,30 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
     </>
   )
 
-  const renderActions = (tag: Tag): React.JSX.Element => {
-    if (mergingId === tag.id) {
-      return (
-        <>
-          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">Merge into</span>
-          <select
-            className="manage-tag-select rounded-md border border-border-subtle bg-[rgba(27,27,31,0.9)] px-1.5 py-1 text-[12px] text-fg"
-            value={mergeTargetId ?? ''}
-            onChange={(e) => setMergeTargetId(Number(e.target.value))}
-          >
-            <option value="" disabled>
-              choose…
-            </option>
-            {tags
-              .filter((t) => t.id !== tag.id)
-              .map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-          </select>
-          <button
-            className="btn backup-confirm"
-            disabled={mergeTargetId === null}
-            onClick={() =>
-              run(async () => {
-                await window.api.mergeTags(tag.id, mergeTargetId!)
-                setMergingId(null)
-                setMergeTargetId(null)
-              })
-            }
-          >
-            Confirm
-          </button>
-          <button className="btn" onClick={() => setMergingId(null)}>
-            Cancel
-          </button>
-        </>
-      )
-    }
-    if (pendingDeleteId === tag.id) {
-      return (
-        <>
-          <span className="backup-confirm-text mr-1 text-[12px] text-[#e6b366]">
-            Remove from all notes?
-          </span>
-          <button
-            className="btn backup-confirm"
-            onClick={() =>
-              run(async () => {
-                await window.api.deleteTag(tag.id)
-                setPendingDeleteId(null)
-              })
-            }
-          >
-            Confirm
-          </button>
-          <button className="btn" onClick={() => setPendingDeleteId(null)}>
-            Cancel
-          </button>
-        </>
-      )
-    }
-    return (
-      <>
-        <button className="btn" onClick={() => startRename(tag)}>
-          Rename
-        </button>
-        <button
-          className="btn"
-          disabled={tags.length < 2}
-          onClick={() => {
-            setMergingId(tag.id)
-            setMergeTargetId(null)
-            setRenamingId(null)
-            setPendingDeleteId(null)
-          }}
-        >
-          Merge
-        </button>
-        <button className="btn" onClick={() => setPendingDeleteId(tag.id)}>
-          Delete
-        </button>
-      </>
-    )
-  }
+  const renderActions = (tag: Tag): React.JSX.Element => (
+    <>
+      <button className="btn" onClick={() => startRename(tag)}>
+        Rename
+      </button>
+      <button
+        className="btn"
+        disabled={tags.length < 2}
+        onClick={() => {
+          setMergingId(tag.id)
+          setMergeTargetId(null)
+          setRenamingId(null)
+        }}
+      >
+        Merge
+      </button>
+      <button className="btn" onClick={() => setPendingDeleteId(tag.id)}>
+        Delete
+      </button>
+    </>
+  )
+
+  const mergingTag = tags.find((t) => t.id === mergingId)
+  const deletingTag = tags.find((t) => t.id === pendingDeleteId)
 
   return (
     <div className="manage-tags flex min-h-0 flex-1 flex-col">
@@ -196,6 +144,86 @@ function ManageTags({ tags, counts, onChanged }: ManageTagsProps): React.JSX.Ele
           <ListRow key={tag.id} main={renderMain(tag)} actions={renderActions(tag)} />
         ))}
       </ul>
+
+      <AlertDialog
+        open={mergingId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setMergingId(null)
+            setMergeTargetId(null)
+          }
+        }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Merge &ldquo;{mergingTag?.name}&rdquo; into…</AlertDialogTitle>
+            <AlertDialogDescription>
+              Its notes move to the tag you choose; &ldquo;{mergingTag?.name}&rdquo; is then
+              deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <select
+            className="manage-tag-select rounded-md border border-border-subtle bg-[rgba(27,27,31,0.9)] px-1.5 py-1 text-[12px] text-fg"
+            value={mergeTargetId ?? ''}
+            onChange={(e) => setMergeTargetId(Number(e.target.value))}
+          >
+            <option value="" disabled>
+              choose…
+            </option>
+            {tags
+              .filter((t) => t.id !== mergingId)
+              .map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+          </select>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={mergeTargetId === null}
+              onClick={() =>
+                run(async () => {
+                  await window.api.mergeTags(mergingId!, mergeTargetId!)
+                  setMergingId(null)
+                  setMergeTargetId(null)
+                })
+              }
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete &ldquo;{deletingTag?.name}&rdquo;?</AlertDialogTitle>
+            <AlertDialogDescription>
+              It is removed from {deletingTag ? (counts.get(deletingTag.name) ?? 0) : 0} note(s);
+              the notes themselves are kept.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() =>
+                run(async () => {
+                  await window.api.deleteTag(pendingDeleteId!)
+                  setPendingDeleteId(null)
+                })
+              }
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
