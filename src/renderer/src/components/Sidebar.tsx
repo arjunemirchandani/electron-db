@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import type { Note, Tag } from '../../../shared/types'
+import { tagStyle } from '../lib/tagColor'
 import { ArchiveIcon, GearIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
@@ -18,6 +21,8 @@ interface SidebarProps {
   collapsed: boolean
   onSelect: (view: View) => void
   onToggle: () => void
+  /** Jump to Notes filtered to this tag. */
+  onFilterTag: (name: string) => void
 }
 
 // State-dependent styling lives in these conditionals, not CSS
@@ -31,7 +36,38 @@ interface SidebarProps {
 const railButton =
   'cursor-pointer rounded-md border border-transparent transition-[background-color,color] duration-[120ms]'
 
-function Sidebar({ view, collapsed, onSelect, onToggle }: SidebarProps): React.JSX.Element {
+function Sidebar({
+  view,
+  collapsed,
+  onSelect,
+  onToggle,
+  onFilterTag
+}: SidebarProps): React.JSX.Element {
+  const [tags, setTags] = useState<Tag[]>([])
+  const [counts, setCounts] = useState<Map<string, number>>(new Map())
+
+  // Tag CRUD happens inside the views, so refetching on every view
+  // change keeps this list fresh enough without an event bus.
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([window.api.listTags(), window.api.listNotes()])
+      .then(([nextTags, notes]: [Tag[], Note[]]) => {
+        if (cancelled) return
+        const nextCounts = new Map<string, number>()
+        for (const note of notes) {
+          for (const tag of note.tags) {
+            nextCounts.set(tag.name, (nextCounts.get(tag.name) ?? 0) + 1)
+          }
+        }
+        setTags(nextTags)
+        setCounts(nextCounts)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [view])
+
   return (
     <aside
       className={`sidebar ${collapsed ? 'sidebar-collapsed w-[52px]' : 'w-[180px]'} flex shrink-0 flex-col gap-2 overflow-hidden rounded-lg bg-surface-panel p-2 backdrop-blur-[9px] transition-[width] duration-[160ms] ease-[ease] max-[520px]:w-[52px]`}
@@ -87,6 +123,32 @@ function Sidebar({ view, collapsed, onSelect, onToggle }: SidebarProps): React.J
             </Tooltip>
           )
         })}
+
+        {tags.length > 0 && (
+          <div
+            className={`sidebar-tags mt-3 flex min-h-0 flex-col border-t border-border-subtle pt-3 ${collapsed ? 'hidden' : ''} max-[520px]:hidden`}
+          >
+            <div className="px-2.5 pb-1 text-[11px] font-semibold tracking-wide text-fg-muted uppercase">
+              Tags
+            </div>
+            <div className="min-h-0 overflow-y-auto">
+              {tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  className={`sidebar-tag ${railButton} flex w-full items-center gap-2 bg-transparent px-2.5 py-1.5 text-[12px] text-fg-muted hover:bg-white/[0.06] hover:text-fg`}
+                  style={tagStyle(tag.name, tag.hue)}
+                  onClick={() => onFilterTag(tag.name)}
+                >
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[hsl(var(--tag-h)_60%_55%)]" />
+                  <span className="min-w-0 truncate">{tag.name}</span>
+                  <span className="ml-auto text-[11px] opacity-70">
+                    {counts.get(tag.name) ?? 0}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
     </aside>
   )

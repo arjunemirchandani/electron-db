@@ -25,6 +25,7 @@ const readCollapsed = (): boolean => {
 function App(): React.JSX.Element {
   const [view, setView] = useState<View>('notes')
   const [revealNoteId, setRevealNoteId] = useState<number | null>(null)
+  const [pendingTagFilter, setPendingTagFilter] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(readCollapsed)
 
   const toggleCollapsed = (): void =>
@@ -52,6 +53,10 @@ function App(): React.JSX.Element {
             collapsed={collapsed}
             onSelect={setView}
             onToggle={toggleCollapsed}
+            onFilterTag={(name) => {
+              setView('notes')
+              setPendingTagFilter(name)
+            }}
           />
           <main className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
             <header className="app-header flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -78,7 +83,12 @@ function App(): React.JSX.Element {
               <Versions></Versions>
             </header>
             {view === 'notes' && (
-              <Notes revealNoteId={revealNoteId} onRevealHandled={() => setRevealNoteId(null)} />
+              <Notes
+                revealNoteId={revealNoteId}
+                onRevealHandled={() => setRevealNoteId(null)}
+                tagFilter={pendingTagFilter}
+                onTagFilterHandled={() => setPendingTagFilter(null)}
+              />
             )}
             {view === 'backups' && <BackupsView />}
             {view === 'tags' && <TagsView />}

@@ -27,6 +27,23 @@ test('sidebar switches views and marks the active item', async ({ launch }) => {
   await expect(page.locator('[data-slot="tooltip-content"]')).toHaveText('Collapse sidebar')
 })
 
+test('sidebar lists tags and clicking one filters the notes view', async ({ launch }) => {
+  const { page } = await launch()
+  await page.evaluate(async () => {
+    await window.api.createNote({ title: 'Sprint', tags: ['work'] })
+    await window.api.createNote({ title: 'Plants', tags: ['home'] })
+    location.reload()
+  })
+  const sidebarTag = page.locator('.sidebar-tag', { hasText: 'home' })
+  await expect(sidebarTag).toContainText('1')
+  await page.click('.sidebar-item[data-view="backups"]')
+  await sidebarTag.click()
+  await expect(page.locator('.notes h2')).toHaveText('Notes')
+  await expect(page.locator('.tag-filter .tag-chip-active')).toHaveText(/^home/)
+  await expect(page.locator('.note-row')).toHaveCount(1)
+  await expect(page.locator('.note-row')).toContainText('Plants')
+})
+
 test('sidebar collapse is remembered across relaunches', async ({ launch }) => {
   const { app, page } = await launch()
   await expect(page.locator('.sidebar')).not.toHaveClass(/sidebar-collapsed/)

@@ -11,9 +11,17 @@ interface NotesProps {
   /** Set by the command palette: scroll to and flash this note. */
   revealNoteId?: number | null
   onRevealHandled?: () => void
+  /** Set by the sidebar: replace the tag filter with this one tag. */
+  tagFilter?: string | null
+  onTagFilterHandled?: () => void
 }
 
-function Notes({ revealNoteId, onRevealHandled }: NotesProps): React.JSX.Element {
+function Notes({
+  revealNoteId,
+  onRevealHandled,
+  tagFilter,
+  onTagFilterHandled
+}: NotesProps): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
   const [allTags, setAllTags] = useState<Tag[]>([])
   const [title, setTitle] = useState('')
@@ -69,6 +77,17 @@ function Notes({ revealNoteId, onRevealHandled }: NotesProps): React.JSX.Element
     }, 0)
     return () => clearTimeout(timer)
   }, [revealNoteId, onRevealHandled])
+
+  useEffect(() => {
+    if (tagFilter == null) return
+    const timer = setTimeout(() => {
+      setSearchQuery('')
+      setMetaFilter(null)
+      setFilterTags([tagFilter])
+      onTagFilterHandled?.()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [tagFilter, onTagFilterHandled])
 
   const searchActive = searchQuery.trim().length > 0
 
