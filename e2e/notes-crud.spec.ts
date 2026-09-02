@@ -11,6 +11,16 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   await expect(item).toBeVisible()
   await expect(item).toContainText('hello sqlite')
 
+  // Newest first: a second note appears above the first.
+  await page.fill('input[placeholder="Title"]', 'Second note')
+  await page.click('.notes-form button[type="submit"]')
+  await expect(page.locator('.note-row').first()).toContainText('Second note')
+  await page
+    .locator('.notes-list li', { hasText: 'Second note' })
+    .getByRole('button', { name: 'Delete' })
+    .click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
+
   await item.getByRole('button', { name: 'Delete' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(item).toHaveCount(0)
