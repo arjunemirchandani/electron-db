@@ -42,6 +42,14 @@ test('sidebar lists tags and clicking one filters the notes view', async ({ laun
   await expect(page.locator('.tag-filter .tag-chip-active')).toHaveText(/^home/)
   await expect(page.locator('.note-row')).toHaveCount(1)
   await expect(page.locator('.note-row')).toContainText('Plants')
+
+  // Live updates: creating a tagged note refreshes the sidebar without
+  // a view change.
+  await page.locator('.tag-filter-clear', { hasText: 'Clear' }).click()
+  await page.fill('input[placeholder="Title"]', 'Fresh idea')
+  await page.locator('.notes-form-tags input').fill('fresh')
+  await page.click('.notes-form button[type="submit"]')
+  await expect(page.locator('.sidebar-tag', { hasText: 'fresh' })).toContainText('1')
 })
 
 test('sidebar collapse is remembered across relaunches', async ({ launch }) => {

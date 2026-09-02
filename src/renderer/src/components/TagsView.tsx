@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Note, Tag } from '../../../shared/types'
 import ManageTags from './ManageTags'
+import { emitTagsChanged } from '../lib/appEvents'
 
 /** Tag management view. Notes are fetched only to show usage counts. */
 function TagsView(): React.JSX.Element {
@@ -12,6 +13,7 @@ function TagsView(): React.JSX.Element {
     const [nextNotes, nextTags] = await Promise.all([window.api.listNotes(), window.api.listTags()])
     setNotes(nextNotes)
     setTags(nextTags)
+    emitTagsChanged()
   }, [])
 
   useEffect(() => {

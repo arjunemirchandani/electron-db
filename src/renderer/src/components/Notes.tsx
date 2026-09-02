@@ -5,6 +5,7 @@ import NoteRow from './NoteRow'
 import { Toolbar } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
 import { toastWithUndo, useToast } from './toast-context'
+import { emitTagsChanged } from '../lib/appEvents'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
@@ -43,6 +44,7 @@ function Notes({
     setNotes(nextNotes)
     setAllTags(nextTags)
     setFilterTags((current) => current.filter((name) => nextTags.some((t) => t.name === name)))
+    emitTagsChanged()
   }, [])
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Note, Tag } from '../../../shared/types'
 import { tagStyle } from '../lib/tagColor'
+import { onTagsChanged } from '../lib/appEvents'
 import { ArchiveIcon, GearIcon, NotesIcon, PanelLeftIcon, TagIcon } from './icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
@@ -46,25 +47,30 @@ function Sidebar({
   const [tags, setTags] = useState<Tag[]>([])
   const [counts, setCounts] = useState<Map<string, number>>(new Map())
 
-  // Tag CRUD happens inside the views, so refetching on every view
-  // change keeps this list fresh enough without an event bus.
+  // Views emit tags-changed after any mutating refresh; refetching on
+  // that signal (plus view changes, belt and braces) keeps this live.
   useEffect(() => {
     let cancelled = false
-    Promise.all([window.api.listTags(), window.api.listNotes()])
-      .then(([nextTags, notes]: [Tag[], Note[]]) => {
-        if (cancelled) return
-        const nextCounts = new Map<string, number>()
-        for (const note of notes) {
-          for (const tag of note.tags) {
-            nextCounts.set(tag.name, (nextCounts.get(tag.name) ?? 0) + 1)
+    const load = (): void => {
+      Promise.all([window.api.listTags(), window.api.listNotes()])
+        .then(([nextTags, notes]: [Tag[], Note[]]) => {
+          if (cancelled) return
+          const nextCounts = new Map<string, number>()
+          for (const note of notes) {
+            for (const tag of note.tags) {
+              nextCounts.set(tag.name, (nextCounts.get(tag.name) ?? 0) + 1)
+            }
           }
-        }
-        setTags(nextTags)
-        setCounts(nextCounts)
-      })
-      .catch(() => {})
+          setTags(nextTags)
+          setCounts(nextCounts)
+        })
+        .catch(() => {})
+    }
+    load()
+    const off = onTagsChanged(load)
     return () => {
       cancelled = true
+      off()
     }
   }, [view])
 

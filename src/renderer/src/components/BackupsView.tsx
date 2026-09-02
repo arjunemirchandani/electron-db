@@ -3,6 +3,7 @@ import type { BackupInfo } from '../../../shared/types'
 import BackupsPanel from './BackupsPanel'
 import { Toolbar } from './primitives'
 import { toastError, useToast } from './toast-context'
+import { emitTagsChanged } from '../lib/appEvents'
 
 /**
  * Data-lifecycle view: snapshots plus export/import. Self-sufficient — it
@@ -92,6 +93,7 @@ function BackupsView(): React.JSX.Element {
           'A safety snapshot was taken first'
         )
         await refresh()
+        emitTagsChanged()
       }
     } catch (err) {
       toastError('Import failed', message(err))
