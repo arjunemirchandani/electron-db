@@ -258,7 +258,7 @@ function NoteRow({
         </time>
         <IconButton
           label={note.pinned ? 'Unpin' : 'Pin'}
-          className={note.pinned ? 'pinned text-accent opacity-100!' : ''}
+          className={note.pinned ? 'pinned text-accent! opacity-100! [&_svg]:fill-current' : ''}
           onClick={onTogglePin}
         >
           <PinIcon />

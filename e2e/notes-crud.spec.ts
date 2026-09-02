@@ -28,6 +28,11 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   const second = page.locator('.notes-list li', { hasText: 'Second note' })
   await second.getByRole('button', { name: 'Pin' }).click()
   await expect(page.locator('.note-row').first()).toContainText('Second note')
+  const unpin = second.getByRole('button', { name: 'Unpin' })
+  await expect(unpin).toHaveClass(/pinned/)
+  await expect
+    .poll(() => unpin.evaluate((el) => getComputedStyle(el).color))
+    .toBe('rgb(105, 136, 230)')
   await second.getByRole('button', { name: 'Unpin' }).click()
   await expect(page.locator('.note-row').first()).toContainText('First note')
 
