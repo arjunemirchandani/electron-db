@@ -9,8 +9,7 @@ import {
   CommandItem,
   CommandList
 } from './ui/command'
-import { toast as manager } from './ui/toast'
-import { useToast } from './toast-context'
+import { toastError, useToast } from './toast-context'
 import { renderMarked } from '../lib/marked'
 import { ArchiveIcon, GearIcon, NotesIcon, TagIcon } from './icons'
 import type { View } from './Sidebar'
@@ -79,13 +78,7 @@ function CommandPalette({ onNavigate, onRevealNote }: CommandPaletteProps): Reac
       await window.api.backupNow()
       toast('Backed up', 'Snapshot saved to Backups')
     } catch (err) {
-      // The palette has no inline error surface, so this is the one
-      // place an error rides the toast channel.
-      manager.add({
-        title: 'Backup failed',
-        description: err instanceof Error ? err.message : String(err),
-        type: 'error'
-      })
+      toastError('Backup failed', err instanceof Error ? err.message : String(err))
     }
   }
 

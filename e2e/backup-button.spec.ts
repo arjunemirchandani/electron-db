@@ -9,7 +9,7 @@ test('backup button creates a backup and prunes to the 3 most recent', async ({
   const button = page.locator('.notes-backup button', { hasText: 'Back Up Database' })
 
   await button.click()
-  await expect(page.locator('.backup-status')).toContainText('Backed up to')
+  await expect(page.locator('.toast', { hasText: 'Backed up' }).first()).toBeVisible()
   expect(backups()).toHaveLength(1)
 
   // Three more backups: pruning must cap the total at 3.

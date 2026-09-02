@@ -16,7 +16,7 @@ test('backups view lists, restores (reversibly), and deletes backups', async ({
   await addNote('before snapshot')
   await goto('backups')
   await page.click('.notes-backup button:has-text("Back Up Database")')
-  await expect(page.locator('.backup-status')).toContainText('Backed up to')
+  await expect(page.locator('.toast', { hasText: 'Backed up' })).toBeVisible()
   await expect(page.locator('.backups-list .list-row')).toHaveCount(1)
 
   await goto('notes')
@@ -37,7 +37,7 @@ test('backups view lists, restores (reversibly), and deletes backups', async ({
   await goto('backups')
   await row.getByRole('button', { name: 'Restore' }).click()
   await dialog.getByRole('button', { name: 'Restore' }).click()
-  await expect(page.locator('.backup-status')).toContainText('Restored')
+  await expect(page.locator('.toast', { hasText: 'Restored' })).toBeVisible()
 
   // ...and a safety snapshot of the pre-restore state was taken first.
   await expect(page.locator('.backups-list .list-row')).toHaveCount(2)

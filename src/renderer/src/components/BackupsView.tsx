@@ -2,16 +2,19 @@ import { useCallback, useEffect, useState } from 'react'
 import type { BackupInfo } from '../../../shared/types'
 import BackupsPanel from './BackupsPanel'
 import { Toolbar } from './primitives'
+import { toastError, useToast } from './toast-context'
 
 /**
  * Data-lifecycle view: snapshots plus export/import. Self-sufficient — it
  * fetches on mount, and the Notes view refetches when switched back to, so
  * no state needs to thread across views after a restore or import.
+ * All action feedback rides the toast channel (successes and failures —
+ * these are fire-and-forget actions with no form to sit beside).
  */
 function BackupsView(): React.JSX.Element {
   const [backups, setBackups] = useState<BackupInfo[]>([])
-  const [status, setStatus] = useState<string | null>(null)
   const [backingUp, setBackingUp] = useState(false)
+  const toast = useToast()
 
   const refresh = useCallback(async (): Promise<void> => {
     setBackups(await window.api.listBackups())
@@ -25,71 +28,73 @@ function BackupsView(): React.JSX.Element {
         if (!cancelled) setBackups(next)
       })
       .catch((e) => {
-        if (!cancelled) setStatus(String(e))
+        if (!cancelled) toastError('Could not load backups', String(e))
       })
     return () => {
       cancelled = true
     }
   }, [])
 
+  const message = (err: unknown): string => (err instanceof Error ? err.message : String(err))
+
   const backupNow = async (): Promise<void> => {
     setBackingUp(true)
-    setStatus(null)
     try {
       const path = await window.api.backupNow()
-      const filename = path.split(/[\\/]/).pop()
-      setStatus(`Backed up to ${filename}`)
+      toast('Backed up', `Saved ${path.split(/[\\/]/).pop()}`)
       await refresh()
     } catch (err) {
-      setStatus(`Backup failed: ${err instanceof Error ? err.message : String(err)}`)
+      toastError('Backup failed', message(err))
     } finally {
       setBackingUp(false)
     }
   }
 
   const restoreBackup = async (filename: string): Promise<void> => {
-    setStatus(null)
     try {
       await window.api.restoreBackup(filename)
-      setStatus(`Restored ${filename}`)
+      toast('Restored', filename)
       await refresh()
     } catch (err) {
-      setStatus(`Restore failed: ${err instanceof Error ? err.message : String(err)}`)
+      toastError('Restore failed', message(err))
       throw err
     }
   }
 
   const deleteBackup = async (filename: string): Promise<void> => {
+    const backup = backups.find((b) => b.filename === filename)
     await window.api.deleteBackup(filename)
+    toast(
+      'Backup deleted',
+      backup ? `${new Date(backup.createdAt).toLocaleString()} snapshot removed` : filename
+    )
     await refresh()
   }
 
   const exportNotes = async (): Promise<void> => {
-    setStatus(null)
     try {
       const result = await window.api.exportNotes()
       if (result) {
-        setStatus(`Exported ${result.notes} notes to ${result.path.split(/[\\/]/).pop()}`)
+        toast(`Exported ${result.notes} notes`, `Saved ${result.path.split(/[\\/]/).pop()}`)
       }
     } catch (err) {
-      setStatus(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
+      toastError('Export failed', message(err))
     }
   }
 
   const importNotes = async (): Promise<void> => {
-    setStatus(null)
     try {
       const result = await window.api.importNotes()
       if (result) {
-        setStatus(
+        toast(
           `Imported ${result.notes} notes` +
-            (result.tagsCreated > 0 ? ` and ${result.tagsCreated} new tags` : '') +
-            ' (snapshot taken first)'
+            (result.tagsCreated > 0 ? ` and ${result.tagsCreated} new tags` : ''),
+          'A safety snapshot was taken first'
         )
         await refresh()
       }
     } catch (err) {
-      setStatus(`Import failed: ${err instanceof Error ? err.message : String(err)}`)
+      toastError('Import failed', message(err))
     }
   }
 
@@ -109,11 +114,6 @@ function BackupsView(): React.JSX.Element {
         <button className="btn import-button whitespace-nowrap" onClick={importNotes}>
           Import…
         </button>
-        {status && (
-          <span className="backup-status overflow-hidden rounded-full border border-border-subtle bg-white/[0.05] px-3 py-1 text-[12px] text-ellipsis whitespace-nowrap text-fg-muted">
-            {status}
-          </span>
-        )}
       </Toolbar>
       <BackupsPanel backups={backups} onRestore={restoreBackup} onDelete={deleteBackup} />
     </div>

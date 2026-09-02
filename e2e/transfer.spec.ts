@@ -22,7 +22,7 @@ test('export writes a versioned envelope with tags by name', async ({ launch }) 
 
   await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Export…' }).click()
-  await expect(page.locator('.backup-status')).toContainText('Exported 2 notes')
+  await expect(page.locator('.toast', { hasText: 'Exported 2 notes' })).toBeVisible()
 
   const data = JSON.parse(fs.readFileSync(out, 'utf8'))
   expect(data.format).toBe('electrondb-export')
@@ -81,9 +81,8 @@ test('import merges a v1 file, preserves existing tag colors, snapshots first', 
 
   await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Import…' }).click()
-  await expect(page.locator('.backup-status')).toContainText(
-    'Imported 2 notes and 1 new tags (snapshot taken first)'
-  )
+  const importedToast = page.locator('.toast', { hasText: 'Imported 2 notes and 1 new tags' })
+  await expect(importedToast).toContainText('safety snapshot')
   await page.click('.sidebar-item[data-view="notes"]')
   await expect(page.locator('.note-row')).toHaveCount(3)
   const imported = page.locator('.note-row', { hasText: 'Imported plans' })
@@ -109,7 +108,7 @@ test('import rejects newer or foreign files with honest errors', async ({ launch
   const { app, page } = await launch({ ELECTRONDB_IMPORT_PATH: newer })
   await page.click('.sidebar-item[data-view="backups"]')
   await page.getByRole('button', { name: 'Import…' }).click()
-  await expect(page.locator('.backup-status')).toContainText(
+  await expect(page.locator('.toast', { hasText: 'Import failed' })).toContainText(
     'created by a newer version of ElectronDB'
   )
   await page.click('.sidebar-item[data-view="notes"]')
@@ -121,5 +120,7 @@ test('import rejects newer or foreign files with honest errors', async ({ launch
   const second = await launch({ ELECTRONDB_IMPORT_PATH: foreign })
   await second.page.click('.sidebar-item[data-view="backups"]')
   await second.page.getByRole('button', { name: 'Import…' }).click()
-  await expect(second.page.locator('.backup-status')).toContainText("isn't an ElectronDB export")
+  await expect(second.page.locator('.toast', { hasText: 'Import failed' })).toContainText(
+    "isn't an ElectronDB export"
+  )
 })

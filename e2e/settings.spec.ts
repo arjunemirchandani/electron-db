@@ -26,7 +26,7 @@ test('backup retention setting controls pruning and survives relaunch', async ({
   await page.click('.sidebar-item[data-view="backups"]')
   const backupButton = page.locator('.notes-backup button', { hasText: 'Back Up Database' })
   await backupButton.click()
-  await expect(page.locator('.backup-status')).toContainText('Backed up to')
+  await expect(page.locator('.toast', { hasText: 'Backed up' })).toBeVisible()
   await backupButton.click()
   await expect(backupButton).toBeEnabled()
   await expect.poll(() => backups().length).toBe(1)
