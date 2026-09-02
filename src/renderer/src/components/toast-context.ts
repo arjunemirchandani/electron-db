@@ -15,3 +15,14 @@ export function useToast(): (message: string, description?: string) => void {
 export function toastError(message: string, description?: string): void {
   manager.add({ title: message, description, type: 'error', timeout: 6000 })
 }
+
+/** Success toast carrying an Undo action; the action closes the toast. */
+export function toastWithUndo(message: string, description: string, onUndo: () => void): void {
+  manager.add({
+    title: message,
+    description,
+    type: 'success',
+    timeout: 6000,
+    actionProps: { children: 'Undo', onClick: onUndo }
+  })
+}

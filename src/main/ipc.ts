@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { and, desc, eq, inArray, notInArray, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, isNull, lt, notInArray, sql } from 'drizzle-orm'
 import { createBackup, deleteBackup, getDb, listBackups, restoreBackup } from './db'
 import { cleanMetadata, exportToFile, importFromFile } from './transfer'
 import { readSettings, updateSettings } from './settings'
@@ -49,11 +49,20 @@ function pruneOrphanTags(): void {
 }
 
 export function registerIpcHandlers(): void {
+  // Purge notes whose undo window has long passed; cascade removes
+  // their tag links, then orphaned tags fall away.
+  getDb()
+    .delete(notes)
+    .where(lt(notes.deletedAt, sql`datetime('now', '-1 day')`))
+    .run()
+  pruneOrphanTags()
+
   ipcMain.handle('notes:list', (): Note[] => {
     const byNote = tagsByNote()
     return getDb()
       .select()
       .from(notes)
+      .where(isNull(notes.deletedAt))
       .orderBy(
         desc(notes.pinned),
         desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`),
@@ -114,6 +123,7 @@ export function registerIpcHandlers(): void {
       return getDb()
         .select()
         .from(notes)
+        .where(isNull(notes.deletedAt))
         .orderBy(
           desc(notes.pinned),
           desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`),
@@ -147,7 +157,7 @@ export function registerIpcHandlers(): void {
     const byId = new Map(rows.map((note) => [note.id, note]))
     return ranked.flatMap((r) => {
       const note = byId.get(r.id)
-      if (!note) return []
+      if (!note || note.deletedAt) return []
       return [
         {
           ...withDefaults(note),
@@ -167,12 +177,27 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('notes:delete', (_event, id: number): void => {
     if (!Number.isInteger(id)) throw new Error('Invalid note id')
-    getDb().delete(notes).where(eq(notes.id, id)).run()
-    pruneOrphanTags()
+    // Soft delete: hidden immediately, restorable via the Undo toast,
+    // purged for real after a day (see the startup purge below).
+    getDb()
+      .update(notes)
+      .set({ deletedAt: sql`(datetime('now'))` })
+      .where(eq(notes.id, id))
+      .run()
+  })
+
+  ipcMain.handle('notes:restore', (_event, id: number): void => {
+    if (!Number.isInteger(id)) throw new Error('Invalid note id')
+    getDb().update(notes).set({ deletedAt: null }).where(eq(notes.id, id)).run()
   })
 
   ipcMain.handle('tags:list', (): Tag[] => {
-    const used = getDb().select({ tagId: noteTags.tagId }).from(noteTags).all()
+    const used = getDb()
+      .select({ tagId: noteTags.tagId })
+      .from(noteTags)
+      .innerJoin(notes, eq(noteTags.noteId, notes.id))
+      .where(isNull(notes.deletedAt))
+      .all()
     const usedIds = [...new Set(used.map((r) => r.tagId))]
     if (usedIds.length === 0) return []
     return getDb().select().from(tags).where(inArray(tags.id, usedIds)).orderBy(tags.name).all()

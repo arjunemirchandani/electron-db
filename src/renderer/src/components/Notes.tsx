@@ -4,6 +4,7 @@ import TagInput, { type TagInputHandle } from './TagInput'
 import NoteRow from './NoteRow'
 import { Toolbar } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
+import { toastWithUndo } from './toast-context'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
@@ -121,9 +122,12 @@ function Notes({
     }
   }
 
-  const removeNote = async (id: number): Promise<void> => {
+  const removeNote = async (id: number, title: string): Promise<void> => {
     await window.api.deleteNote(id)
     await refresh()
+    toastWithUndo('Note deleted', `“${title}”`, () => {
+      void window.api.restoreNote(id).then(refresh)
+    })
   }
 
   const removeTag = async (noteId: number, tagId: number): Promise<void> => {
@@ -348,7 +352,7 @@ function Notes({
               await window.api.updateNote(note.id, input)
               await refresh()
             }}
-            onDelete={() => removeNote(note.id)}
+            onDelete={() => removeNote(note.id, note.title)}
           />
         ))}
       </ul>

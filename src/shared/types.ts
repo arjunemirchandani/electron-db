@@ -84,6 +84,8 @@ export interface DbApi {
   /** Replace the live database with a backup (a safety snapshot is taken first). */
   restoreBackup: (filename: string) => Promise<void>
   deleteBackup: (filename: string) => Promise<void>
+  /** Bring a soft-deleted note back (the Undo in the delete toast). */
+  restoreNote: (id: number) => Promise<void>
   /** Pin or unpin a note; pinned notes sort first. */
   setPinned: (id: number, pinned: boolean) => Promise<void>
   /** App-level preferences from userData/settings.json (not the database). */

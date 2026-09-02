@@ -40,6 +40,18 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   await item.getByRole('button', { name: 'Delete' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
   await expect(item).toHaveCount(0)
+
+  // The toast offers Undo: the very same note returns, edit stamp intact.
+  await page
+    .locator('.toast', { hasText: 'First note' })
+    .getByRole('button', { name: 'Undo' })
+    .click()
+  await expect(item).toBeVisible()
+  await expect(item).toContainText('edited')
+
+  await item.getByRole('button', { name: 'Delete' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
+  await expect(item).toHaveCount(0)
   await expect(page.locator('.notes-empty')).toBeVisible()
 })
 

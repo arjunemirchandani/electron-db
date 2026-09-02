@@ -13,7 +13,9 @@ export const notes = sqliteTable('notes', {
   /** Flexible per-note properties; stored as a JSON object of strings. */
   metadata: text('metadata', { mode: 'json' }).$type<Record<string, string>>(),
   /** Pinned notes sort above everything else. */
-  pinned: integer('pinned', { mode: 'boolean' }).notNull().default(false)
+  pinned: integer('pinned', { mode: 'boolean' }).notNull().default(false),
+  /** Soft-delete stamp; hidden while set, purged after a day. */
+  deletedAt: text('deleted_at')
 })
 
 export const tags = sqliteTable('tags', {
