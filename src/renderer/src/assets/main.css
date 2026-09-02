@@ -209,6 +209,20 @@ code {
   border-color: rgba(105, 136, 230, 0.75);
 }
 
+/* Command-palette reveal: pulse the jumped-to note row */
+@keyframes note-flash {
+  from {
+    background-color: rgba(105, 136, 230, 0.28);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.note-row-flash {
+  animation: note-flash 1.2s ease-out;
+}
+
 /* Thin-column mode: the sidebar always shows as an icon rail so the
    320px content floor keeps room for the actual view */
 @media (max-width: 520px) {

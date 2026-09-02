@@ -7,7 +7,13 @@ import { metaPillClass } from '../lib/pillStyle'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
-function Notes(): React.JSX.Element {
+interface NotesProps {
+  /** Set by the command palette: scroll to and flash this note. */
+  revealNoteId?: number | null
+  onRevealHandled?: () => void
+}
+
+function Notes({ revealNoteId, onRevealHandled }: NotesProps): React.JSX.Element {
   const [notes, setNotes] = useState<Note[]>([])
   const [allTags, setAllTags] = useState<Tag[]>([])
   const [title, setTitle] = useState('')
@@ -44,6 +50,25 @@ function Notes(): React.JSX.Element {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    if (revealNoteId == null) return
+    const timer = setTimeout(() => {
+      setSearchQuery('')
+      setFilterTags([])
+      setMetaFilter(null)
+      setTimeout(() => {
+        const row = document.querySelector(`[data-note-id="${revealNoteId}"]`)
+        if (row) {
+          row.scrollIntoView({ block: 'center' })
+          row.classList.add('note-row-flash')
+          setTimeout(() => row.classList.remove('note-row-flash'), 1300)
+        }
+        onRevealHandled?.()
+      }, 60)
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [revealNoteId, onRevealHandled])
 
   const searchActive = searchQuery.trim().length > 0
 

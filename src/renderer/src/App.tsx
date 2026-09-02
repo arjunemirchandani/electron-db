@@ -4,6 +4,7 @@ import Notes from './components/Notes'
 import BackupsView from './components/BackupsView'
 import TagsView from './components/TagsView'
 import SettingsView from './components/SettingsView'
+import CommandPalette from './components/CommandPalette'
 import { Toaster } from './components/ui/toast'
 import { TooltipProvider } from './components/ui/tooltip'
 import Sidebar, { type View } from './components/Sidebar'
@@ -23,6 +24,7 @@ const readCollapsed = (): boolean => {
 
 function App(): React.JSX.Element {
   const [view, setView] = useState<View>('notes')
+  const [revealNoteId, setRevealNoteId] = useState<number | null>(null)
   const [collapsed, setCollapsed] = useState(readCollapsed)
 
   const toggleCollapsed = (): void =>
@@ -75,12 +77,21 @@ function App(): React.JSX.Element {
               </div>
               <Versions></Versions>
             </header>
-            {view === 'notes' && <Notes />}
+            {view === 'notes' && (
+              <Notes revealNoteId={revealNoteId} onRevealHandled={() => setRevealNoteId(null)} />
+            )}
             {view === 'backups' && <BackupsView />}
             {view === 'tags' && <TagsView />}
             {view === 'settings' && <SettingsView />}
           </main>
         </div>
+        <CommandPalette
+          onNavigate={setView}
+          onRevealNote={(id) => {
+            setView('notes')
+            setRevealNoteId(id)
+          }}
+        />
       </TooltipProvider>
     </Toaster>
   )

@@ -13,25 +13,10 @@ import {
 } from './ui/alert-dialog'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
+import { renderMarked } from '../lib/marked'
 import { IconButton } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
 import { PencilIcon, TrashIcon } from './icons'
-
-// Search matches arrive wrapped in \u0001…\u0002; render them as <mark>
-// elements so note text itself is never treated as markup.
-function renderMarked(text: string): React.ReactNode {
-  // eslint-disable-next-line no-control-regex -- the markers are deliberately control chars so they can't occur in note text
-  const parts = text.split(/\u0001(.*?)\u0002/g)
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <mark key={i} className="rounded-[3px] bg-[hsl(228_65%_60%/0.35)] px-[1px] text-inherit">
-        {part}
-      </mark>
-    ) : (
-      part
-    )
-  )
-}
 
 interface NoteRowProps {
   note: Note
@@ -108,7 +93,10 @@ function NoteRow({
 
   if (editing) {
     return (
-      <li className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] note-row-editing block">
+      <li
+        className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] note-row-editing block"
+        data-note-id={note.id}
+      >
         <form className="note-edit flex flex-wrap gap-2" onSubmit={save}>
           <input
             className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_160px] px-2.5 py-2 text-[14px]"
@@ -185,7 +173,10 @@ function NoteRow({
   }
 
   return (
-    <li className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] group/row @max-[520px]:flex-col @max-[520px]:gap-2 @max-[520px]:py-3">
+    <li
+      className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] group/row @max-[520px]:flex-col @max-[520px]:gap-2 @max-[520px]:py-3"
+      data-note-id={note.id}
+    >
       <div className="note-main flex min-w-0 flex-auto flex-col gap-1.5">
         <div className="note-title-line [overflow-wrap:anywhere]">
           <strong>
