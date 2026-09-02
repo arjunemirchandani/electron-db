@@ -23,6 +23,14 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
   await item.getByRole('button', { name: 'Edit' }).click()
   await page.locator('.note-edit button[type="submit"]').click()
   await expect(page.locator('.note-row').first()).toContainText('First note')
+
+  // Pinned beats freshness: pin the (now lower) second note.
+  const second = page.locator('.notes-list li', { hasText: 'Second note' })
+  await second.getByRole('button', { name: 'Pin' }).click()
+  await expect(page.locator('.note-row').first()).toContainText('Second note')
+  await second.getByRole('button', { name: 'Unpin' }).click()
+  await expect(page.locator('.note-row').first()).toContainText('First note')
+
   await page
     .locator('.notes-list li', { hasText: 'Second note' })
     .getByRole('button', { name: 'Delete' })

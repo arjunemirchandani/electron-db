@@ -18,6 +18,8 @@ export interface Note {
   updatedAt: string | null
   /** Flexible key/value properties (e.g. priority, url, due). */
   metadata: Record<string, string>
+  /** Pinned notes sort above everything else. */
+  pinned: boolean
   tags: Tag[]
   /** Search results only: title with matches wrapped in \u0001…\u0002. */
   highlightedTitle?: string
@@ -82,6 +84,8 @@ export interface DbApi {
   /** Replace the live database with a backup (a safety snapshot is taken first). */
   restoreBackup: (filename: string) => Promise<void>
   deleteBackup: (filename: string) => Promise<void>
+  /** Pin or unpin a note; pinned notes sort first. */
+  setPinned: (id: number, pinned: boolean) => Promise<void>
   /** App-level preferences from userData/settings.json (not the database). */
   getSettings: () => Promise<AppSettings>
   /** Merge a partial update into settings; returns the sanitized result. */

@@ -335,6 +335,10 @@ function Notes({
             onCancelAddTag={() => setAddingTagFor(null)}
             onAddTags={(names) => addTagsToNote(note.id, names)}
             onRemoveTag={(tagId) => removeTag(note.id, tagId)}
+            onTogglePin={async () => {
+              await window.api.setPinned(note.id, !note.pinned)
+              await refresh()
+            }}
             onFilterMeta={(key, value) =>
               setMetaFilter((current) =>
                 current && current.key === key && current.value === value ? null : { key, value }

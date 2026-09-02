@@ -43,6 +43,13 @@
       "when": 1787773003929,
       "tag": "0005_melodic_alex_wilder",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1787773004929,
+      "tag": "0006_notes_pinned",
+      "breakpoints": true
     }
   ]
 }

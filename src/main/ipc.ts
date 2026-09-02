@@ -54,7 +54,11 @@ export function registerIpcHandlers(): void {
     return getDb()
       .select()
       .from(notes)
-      .orderBy(desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`), desc(notes.id))
+      .orderBy(
+        desc(notes.pinned),
+        desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`),
+        desc(notes.id)
+      )
       .all()
       .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
   })
@@ -110,7 +114,11 @@ export function registerIpcHandlers(): void {
       return getDb()
         .select()
         .from(notes)
-        .orderBy(desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`), desc(notes.id))
+        .orderBy(
+          desc(notes.pinned),
+          desc(sql`COALESCE(${notes.updatedAt}, ${notes.createdAt})`),
+          desc(notes.id)
+        )
         .all()
         .map((note) => ({ ...withDefaults(note), tags: byNote.get(note.id) ?? [] }))
     }
@@ -149,6 +157,12 @@ export function registerIpcHandlers(): void {
         }
       ]
     })
+  })
+
+  ipcMain.handle('notes:setPinned', (_event, id: number, pinned: boolean): void => {
+    if (!Number.isInteger(id)) throw new Error('Invalid note id')
+    if (typeof pinned !== 'boolean') throw new Error('Invalid pinned value')
+    getDb().update(notes).set({ pinned }).where(eq(notes.id, id)).run()
   })
 
   ipcMain.handle('notes:delete', (_event, id: number): void => {

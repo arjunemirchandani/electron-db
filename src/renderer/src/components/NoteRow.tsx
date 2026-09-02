@@ -16,7 +16,7 @@ import { formatFull, formatRelative } from '../lib/time'
 import { renderMarked } from '../lib/marked'
 import { IconButton } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
-import { PencilIcon, TrashIcon } from './icons'
+import { PencilIcon, PinIcon, TrashIcon } from './icons'
 
 interface NoteRowProps {
   note: Note
@@ -29,6 +29,7 @@ interface NoteRowProps {
   onRemoveTag: (tagId: number) => void
   /** Toggle a metadata key/value filter in the parent list. */
   onFilterMeta: (key: string, value: string) => void
+  onTogglePin: () => void
   onUpdate: (input: {
     title: string
     content: string
@@ -47,6 +48,7 @@ function NoteRow({
   onAddTags,
   onRemoveTag,
   onFilterMeta,
+  onTogglePin,
   onUpdate,
   onDelete
 }: NoteRowProps): React.JSX.Element {
@@ -254,6 +256,13 @@ function NoteRow({
             ? `edited ${formatRelative(note.updatedAt)}`
             : formatRelative(note.createdAt)}
         </time>
+        <IconButton
+          label={note.pinned ? 'Unpin' : 'Pin'}
+          className={note.pinned ? 'pinned text-accent opacity-100!' : ''}
+          onClick={onTogglePin}
+        >
+          <PinIcon />
+        </IconButton>
         <IconButton label="Edit" onClick={startEdit}>
           <PencilIcon />
         </IconButton>

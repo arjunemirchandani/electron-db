@@ -11,7 +11,9 @@ export const notes = sqliteTable('notes', {
   /** Set on every edit; null means never edited. */
   updatedAt: text('updated_at'),
   /** Flexible per-note properties; stored as a JSON object of strings. */
-  metadata: text('metadata', { mode: 'json' }).$type<Record<string, string>>()
+  metadata: text('metadata', { mode: 'json' }).$type<Record<string, string>>(),
+  /** Pinned notes sort above everything else. */
+  pinned: integer('pinned', { mode: 'boolean' }).notNull().default(false)
 })
 
 export const tags = sqliteTable('tags', {

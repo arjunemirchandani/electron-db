@@ -26,6 +26,7 @@ const api: DbApi = {
   listBackups: () => ipcRenderer.invoke('backups:list'),
   restoreBackup: (filename: string) => ipcRenderer.invoke('backups:restore', filename),
   deleteBackup: (filename: string) => ipcRenderer.invoke('backups:delete', filename),
+  setPinned: (id: number, pinned: boolean) => ipcRenderer.invoke('notes:setPinned', id, pinned),
   getSettings: () => ipcRenderer.invoke('settings:get'),
   setSettings: (patch: Partial<AppSettings>) => ipcRenderer.invoke('settings:set', patch)
 }
