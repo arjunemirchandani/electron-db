@@ -16,13 +16,21 @@ export function toastError(message: string, description?: string): void {
   manager.add({ title: message, description, type: 'error', timeout: 6000 })
 }
 
-/** Success toast carrying an Undo action; the action closes the toast. */
+/** Success toast carrying an Undo action. The click closes this toast
+ *  explicitly (the primitive alone left it standing) before running
+ *  the undo, so callers can follow up with their own confirmation. */
 export function toastWithUndo(message: string, description: string, onUndo: () => void): void {
-  manager.add({
+  const id = manager.add({
     title: message,
     description,
     type: 'success',
     timeout: 6000,
-    actionProps: { children: 'Undo', onClick: onUndo }
+    actionProps: {
+      children: 'Undo',
+      onClick: () => {
+        manager.close(id)
+        onUndo()
+      }
+    }
   })
 }

@@ -4,7 +4,7 @@ import TagInput, { type TagInputHandle } from './TagInput'
 import NoteRow from './NoteRow'
 import { Toolbar } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
-import { toastWithUndo } from './toast-context'
+import { toastWithUndo, useToast } from './toast-context'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { SearchIcon } from './icons'
 
@@ -23,6 +23,7 @@ function Notes({
   tagFilter,
   onTagFilterHandled
 }: NotesProps): React.JSX.Element {
+  const toast = useToast()
   const [notes, setNotes] = useState<Note[]>([])
   const [allTags, setAllTags] = useState<Tag[]>([])
   const [title, setTitle] = useState('')
@@ -126,7 +127,10 @@ function Notes({
     await window.api.deleteNote(id)
     await refresh()
     toastWithUndo('Note deleted', `“${title}”`, () => {
-      void window.api.restoreNote(id).then(refresh)
+      void window.api.restoreNote(id).then(async () => {
+        await refresh()
+        toast('Note restored', `“${title}”`)
+      })
     })
   }
 

@@ -53,6 +53,11 @@ test('creates, lists, and deletes a note', async ({ launch }) => {
     .click()
   await expect(item).toBeVisible()
   await expect(item).toContainText('edited')
+  // The undo toast dismisses itself and a restored confirmation follows.
+  await expect(page.locator('.toast', { hasText: 'Note restored' })).toBeVisible()
+  await expect(
+    page.locator('.toast', { hasText: 'Note deleted' }).filter({ hasText: 'First note' })
+  ).toHaveCount(0)
 
   await item.getByRole('button', { name: 'Delete' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click()
