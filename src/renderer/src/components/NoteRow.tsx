@@ -3,6 +3,7 @@ import TagInput from './TagInput'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { renderMarked } from '../lib/marked'
+import { markdownPreview } from '../lib/markdownPreview'
 import { metaPillClass } from '../lib/pillStyle'
 import { IconButton } from './primitives'
 import { PencilIcon, PinIcon, TrashIcon } from './icons'
@@ -62,7 +63,12 @@ function NoteRow({
                   — {renderMarked(note.contentSnippet)}
                 </span>
               )
-            : note.content && <span className="note-content text-fg-muted"> — {note.content}</span>}
+            : note.content && (
+                <span className="note-content text-fg-muted">
+                  {' '}
+                  — {markdownPreview(note.content)}
+                </span>
+              )}
         </div>
         <span
           className="note-tags ml-1.5 inline-flex flex-wrap items-center gap-1"
