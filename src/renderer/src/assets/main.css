@@ -122,6 +122,72 @@
   }
 }
 
+/* Rendered-markdown typography for the note editor, on house tokens.
+   Components layer: outranks base resets (ul list-style, * font-weight),
+   yields to utilities. */
+@layer components {
+  .note-prose .ProseMirror > * + * {
+    margin-top: 0.6em;
+  }
+
+  .note-prose h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ev-c-text-1);
+  }
+
+  .note-prose h2 {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .note-prose h3 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .note-prose strong {
+    font-weight: 700;
+  }
+
+  .note-prose ul {
+    list-style: disc;
+    padding-left: 1.2em;
+  }
+
+  .note-prose ol {
+    list-style: decimal;
+    padding-left: 1.2em;
+  }
+
+  .note-prose li + li {
+    margin-top: 0.2em;
+  }
+
+  .note-prose blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 10px;
+    color: var(--ev-c-text-2);
+  }
+
+  .note-prose pre {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background-color: rgba(0, 0, 0, 0.35);
+    overflow-x: auto;
+  }
+
+  .note-prose pre code {
+    padding: 0;
+    background: none;
+  }
+
+  .note-prose hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+}
+
 body {
   min-height: 100vh;
   overflow-x: hidden;

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Note } from '../../../shared/types'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { IconButton } from './primitives'
 import { PinIcon, TrashIcon } from './icons'
+import MarkdownEditor, { type MarkdownEditorHandle } from './MarkdownEditor'
 
 interface NoteDetailProps {
   note: Note
@@ -32,10 +33,12 @@ function NoteDetail({
   )
   const [editError, setEditError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const editorRef = useRef<MarkdownEditorHandle>(null)
 
   const resetDrafts = (): void => {
     setDraftTitle(note.title)
     setDraftContent(note.content)
+    editorRef.current?.setMarkdown(note.content)
     setDraftMeta(Object.entries(note.metadata).map(([key, value]) => ({ key, value })))
     setEditError(null)
   }
@@ -127,13 +130,9 @@ function NoteDetail({
           onChange={(e) => setDraftTitle(e.target.value)}
           onKeyDown={onEscape}
         />
-        <textarea
-          className="min-h-[120px] min-w-0 flex-1 resize-none rounded-md border border-border-input bg-surface-input px-2.5 py-2 text-[14px] leading-relaxed text-fg"
-          value={draftContent}
-          placeholder="Content"
-          onChange={(e) => setDraftContent(e.target.value)}
-          onKeyDown={onEscape}
-        />
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col" onKeyDown={onEscape}>
+          <MarkdownEditor ref={editorRef} initial={note.content} onChange={setDraftContent} />
+        </div>
         <div className="note-edit-meta flex shrink-0 basis-auto flex-col gap-1.5">
           {draftMeta.map((rowItem, i) => (
             <div key={i} className="flex items-center gap-1.5">
