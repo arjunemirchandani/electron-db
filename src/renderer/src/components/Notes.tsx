@@ -27,13 +27,16 @@ interface NotesProps {
   /** Set by the sidebar: replace the tag filter with this one tag. */
   tagFilter?: string | null
   onTagFilterHandled?: () => void
+  /** From settings: show the formatting toolbar in the detail editor. */
+  showEditorToolbar: boolean
 }
 
 function Notes({
   revealNoteId,
   onRevealHandled,
   tagFilter,
-  onTagFilterHandled
+  onTagFilterHandled,
+  showEditorToolbar
 }: NotesProps): React.JSX.Element {
   const toast = useToast()
   const [notes, setNotes] = useState<Note[]>([])
@@ -396,6 +399,7 @@ function Notes({
             <NoteDetail
               key={`${selectedNote.id}:${selectedNote.updatedAt ?? ''}`}
               note={selectedNote}
+              showToolbar={showEditorToolbar}
               onSaved={refresh}
               onTogglePin={async () => {
                 await window.api.setPinned(selectedNote.id, !selectedNote.pinned)

@@ -46,6 +46,8 @@ export interface BackupInfo {
 export interface AppSettings {
   /** How many backups to keep before pruning the oldest (1-10). */
   backupRetention: number
+  /** Show the formatting toolbar above the note editor. */
+  showEditorToolbar: boolean
 }
 
 export interface DbApi {

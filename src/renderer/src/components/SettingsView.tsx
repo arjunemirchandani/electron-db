@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { AppSettings } from '../../../shared/types'
 import { useToast } from './toast-context'
+import { emitSettingsChanged } from '../lib/appEvents'
 
 const RETENTION_MIN = 1
 const RETENTION_MAX = 10
@@ -33,6 +34,7 @@ function SettingsView(): React.JSX.Element {
       // The main process clamps and returns the sanitized result.
       const next = await window.api.setSettings({ backupRetention: value })
       setSettings(next)
+      emitSettingsChanged()
       toast('Saved', `Backups to keep: ${next.backupRetention}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
@@ -85,6 +87,36 @@ function SettingsView(): React.JSX.Element {
               +
             </button>
           </div>
+        </div>
+      )}
+      {settings && (
+        <div className="settings-row flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border-subtle py-3">
+          <div className="min-w-0 flex-[1_1_240px]">
+            <strong className="text-[14px] text-fg">Formatting toolbar</strong>
+            <p className="mt-[2px] text-[12px] text-fg-muted">
+              Bold, heading, and list buttons above the note editor. Markdown shortcuts work either
+              way.
+            </p>
+          </div>
+          <label className="flex cursor-pointer items-center gap-2 text-[13px] text-fg">
+            <input
+              type="checkbox"
+              className="h-4 w-4 cursor-pointer accent-accent"
+              checked={settings.showEditorToolbar}
+              onChange={async (e) => {
+                setError(null)
+                try {
+                  const next = await window.api.setSettings({ showEditorToolbar: e.target.checked })
+                  setSettings(next)
+                  emitSettingsChanged()
+                  toast('Saved', `Formatting toolbar ${next.showEditorToolbar ? 'on' : 'off'}`)
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : String(err))
+                }
+              }}
+            />
+            Show toolbar
+          </label>
         </div>
       )}
     </div>

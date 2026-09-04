@@ -8,6 +8,8 @@ import MarkdownEditor, { type MarkdownEditorHandle } from './MarkdownEditor'
 
 interface NoteDetailProps {
   note: Note
+  /** From settings: show the formatting toolbar above the editor. */
+  showToolbar: boolean
   onSaved: () => Promise<void>
   onTogglePin: () => void
   onDelete: () => void
@@ -21,6 +23,7 @@ interface NoteDetailProps {
  *  are the e2e contract carried over from the retired inline editor. */
 function NoteDetail({
   note,
+  showToolbar,
   onSaved,
   onTogglePin,
   onDelete,
@@ -131,7 +134,12 @@ function NoteDetail({
           onKeyDown={onEscape}
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col" onKeyDown={onEscape}>
-          <MarkdownEditor ref={editorRef} initial={note.content} onChange={setDraftContent} />
+          <MarkdownEditor
+            ref={editorRef}
+            initial={note.content}
+            onChange={setDraftContent}
+            showToolbar={showToolbar}
+          />
         </div>
         <div className="note-edit-meta flex shrink-0 basis-auto flex-col gap-1.5">
           {draftMeta.map((rowItem, i) => (

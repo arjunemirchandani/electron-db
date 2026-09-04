@@ -10,7 +10,8 @@ import type { AppSettings } from '../shared/types'
 const SETTINGS_FILENAME = 'settings.json'
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  backupRetention: 3
+  backupRetention: 3,
+  showEditorToolbar: true
 }
 
 export const BACKUP_RETENTION_MIN = 1
@@ -27,6 +28,9 @@ function sanitize(raw: unknown): AppSettings {
   const settings = { ...DEFAULT_SETTINGS }
   if (raw !== null && typeof raw === 'object') {
     const record = raw as Record<string, unknown>
+    if (typeof record.showEditorToolbar === 'boolean') {
+      settings.showEditorToolbar = record.showEditorToolbar
+    }
     if (typeof record.backupRetention === 'number' && Number.isFinite(record.backupRetention)) {
       settings.backupRetention = Math.min(
         BACKUP_RETENTION_MAX,

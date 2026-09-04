@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import type { AppSettings } from '../../shared/types'
+import { onSettingsChanged } from './lib/appEvents'
 import Versions from './components/Versions'
 import Notes from './components/Notes'
 import BackupsView from './components/BackupsView'
@@ -27,6 +29,29 @@ function App(): React.JSX.Element {
   const [revealNoteId, setRevealNoteId] = useState<number | null>(null)
   const [pendingTagFilter, setPendingTagFilter] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  const [settings, setSettings] = useState<AppSettings | null>(null)
+
+  // App-level settings distribution: loaded once, refreshed whenever any
+  // view saves a change (SettingsView emits the signal after persisting).
+  useEffect(() => {
+    let cancelled = false
+    const load = (): void => {
+      window.api
+        .getSettings()
+        .then((next) => {
+          if (!cancelled) setSettings(next)
+        })
+        .catch(() => {
+          // defaults apply until a read succeeds
+        })
+    }
+    load()
+    const off = onSettingsChanged(load)
+    return () => {
+      cancelled = true
+      off()
+    }
+  }, [])
 
   const toggleCollapsed = (): void =>
     setCollapsed((current) => {
@@ -88,6 +113,7 @@ function App(): React.JSX.Element {
                 onRevealHandled={() => setRevealNoteId(null)}
                 tagFilter={pendingTagFilter}
                 onTagFilterHandled={() => setPendingTagFilter(null)}
+                showEditorToolbar={settings?.showEditorToolbar ?? true}
               />
             )}
             {view === 'backups' && <BackupsView />}
