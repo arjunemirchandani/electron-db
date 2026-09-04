@@ -7,3 +7,4 @@ out
 .idea
 playwright-report
 test-results
+identifier.sqlite
