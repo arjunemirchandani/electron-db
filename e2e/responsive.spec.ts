@@ -86,8 +86,10 @@ test('note rows become stacked cards in a narrow panel, with relative dates', as
   await expect(row.locator('.notes-date')).toHaveText('just now')
   await expect(row.locator('.notes-date')).toHaveAttribute('title', /\d{4}|\d{1,2}:\d{2}/)
 
+  // The list column is its own container: rows render as compact cards
+  // both in the wide split (narrow column) and at narrow windows.
   await setWidth(app, 900, 700)
-  await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('row')
+  await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('column')
   await setWidth(app, 360, 700)
   await expect.poll(() => row.evaluate((el) => getComputedStyle(el).flexDirection)).toBe('column')
 

@@ -25,7 +25,7 @@ test('notes can be edited inline, with escape to cancel and validation', async (
 
   // A real edit saves, marks the note as edited, and survives relaunch.
   await page.locator('.note-edit input').first().fill('Final title')
-  await page.locator('.note-edit input').nth(1).fill('second pass')
+  await page.locator('.note-edit textarea').fill('second pass')
   await page.locator('.note-edit .button-primary').click()
   await expect(row).toContainText('Final title — second pass')
   await expect(row.locator('.notes-date')).toHaveText('edited just now')

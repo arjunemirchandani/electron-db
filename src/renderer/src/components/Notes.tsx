@@ -2,6 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Note, Tag } from '../../../shared/types'
 import TagInput, { type TagInputHandle } from './TagInput'
 import NoteRow from './NoteRow'
+import NoteDetail from './NoteDetail'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from './ui/alert-dialog'
 import { Toolbar } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
 import { toastWithUndo, useToast } from './toast-context'
@@ -37,6 +48,8 @@ function Notes({
   const [searchResults, setSearchResults] = useState<Note[] | null>(null)
   const [filterMode, setFilterMode] = useState<'all' | 'any'>('all')
   const [addingTagFor, setAddingTagFor] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; title: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async (): Promise<void> => {
@@ -69,6 +82,7 @@ function Notes({
       setSearchQuery('')
       setFilterTags([])
       setMetaFilter(null)
+      setSelectedId(revealNoteId)
       setTimeout(() => {
         const row = document.querySelector(`[data-note-id="${revealNoteId}"]`)
         if (row) {
@@ -115,7 +129,8 @@ function Notes({
     setError(null)
     try {
       const tagNames = tagInputRef.current?.flush() ?? newTags
-      await window.api.createNote({ title, content, tags: tagNames })
+      const created = await window.api.createNote({ title, content, tags: tagNames })
+      setSelectedId(created.id)
       setTitle('')
       setContent('')
       setNewTags([])
@@ -126,6 +141,7 @@ function Notes({
   }
 
   const removeNote = async (id: number, title: string): Promise<void> => {
+    setSelectedId((current) => (current === id ? null : current))
     await window.api.deleteNote(id)
     await refresh()
     toastWithUndo('Note deleted', `“${title}”`, () => {
@@ -168,6 +184,8 @@ function Notes({
 
   const hueFor = (name: string): number | null | undefined =>
     allTags.find((t) => t.name === name)?.hue
+
+  const selectedNote = notes.find((n) => n.id === selectedId) ?? null
 
   const tagCounts = new Map<string, number>()
   for (const note of notes) {
@@ -290,78 +308,135 @@ function Notes({
           )}
         </Toolbar>
       )}
-      <ul className="notes-list min-h-0 flex-1 list-none overflow-y-auto p-0">
-        {visibleNotes.length === 0 && (
-          <li className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">
-            {searchActive && searchResults !== null ? (
-              <>
-                <strong>No notes match “{searchQuery.trim()}”.</strong>
-                <span>
-                  Search covers titles and content.{' '}
-                  <button
-                    className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline"
-                    onClick={() => setSearchQuery('')}
-                  >
-                    Clear the search
-                  </button>
-                  .
-                </span>
-              </>
-            ) : filterTags.length > 0 ? (
-              <>
-                <strong>
-                  No notes match {filterMode === 'all' ? 'all of' : 'any of'}{' '}
-                  {filterTags.join(', ')}.
-                </strong>
-                <span>
-                  Try switching to {filterMode === 'all' ? '“any”' : '“all”'} or{' '}
-                  <button
-                    className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline"
-                    onClick={() => setFilterTags([])}
-                  >
-                    clear the filter
-                  </button>
-                  .
-                </span>
-              </>
-            ) : (
-              <>
-                <strong>No notes yet — add one above.</strong>
-                <span>
-                  Tags help you find notes later; the filter bar appears once you have some.
-                </span>
-              </>
+      <div className="flex min-h-0 flex-1 gap-4">
+        <div
+          className={`@container flex min-h-0 w-full flex-col @min-[560px]:w-[300px]! @min-[560px]:shrink-0 ${
+            selectedNote ? '@max-[560px]:hidden' : ''
+          }`}
+        >
+          <ul className="notes-list min-h-0 flex-1 list-none overflow-y-auto p-0">
+            {visibleNotes.length === 0 && (
+              <li className="notes-empty flex flex-col gap-1 py-[18px] text-[14px] text-fg-muted [&_strong]:font-medium [&_strong]:text-fg">
+                {searchActive && searchResults !== null ? (
+                  <>
+                    <strong>No notes match “{searchQuery.trim()}”.</strong>
+                    <span>
+                      Search covers titles and content.{' '}
+                      <button
+                        className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline"
+                        onClick={() => setSearchQuery('')}
+                      >
+                        Clear the search
+                      </button>
+                      .
+                    </span>
+                  </>
+                ) : filterTags.length > 0 ? (
+                  <>
+                    <strong>
+                      No notes match {filterMode === 'all' ? 'all of' : 'any of'}{' '}
+                      {filterTags.join(', ')}.
+                    </strong>
+                    <span>
+                      Try switching to {filterMode === 'all' ? '“any”' : '“all”'} or{' '}
+                      <button
+                        className="tag-filter-clear cursor-pointer border-0 bg-transparent p-0 text-[12px] font-medium text-[#8fa8ff] hover:underline"
+                        onClick={() => setFilterTags([])}
+                      >
+                        clear the filter
+                      </button>
+                      .
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <strong>No notes yet — add one above.</strong>
+                    <span>
+                      Tags help you find notes later; the filter bar appears once you have some.
+                    </span>
+                  </>
+                )}
+              </li>
             )}
-          </li>
-        )}
-        {visibleNotes.map((note) => (
-          <NoteRow
-            key={note.id}
-            note={note}
-            tagSuggestions={allTags.map((t) => t.name)}
-            hueFor={hueFor}
-            addingTag={addingTagFor === note.id}
-            onStartAddTag={() => setAddingTagFor(note.id)}
-            onCancelAddTag={() => setAddingTagFor(null)}
-            onAddTags={(names) => addTagsToNote(note.id, names)}
-            onRemoveTag={(tagId) => removeTag(note.id, tagId)}
-            onTogglePin={async () => {
-              await window.api.setPinned(note.id, !note.pinned)
-              await refresh()
-            }}
-            onFilterMeta={(key, value) =>
-              setMetaFilter((current) =>
-                current && current.key === key && current.value === value ? null : { key, value }
-              )
-            }
-            onUpdate={async (input) => {
-              await window.api.updateNote(note.id, input)
-              await refresh()
-            }}
-            onDelete={() => removeNote(note.id, note.title)}
-          />
-        ))}
-      </ul>
+            {visibleNotes.map((note) => (
+              <NoteRow
+                key={note.id}
+                note={note}
+                tagSuggestions={allTags.map((t) => t.name)}
+                hueFor={hueFor}
+                selected={note.id === selectedId}
+                addingTag={addingTagFor === note.id}
+                onStartAddTag={() => setAddingTagFor(note.id)}
+                onCancelAddTag={() => setAddingTagFor(null)}
+                onAddTags={(names) => addTagsToNote(note.id, names)}
+                onRemoveTag={(tagId) => removeTag(note.id, tagId)}
+                onTogglePin={async () => {
+                  await window.api.setPinned(note.id, !note.pinned)
+                  await refresh()
+                }}
+                onFilterMeta={(key, value) =>
+                  setMetaFilter((current) =>
+                    current && current.key === key && current.value === value
+                      ? null
+                      : { key, value }
+                  )
+                }
+                onSelect={() => setSelectedId(note.id)}
+                onDelete={() => setPendingDelete({ id: note.id, title: note.title })}
+              />
+            ))}
+          </ul>
+        </div>
+        <div
+          className={`flex min-h-0 min-w-0 flex-1 flex-col @min-[560px]:border-l @min-[560px]:border-border-subtle @min-[560px]:pl-4 ${
+            selectedNote ? '' : '@max-[560px]:hidden'
+          }`}
+        >
+          {selectedNote ? (
+            <NoteDetail
+              key={`${selectedNote.id}:${selectedNote.updatedAt ?? ''}`}
+              note={selectedNote}
+              onSaved={refresh}
+              onTogglePin={async () => {
+                await window.api.setPinned(selectedNote.id, !selectedNote.pinned)
+                await refresh()
+              }}
+              onDelete={() => setPendingDelete({ id: selectedNote.id, title: selectedNote.title })}
+              onBack={() => setSelectedId(null)}
+            />
+          ) : (
+            <div className="flex flex-1 items-center justify-center text-[13px] text-fg-muted">
+              Select a note to view and edit it
+            </div>
+          )}
+        </div>
+      </div>
+
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this note?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{pendingDelete?.title}&rdquo; will be removed permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (pendingDelete) void removeNote(pendingDelete.id, pendingDelete.title)
+                setPendingDelete(null)
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

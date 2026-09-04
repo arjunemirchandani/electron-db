@@ -1,25 +1,15 @@
-import { useState } from 'react'
 import type { Note } from '../../../shared/types'
 import TagInput from './TagInput'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from './ui/alert-dialog'
 import { tagChipClass, tagStyle } from '../lib/tagColor'
 import { formatFull, formatRelative } from '../lib/time'
 import { renderMarked } from '../lib/marked'
-import { IconButton } from './primitives'
 import { metaPillClass } from '../lib/pillStyle'
+import { IconButton } from './primitives'
 import { PencilIcon, PinIcon, TrashIcon } from './icons'
 
 interface NoteRowProps {
   note: Note
+  selected: boolean
   tagSuggestions: string[]
   hueFor: (name: string) => number | null | undefined
   addingTag: boolean
@@ -30,16 +20,16 @@ interface NoteRowProps {
   /** Toggle a metadata key/value filter in the parent list. */
   onFilterMeta: (key: string, value: string) => void
   onTogglePin: () => void
-  onUpdate: (input: {
-    title: string
-    content: string
-    metadata: Record<string, string>
-  }) => Promise<void>
+  /** Open this note in the detail pane. */
+  onSelect: () => void
   onDelete: () => void
 }
 
+/** A list item. Viewing and editing happen in the detail pane; the row
+ *  keeps quick actions (pin, delete, tags) and selects on click. */
 function NoteRow({
   note,
+  selected,
   tagSuggestions,
   hueFor,
   addingTag,
@@ -49,135 +39,16 @@ function NoteRow({
   onRemoveTag,
   onFilterMeta,
   onTogglePin,
-  onUpdate,
+  onSelect,
   onDelete
 }: NoteRowProps): React.JSX.Element {
-  const [editing, setEditing] = useState(false)
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const [draftTitle, setDraftTitle] = useState('')
-  const [draftContent, setDraftContent] = useState('')
-  const [draftMeta, setDraftMeta] = useState<Array<{ key: string; value: string }>>([])
-  const [editError, setEditError] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
-
-  const startEdit = (): void => {
-    setDraftTitle(note.title)
-    setDraftContent(note.content)
-    setDraftMeta(Object.entries(note.metadata).map(([key, value]) => ({ key, value })))
-    setEditError(null)
-    setEditing(true)
-  }
-
-  const buildMetadata = (): Record<string, string> => {
-    const metadata: Record<string, string> = {}
-    for (const { key, value } of draftMeta) {
-      const trimmed = key.trim()
-      if (!trimmed) continue
-      if (trimmed in metadata) throw new Error(`Duplicate property "${trimmed}"`)
-      metadata[trimmed] = value
-    }
-    return metadata
-  }
-
-  const save = async (e?: React.FormEvent): Promise<void> => {
-    e?.preventDefault()
-    setSaving(true)
-    setEditError(null)
-    try {
-      await onUpdate({ title: draftTitle, content: draftContent, metadata: buildMetadata() })
-      setEditing(false)
-    } catch (err) {
-      setEditError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (editing) {
-    return (
-      <li
-        className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] note-row-editing block"
-        data-note-id={note.id}
-      >
-        <form className="note-edit flex flex-wrap gap-2" onSubmit={save}>
-          <input
-            className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_160px] px-2.5 py-2 text-[14px]"
-            value={draftTitle}
-            autoFocus
-            placeholder="Title"
-            onChange={(e) => setDraftTitle(e.target.value)}
-            onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
-          />
-          <input
-            className="min-w-0 rounded-md border border-border-input bg-surface-input text-fg flex-[1_1_160px] px-2.5 py-2 text-[14px]"
-            value={draftContent}
-            placeholder="Content (optional)"
-            onChange={(e) => setDraftContent(e.target.value)}
-            onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
-          />
-          <div className="note-edit-meta flex basis-full flex-col gap-1.5">
-            {draftMeta.map((row, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <input
-                  className="min-w-0 rounded-sm border border-border-input bg-surface-input text-fg flex-[1_1_100px] px-2 py-[5px] text-[12px]"
-                  value={row.key}
-                  placeholder="Property"
-                  aria-label="Property name"
-                  onChange={(e) =>
-                    setDraftMeta((rows) =>
-                      rows.map((r, j) => (j === i ? { ...r, key: e.target.value } : r))
-                    )
-                  }
-                />
-                <input
-                  className="min-w-0 rounded-sm border border-border-input bg-surface-input text-fg flex-[1_1_100px] px-2 py-[5px] text-[12px]"
-                  value={row.value}
-                  placeholder="Value"
-                  aria-label="Property value"
-                  onChange={(e) =>
-                    setDraftMeta((rows) =>
-                      rows.map((r, j) => (j === i ? { ...r, value: e.target.value } : r))
-                    )
-                  }
-                />
-                <button
-                  type="button"
-                  className="tag-remove meta-remove cursor-pointer border-0 bg-transparent p-0 text-[13px] leading-none text-inherit opacity-70 hover:text-white"
-                  title="Remove property"
-                  onClick={() => setDraftMeta((rows) => rows.filter((_, j) => j !== i))}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="btn meta-add self-start border-dashed bg-transparent px-2.5 py-[3px] text-[12px]"
-              onClick={() => setDraftMeta((rows) => [...rows, { key: '', value: '' }])}
-            >
-              + Property
-            </button>
-          </div>
-          <button type="submit" className="btn button-primary" disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
-          </button>
-          <button type="button" className="btn" onClick={() => setEditing(false)} disabled={saving}>
-            Cancel
-          </button>
-          {editError && (
-            <p className="notes-error note-edit-error m-0 basis-full text-[13px] text-[#e66]">
-              {editError}
-            </p>
-          )}
-        </form>
-      </li>
-    )
-  }
-
   return (
     <li
-      className="note-row flex items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 hover:bg-white/[0.035] group/row @max-[520px]:flex-col @max-[520px]:gap-2 @max-[520px]:py-3"
+      className={`note-row group/row flex cursor-pointer items-start justify-between gap-3 rounded-md border-b border-border-subtle px-2 py-2.5 text-[14px] text-fg transition-colors duration-[120ms] last:border-b-0 ${
+        selected ? 'bg-accent/[0.1]' : 'hover:bg-white/[0.035]'
+      } @max-[520px]:flex-col @max-[520px]:gap-2 @max-[520px]:py-3`}
       data-note-id={note.id}
+      onClick={onSelect}
     >
       <div className="note-main flex min-w-0 flex-auto flex-col gap-1.5">
         <div className="note-title-line [overflow-wrap:anywhere]">
@@ -193,7 +64,10 @@ function NoteRow({
               )
             : note.content && <span className="note-content text-fg-muted"> — {note.content}</span>}
         </div>
-        <span className="note-tags ml-1.5 inline-flex flex-wrap items-center gap-1">
+        <span
+          className="note-tags ml-1.5 inline-flex flex-wrap items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           {note.tags.map((tag) => (
             <span
               key={tag.id}
@@ -232,7 +106,10 @@ function NoteRow({
           )}
         </span>
         {Object.keys(note.metadata).length > 0 && (
-          <span className="note-meta inline-flex flex-wrap gap-1">
+          <span
+            className="note-meta inline-flex flex-wrap gap-1"
+            onClick={(e) => e.stopPropagation()}
+          >
             {Object.entries(note.metadata).map(([key, value]) => (
               <button
                 key={key}
@@ -247,7 +124,10 @@ function NoteRow({
           </span>
         )}
       </div>
-      <div className="note-foot flex shrink-0 items-center gap-2 @max-[520px]:w-full @max-[520px]:justify-between">
+      <div
+        className="note-foot flex shrink-0 items-center gap-2 @max-[520px]:w-full @max-[520px]:justify-between"
+        onClick={(e) => e.stopPropagation()}
+      >
         <time
           className="notes-date cursor-default text-[12px] whitespace-nowrap text-fg-muted"
           title={formatFull(note.updatedAt ?? note.createdAt)}
@@ -263,34 +143,12 @@ function NoteRow({
         >
           <PinIcon />
         </IconButton>
-        <IconButton label="Edit" onClick={startEdit}>
+        <IconButton label="Edit" onClick={onSelect}>
           <PencilIcon />
         </IconButton>
-        <IconButton label="Delete" onClick={() => setConfirmingDelete(true)}>
+        <IconButton label="Delete" onClick={onDelete}>
           <TrashIcon />
         </IconButton>
-        <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete this note?</AlertDialogTitle>
-              <AlertDialogDescription>
-                &ldquo;{note.title}&rdquo; will be removed permanently.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                onClick={() => {
-                  setConfirmingDelete(false)
-                  onDelete()
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </li>
   )
